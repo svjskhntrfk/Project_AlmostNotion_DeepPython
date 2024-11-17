@@ -28,7 +28,9 @@ templates = Jinja2Templates(directory="templates")
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     return templates.TemplateResponse("landing.html", {"request": request})
-
+@app.get("/registration/password", response_class=HTMLResponse)
+async def registration(request: Request):
+    return templates.TemplateResponse("reg_password.html", {"request": request})
 @app.get("/registration", response_class=HTMLResponse)
 async def registration(request: Request):
     return templates.TemplateResponse("reg.html", {"request": request})
