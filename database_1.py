@@ -61,19 +61,3 @@ def get_all_users():
     return users
 
 
-if __name__ == "__main__":
-    
-    create_table()
-
-    
-    add_user("sisipopki@email.com", "12345678")
-    add_user("popkisisi@email.com", "12345678")
-    add_user("popkisisi@email.com", "12345678")
-    
-    
-    users = get_all_users()
-    print("Список пользователей:")
-    for user in users:
-        print(user)
-
-
