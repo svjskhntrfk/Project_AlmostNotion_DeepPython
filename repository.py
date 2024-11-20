@@ -1,12 +1,12 @@
 from sqlalchemy import select
 
-from schemas import UserInfoAdd, UserId
+from schemas import UserId, UserInfoReg
 from db import new_session, UserOrm
 
 
 class UserRepo:
     @classmethod
-    async def add_one(cls, data : UserInfoAdd):
+    async def add_one(cls, data : UserInfoReg):
         async with new_session() as session:
             user_dict = data.model_dump()
 
