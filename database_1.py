@@ -50,7 +50,3 @@ async def add_user(email, password):
         except aiosqlite.IntegrityError as e:
             print(f"Ошибка: Не удалось добавить пользователя. Причина: {e}")
 
-
-=
-
-
