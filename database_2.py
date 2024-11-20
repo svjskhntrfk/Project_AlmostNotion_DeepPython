@@ -4,7 +4,7 @@ from pymongo import MongoClient
 client = MongoClient("localhost", 27017)
 
 #создаем базу данных
-db = client['pochti_notion']
+db = client['almost_notion']
 
 #создаем коллекции
 todo_collection = db['todo_list']

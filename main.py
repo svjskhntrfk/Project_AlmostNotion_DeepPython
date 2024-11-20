@@ -1,9 +1,9 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from database_1 import create_table, add_user, is_email_registered
 from router import router as users_router
-from schemas import  UserInfoReg
+from schemas import  UserInfoReg, UserInfoAuth
 
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -49,9 +49,11 @@ async def login(user_data: UserInfoAuth) -> dict:
     user = await is_email_registered(email=user_data.email)
     if not user:
         # TODO FOR MARIA if user not in the table
-        return None
+        raise HTTPException(status_code=404, detail="Email not found")
+        #return {'message': 'Пользователь с таким email не найден.'}
     if not verify_password(user_data.password, user.password):
         # TODO FOR MARIA if passwords dont match
-        return None
+        raise HTTPException(status_code=404, detail="Email not found")
+        # return {'message': 'Неверный пароль.'}
     return {'message': 'Вы успешно зашли в аккаунт!'}
 

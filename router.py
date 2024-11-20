@@ -4,7 +4,7 @@ from typing import Annotated
 from fastapi.params import Depends
 
 from repository import UserRepo
-from schemas import UserInfoAdd, UserId
+from schemas import UserInfoReg, UserId
 
 router = APIRouter(
     prefix="/users",
@@ -13,7 +13,7 @@ router = APIRouter(
 
 @router.post("/tasks")
 async def add_user(
-        user : Annotated[UserInfoAdd, Depends()],
+        user : Annotated[UserInfoReg, Depends()],
 ):
     user_id = await UserRepo.add_one(user)
     return {"ok": True, "user_id": user_id}
