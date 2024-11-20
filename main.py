@@ -38,6 +38,7 @@ templates = Jinja2Templates(directory="templates")
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     return templates.TemplateResponse("landing.html", {"request": request})
+  
 @app.post("/registration")
 async def registration(user_data: UserInfoReg) -> dict:
     user_dict = user_data.dict()
