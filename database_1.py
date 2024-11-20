@@ -1,63 +1,52 @@
-import sqlite3
+import aiosqlite
 from datetime import datetime
-
-def connect_db():
-    conn = sqlite3.connect('users.db')
-    return conn
-
-def create_table():
-    conn = connect_db()
-    cursor = conn.cursor()
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        email TEXT NOT NULL UNIQUE,
-        password TEXT NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-    ''')
-    conn.commit()
-    conn.close()
-    print("База данных и таблица успешно созданы.")
+import asyncio
 
 
-def is_email_registered(email):
-    conn = connect_db()
-    cursor = conn.cursor()
-    cursor.execute('SELECT COUNT(*) FROM users WHERE email = ?', (email,))
-    count = cursor.fetchone()[0]
-    conn.close()
-    return count > 0
+async def connect_db():
+    print("Подключение к базе данных...")
+    return await aiosqlite.connect('users.db')
 
 
-def add_user(email, password):
-    if is_email_registered(email):
-        print("Ошибка: Пользователь с такой почтой уже зарегистрирован.")
+async def create_table():
+    print("Создание таблицы...")
+    async with await connect_db() as conn:
+        await conn.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT NOT NULL UNIQUE,
+            password TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        ''')
+        await conn.commit()
+        print("База данных и таблица успешно созданы.")
+
+
+async def is_email_registered(email):
+    print(f"Проверка, зарегистрирован ли email: {email}")
+    async with await connect_db() as conn:
+        cursor = await conn.execute('SELECT email, password, created_at FROM users WHERE email = ?', (email,))
+        user = await cursor.fetchone()
+        print(f"Результат проверки: {user}")
+        return user  # Возвращает None, если пользователь не найден
+
+
+async def add_user(email, password):
+    print(f"Добавление пользователя: {email}")
+    user = await is_email_registered(email)
+    if user:
+        print(f"Ошибка: Пользователь с такой почтой уже зарегистрирован. Данные: {user}")
         return
 
-    conn = connect_db()
-    cursor = conn.cursor()
-    
-    try:
-        cursor.execute('''
-        INSERT INTO users (email, password, created_at)
-        VALUES (?, ?, ?)
-        ''', (email, password, datetime.now()))
-        conn.commit()
-        print("Пользователь успешно добавлен!")
-    except:
-        Exception
-    finally:
-        conn.close()
-
-def get_all_users():
-    conn = connect_db()
-    cursor = conn.cursor()
-    
-    cursor.execute('SELECT * FROM users')
-    users = cursor.fetchall()
-    
-    conn.close()
-    return users
-
+    async with await connect_db() as conn:
+        try:
+            await conn.execute('''
+            INSERT INTO users (email, password, created_at)
+            VALUES (?, ?, ?)
+            ''', (email, password, datetime.now()))
+            await conn.commit()
+            print(f"Пользователь {email} успешно добавлен!")
+        except aiosqlite.IntegrityError as e:
+            print(f"Ошибка: Не удалось добавить пользователя. Причина: {e}")
 
