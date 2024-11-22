@@ -3,7 +3,6 @@ from fastapi import APIRouter
 from typing import Annotated
 from fastapi.params import Depends
 
-from repository import UserRepo
 from schemas import UserInfoReg, UserId
 
 router = APIRouter(

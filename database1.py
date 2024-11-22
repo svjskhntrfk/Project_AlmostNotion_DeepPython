@@ -1,9 +1,7 @@
-from datetime import datetime
 import sqlalchemy
-from sqlalchemy import Integer, func
-from sqlalchemy.orm import DeclarativeBase, declared_attr, Mapped, mapped_column
 from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
-
+import models
+from models import *
 from config import settings
 
 DATABASE_URL = settings.get_db_url()
@@ -14,13 +12,15 @@ engine = create_async_engine(url=DATABASE_URL)
 async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
 
 # Базовый класс для всех моделей
-class Base(AsyncAttrs, DeclarativeBase):
-    __abstract__ = True  # Класс абстрактный, чтобы не создавать отдельную таблицу для него
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    created_at: Mapped[datetime] = mapped_column(server_default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
 
-    @declared_attr.directive
-    def __tablename__(cls) -> str:
-        return cls.__name__.lower() + 's'
+async def create_tables():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+async def create_user(username: str, email: str, password: str, password_again: str):
+    async with async_session_maker() as session:
+        async with session.begin():
+            new_user = User(username=username, email=email, password=password)
+            return session.add(new_user)
+        #TODO is_email_registered и проверки на это

@@ -1,34 +1,22 @@
 from sqlalchemy import ForeignKey, JSON, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from database1 import Base
+from sqlalchemy.orm import DeclarativeBase, declared_attr
+from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
+from sqlalchemy import Integer, func
+from datetime import datetime
 import enum
 
+class Base(AsyncAttrs, DeclarativeBase):
+    __abstract__ = True  # Класс абстрактный, чтобы не создавать отдельную таблицу для него
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    created_at: Mapped[datetime] = mapped_column(server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
+
+    @declared_attr.directive
+    def __tablename__(cls) -> str:
+        return cls.__name__.lower() + 's'
 class User(Base):
     username: Mapped[str] = mapped_column(unique=True)
     email: Mapped[str] = mapped_column(unique=True)
     password: Mapped[str]
-    profile_id: Mapped[int | None] = mapped_column(ForeignKey('profiles.id'))
-
-    profile: Mapped["Profile"] = relationship(
-    "Profile",
-    back_populates="user",
-    uselist=False,  # Ключевой параметр для связи один-к-одному
-    lazy="joined"  # Автоматически подгружает profile при запросе user
-    )
-
-class GenderEnum(str, enum.Enum):
-    MALE = "мужчина"
-    FEMALE = "женщина"
-
-class Profile(Base):
-    first_name: Mapped[str]
-    last_name: Mapped[str | None]
-    age: Mapped[int | None]
-    gender: Mapped[GenderEnum]
-
-    user: Mapped["User"] = relationship(
-        "User",
-        back_populates="profile",
-        uselist=False
-    )
-
