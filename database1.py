@@ -1,4 +1,5 @@
 import sqlalchemy
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
 import models
 from models import *
@@ -18,9 +19,18 @@ async def create_tables():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-async def create_user(username: str, email: str, password: str, password_again: str):
+
+async def create_user(username: str, email: str, password: str):
     async with async_session_maker() as session:
         async with session.begin():
             new_user = User(username=username, email=email, password=password)
-            return session.add(new_user)
-        #TODO is_email_registered и проверки на это
+            session.add(new_user)
+
+
+async def is_email_registered(email: str):
+    async with async_session_maker() as session:
+        async with session.begin():
+            query = select(User).filter_by(email=email)
+            result = await session.execute(query)
+            user = result.scalars().first()
+            return user

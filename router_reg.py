@@ -2,6 +2,10 @@ from fastapi import APIRouter
 from fastapi import FastAPI, HTTPException
 from schemas import  UserInfoReg, UserInfoAuth
 from passlib.context import CryptContext
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
+from starlette.responses import HTMLResponse
+from starlette.requests import Request
 import database1
 from database1 import *
 
@@ -26,15 +30,13 @@ async def registration(user_data: UserInfoReg) -> dict:
     await create_user(**user_dict)
     return {'message': 'Вы успешно зарегистрированы!'}
 
-# @router.post("/login")
-# async def login(user_data: UserInfoAuth) -> dict:
-#     user = await is_email_registered(email=user_data.email)
-#     if not user:
-#         # TODO FOR MARIA if user not in the table
-#         raise HTTPException(status_code=404, detail="Email not found")
-#         #return {'message': 'Пользователь с таким email не найден.'}
-#     if not verify_password(user_data.password, user.password):
-#         # TODO FOR MARIA if passwords dont match
-#         raise HTTPException(status_code=404, detail="Email not found")
-#         # return {'message': 'Неверный пароль.'}
-#     return {'message': 'Вы успешно зашли в аккаунт!'}
+@router.post("/login")
+async def login(user_data: UserInfoAuth) -> dict:
+    user = await is_email_registered(email=user_data.email)
+    if not user:
+        # TODO FOR MARIA if user not in the table
+        raise HTTPException(status_code=404, detail="Email not found")
+    if not verify_password(user_data.password, user.password):
+        # TODO FOR MARIA if passwords dont match
+        raise HTTPException(status_code=404, detail="Email not found")
+    return {'message': 'Вы успешно зашли в аккаунт!'}
