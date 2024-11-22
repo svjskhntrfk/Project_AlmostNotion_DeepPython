@@ -1,0 +1,44 @@
+body {
+    background-color: #F0E4D8;
+    font-family: "Philosopher", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    justify-content: center;
+    align-items: center;
+}
+
+a {
+    text-decoration: none;
+    color: #F0E4D8;
+}
+
+header{
+    width: 100%;
+	background: #DD8E75;
+	height: 80px;
+    border: solid #C9C9C9;
+    border-bottom-right-radius: 25px;
+    border-bottom-left-radius: 25px;
+    margin-bottom: 50px;
+}
+
+body {
+  margin: 0px;
+}
+
+.name{
+    position: absolute;
+    top: 20px;
+	right: 200px;
+    font-size: 30px;
+}
+
+.title{
+    color: #B14F44;
+    font-size: 30px;
+    margin-top: 30px;
+}
+
+main{
+
+}
