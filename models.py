@@ -17,6 +17,6 @@ class Base(AsyncAttrs, DeclarativeBase):
     def __tablename__(cls) -> str:
         return cls.__name__.lower() + 's'
 class User(Base):
-    username: Mapped[str] = mapped_column(unique=True)
+    username: Mapped[str]
     email: Mapped[str] = mapped_column(unique=True)
     password: Mapped[str]
