@@ -2,7 +2,6 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
 from database1 import *
-from router import router as users_router
 from router_reg import router as reg_router
 from schemas import  UserInfoReg, UserInfoAuth
 
@@ -30,7 +29,6 @@ async def lifespan(app: FastAPI):
     print("Выключение")
 
 app = FastAPI(lifespan=lifespan)
-app.include_router(users_router)
 app.include_router(reg_router)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
