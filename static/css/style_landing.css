@@ -7,11 +7,11 @@ body {
     align-items: center;
 }
 
-
 .landing {
     color: #B14F44;
     text-align: center;
     font-weight: 300;
+    font-size: 50px;
 }
 
 .try_registration {
@@ -23,7 +23,9 @@ body {
     padding: 8px 16px;
     text-align: center;
     margin-left: 20px;
+    font-size: 20px;
 }
+
 a {
     text-decoration: none;
     color: #F0E4D8;
@@ -46,4 +48,8 @@ header {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 60%;
+}
+
+nav {
+    font-size: 23px;
 }
