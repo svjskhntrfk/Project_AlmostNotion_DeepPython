@@ -30,12 +30,12 @@ async def registration(email = Form(), username = Form(), password = Form()) -> 
     return {'message': 'registration succsesful!'}
 
 @router.post("/login")
-async def login(user_data: UserInfoAuth) -> dict:
-    user = await is_email_registered(email=user_data.email)
+async def login(email = Form(),password = Form()) -> dict:
+    user = await is_email_registered(email=email)
     if not user:
         # TODO FOR MARIA if user not in the table
         raise HTTPException(status_code=404, detail="Email not found")
-    if not verify_password(user_data.password, user.password):
+    if not verify_password(password, user.password):
         # TODO FOR MARIA if passwords dont match
         raise HTTPException(status_code=404, detail="Email not found")
-    return {'message': 'Вы успешно зашли в аккаунт!'}
+    return {'message': 'login succsesful!'}
