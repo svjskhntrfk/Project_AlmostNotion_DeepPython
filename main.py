@@ -38,3 +38,18 @@ templates = Jinja2Templates(directory="templates")
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     return templates.TemplateResponse("landing.html", {"request": request})
+
+
+@app.get("/registration", response_class=HTMLResponse)
+async def registration_page(request: Request):
+    return templates.TemplateResponse("reg.html", {"request": request})
+
+@app.get("/login", response_class=HTMLResponse)
+async def login_page(request: Request):
+    return templates.TemplateResponse("entry.html", {"request": request})
+
+@app.get("/main", response_class=HTMLResponse) #кнопка регистрации с реги все равно не работает
+async def main(request: Request):
+    return templates.TemplateResponse("main_page.html", {"request": request})
+
+
