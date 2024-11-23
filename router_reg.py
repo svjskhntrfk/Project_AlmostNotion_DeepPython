@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Form
 from fastapi import FastAPI, HTTPException
 from schemas import  UserInfoReg, UserInfoAuth
 from passlib.context import CryptContext
@@ -24,11 +24,10 @@ router = APIRouter(
 )
 
 @router.post("/registration")
-async def registration(user_data: UserInfoReg) -> dict:
-    user_dict = user_data.dict()
-    user_dict['password'] = get_password_hash(user_data.password)
+async def registration(email = Form(), username = Form(), password = Form()) -> dict:
+    user_dict = {"email":email, "username":username, "password": get_password_hash(password)}
     await create_user(**user_dict)
-    return {'message': 'Вы успешно зарегистрированы!'}
+    return {'message': 'registration succsesful!'}
 
 @router.post("/login")
 async def login(user_data: UserInfoAuth) -> dict:

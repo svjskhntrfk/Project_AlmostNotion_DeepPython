@@ -17,15 +17,15 @@
         <main>
             <div class="entry_section">
                 <p style="font-size: 30px; text-align: center">Регистрация<p>
-                <div class="input">
+                <form action="users/registration" method="post">
                     <label for="email">E-mail</label>
                     <input type="text" id="email" name="email" required placeholder="Введите Ваш E-mail">
                     <label for="username">Имя</label>
                     <input type="text" id="username" name="username" required placeholder="Введите Ваше имя">
                     <label for="password">Пароль</label>
                     <input type="password" id="password" name="password" required placeholder="Придумайте пароль">
-                </div>
-                <button class="entry_button"><a href="/main" style="font-size: 20px;">Зарегистрироваться</a></button>
+                    <input type="submit" value="Зарегистрироваться" />
+                </form>
             </div>
         </main>
         <footer>
