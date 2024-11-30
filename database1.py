@@ -34,3 +34,11 @@ async def is_email_registered(email: str):
             result = await session.execute(query)
             user = result.scalars().first()
             return user
+
+async def get_user_by_id(id: int):
+    async with async_session_maker() as session:
+        async with session.begin():
+            query = select(User).filter_by(id=id)
+            result = await session.execute(query)
+            user = result.scalars().first()
+            return user

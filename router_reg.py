@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Form
 from fastapi import FastAPI, HTTPException
+import starlette.status as status
+from fastapi.responses import RedirectResponse
 from schemas import  UserInfoReg, UserInfoAuth
 from passlib.context import CryptContext
 from fastapi.templating import Jinja2Templates
@@ -11,7 +13,8 @@ from database1 import *
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-
+def get_email_hash(email: str) -> str:
+    return pwd_context.hash(email)
 def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
@@ -33,9 +36,8 @@ async def registration(email = Form(), username = Form(), password = Form()) -> 
 async def login(email = Form(),password = Form()) -> dict:
     user = await is_email_registered(email=email)
     if not user:
-        # TODO FOR MARIA if user not in the table
         raise HTTPException(status_code=404, detail="Email not found")
     if not verify_password(password, user.password):
-        # TODO FOR MARIA if passwords dont match
-        raise HTTPException(status_code=404, detail="Email not found")
-    return {'message': 'login succsesful!'}
+        raise HTTPException(status_code=404, detail="Wrong password")
+    return RedirectResponse("/main_page/" + str(user.id),
+        status_code=status.HTTP_302_FOUND)
