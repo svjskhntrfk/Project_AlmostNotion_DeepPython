@@ -2,7 +2,6 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
 from database1 import *
-from models import *
 from router_reg import router as reg_router
 from schemas import  UserInfoReg, UserInfoAuth
 
@@ -39,17 +38,3 @@ templates = Jinja2Templates(directory="templates")
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     return templates.TemplateResponse("landing.html", {"request": request})
-
-@app.get("/registration", response_class=HTMLResponse)
-async def registration_page(request: Request):
-    return templates.TemplateResponse("reg.html", {"request": request})
-
-@app.get("/login", response_class=HTMLResponse)
-async def login_page(request: Request):
-    return templates.TemplateResponse("entry.html", {"request": request})
-
-@app.get("/main_page/{user_id}", response_class=HTMLResponse)
-async def read_root(user_id: str, request: Request):
-    user = await get_user_by_id(int(user_id))
-    return templates.TemplateResponse("main_page.html", {"request": request, "username": user.username} )
-
