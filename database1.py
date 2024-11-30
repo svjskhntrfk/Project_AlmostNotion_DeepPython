@@ -1,9 +1,8 @@
-import sqlalchemy
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
-import models
-from models import *
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
 from config import settings
+from models import *
 
 DATABASE_URL = settings.get_db_url()
 
@@ -42,3 +41,20 @@ async def get_user_by_id(id: int):
             result = await session.execute(query)
             user = result.scalars().first()
             return user
+
+async def create_board(user_id: int):
+    '''Получает на вход ид юзера и создает для него новую ПУСТУЮ доску,
+    возвращает ID СОЗДАННОЙ ДОСКИ'''
+    pass
+
+async def get_board_by_user_id_and_board_id(user_id: int, board_id: int):
+    '''Получает на вход ид юзера и ид доски
+    возвращает класс доски из моделс
+    *хз гарантируется или нет что доска и юзер существуют поэтому лучше как то обработать этот случай'''
+    pass
+
+async def create_text(user_id: int, board_id: int, text: str):
+    '''Получает на вход ид юзера и ид доски
+    создает текстовый объект на доске, те добавляет в джсон словарь по юзер ид и борд ид по ключу Texts
+    ид_текстового_соо(само создается прост уникальное относ текст соо хз мб и не надо, решим потом) и сам текст'''
+    pass
