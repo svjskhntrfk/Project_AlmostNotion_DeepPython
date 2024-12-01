@@ -54,7 +54,7 @@ main {
     padding: 10px;
     margin-bottom: 10px;
     display: block;
-    width: 100%;
+    width: 95%;
 }
 
 h1{
@@ -66,8 +66,8 @@ h1{
     padding: 10px 20px;
     font-family: "Philosopher", sans-serif;
     width: 100%;
-    margin: 10px;
     margin-bottom: 25px;
+    margin-top: 10px;
     background-color: #B14F44;
     color: #F0E4D8;
     font-size: 25px;
