@@ -1,17 +1,14 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException
-from database1 import *
-from models import *
-from router_reg import router as reg_router
-from schemas import  UserInfoReg, UserInfoAuth
-
-from fastapi.templating import Jinja2Templates
+from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from starlette.responses import HTMLResponse
-from starlette.requests import Request
+from fastapi.templating import Jinja2Templates
 from passlib.context import CryptContext
+from starlette.requests import Request
+from starlette.responses import HTMLResponse
 
+from database1 import *
+from router_reg import router as reg_router
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -49,6 +46,12 @@ async def login_page(request: Request):
     return templates.TemplateResponse("entry.html", {"request": request})
 
 @app.get("/main_page/{user_id}", response_class=HTMLResponse)
-async def read_root(user_id: str, request: Request):
+async def main_page(user_id: str, request: Request):
     user = await get_user_by_id(int(user_id))
     return templates.TemplateResponse("main_page.html", {"request": request, "username": user.username} )
+
+@app.get("/main_page/{user_id}/{board_id}")
+async def board_page(user_id: str, board_id: str, request: Request):
+    board = await get_board_by_user_id_and_board_id(int(user_id), int(board_id))
+    return {"message": board.texts[0].words}  #для тестового случая, потом надо переписать нормально
+
