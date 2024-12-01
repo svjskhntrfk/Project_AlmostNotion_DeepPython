@@ -52,4 +52,3 @@ async def login_page(request: Request):
 async def read_root(user_id: str, request: Request):
     user = await get_user_by_id(int(user_id))
     return templates.TemplateResponse("main_page.html", {"request": request, "username": user.username} )
-
