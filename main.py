@@ -46,11 +46,11 @@ async def login_page(request: Request):
     return templates.TemplateResponse("entry.html", {"request": request})
 
 @app.get("/main_page/{user_id}", response_class=HTMLResponse)
-async def read_root(user_id: str, request: Request):
+async def main_page(user_id: str, request: Request):
     user = await get_user_by_id(int(user_id))
     return templates.TemplateResponse("main_page.html", {"request": request, "username": user.username} )
 
 @app.get("/main_page/{user_id}/{board_id}")
-async def read_root(user_id: str, board_id: str, request: Request):
+async def board_page(user_id: str, board_id: str, request: Request):
     board = await get_board_by_user_id_and_board_id(int(user_id), int(board_id))
     return {"message": board.texts[0].words}  #для тестового случая, потом надо переписать нормально
