@@ -1,5 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Form
 from fastapi import FastAPI, HTTPException
+import starlette.status as status
+from fastapi.responses import RedirectResponse
 from schemas import  UserInfoReg, UserInfoAuth
 from passlib.context import CryptContext
 from fastapi.templating import Jinja2Templates
@@ -11,7 +13,8 @@ from database1 import *
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-
+def get_email_hash(email: str) -> str:
+    return pwd_context.hash(email)
 def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
@@ -24,19 +27,17 @@ router = APIRouter(
 )
 
 @router.post("/registration")
-async def registration(user_data: UserInfoReg) -> dict:
-    user_dict = user_data.dict()
-    user_dict['password'] = get_password_hash(user_data.password)
+async def registration(email = Form(), username = Form(), password = Form()) -> dict:
+    user_dict = {"email":email, "username":username, "password": get_password_hash(password)}
     await create_user(**user_dict)
-    return {'message': 'Вы успешно зарегистрированы!'}
+    return {'message': 'registration succsesful!'}
 
 @router.post("/login")
-async def login(user_data: UserInfoAuth) -> dict:
-    user = await is_email_registered(email=user_data.email)
+async def login(email = Form(),password = Form()) -> dict:
+    user = await is_email_registered(email=email)
     if not user:
-        # TODO FOR MARIA if user not in the table
         raise HTTPException(status_code=404, detail="Email not found")
-    if not verify_password(user_data.password, user.password):
-        # TODO FOR MARIA if passwords dont match
-        raise HTTPException(status_code=404, detail="Email not found")
-    return {'message': 'Вы успешно зашли в аккаунт!'}
+    if not verify_password(password, user.password):
+        raise HTTPException(status_code=404, detail="Wrong password")
+    return RedirectResponse("/main_page/" + str(user.id),
+        status_code=status.HTTP_302_FOUND)
