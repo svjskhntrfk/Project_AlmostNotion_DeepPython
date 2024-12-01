@@ -24,15 +24,15 @@ class User(Base):
     username: Mapped[str]
     email: Mapped[str] = mapped_column(unique=True)
     password: Mapped[str]
-    boards: Mapped[dict[str, Any]]
+    boards: Mapped[dict | None] = mapped_column(JSON)
 
 class Text():
-    def __int__(self):
+    def __init__(self):
         text_id: int
         text: str
 
 class Board():
-    def __int__(self):
+    def __init__(self):
         board_id: int
         texts: list[Text]
 
