@@ -9,7 +9,7 @@ from starlette.responses import HTMLResponse
 
 from database1 import *
 from router_reg import router as reg_router
-
+from router_boards import router as board_router
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
@@ -28,6 +28,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(reg_router)
+app.include_router(board_router)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -48,10 +49,10 @@ async def login_page(request: Request):
 @app.get("/main_page/{user_id}", response_class=HTMLResponse)
 async def main_page(user_id: str, request: Request):
     user = await get_user_by_id(int(user_id))
-    return templates.TemplateResponse("main_page.html", {"request": request, "username": user.username} )
+    return templates.TemplateResponse("main_page.html", {"request": request, "username": user.username, "user_id": user_id} )
 
 @app.get("/main_page/{user_id}/{board_id}")
 async def board_page(user_id: str, board_id: str, request: Request):
-    board = await get_board_by_user_id_and_board_id(int(user_id), int(board_id))
-    return {"message": board.texts[0].words}  #для тестового случая, потом надо переписать нормально
+    board = await get_board_by_user_id_and_board_id(int(user_id), board_id)
+    return {"message": "kaif"}  #для тестового случая, потом надо переписать нормально
 

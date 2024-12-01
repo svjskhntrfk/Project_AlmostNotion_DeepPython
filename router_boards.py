@@ -8,7 +8,7 @@ router = APIRouter(
     prefix="/board",
     tags=["Board"]
 )
-@router.post("/main_page/{user_id}/add_board")
+@router.get("/main_page/{user_id}/add_board")
 async def create_new_board(user_id: str) :
     board_id = await create_board(int(user_id))
     return RedirectResponse("/main_page/" + user_id + '/' + board_id ,
