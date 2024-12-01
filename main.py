@@ -54,3 +54,4 @@ async def main_page(user_id: str, request: Request):
 async def board_page(user_id: str, board_id: str, request: Request):
     board = await get_board_by_user_id_and_board_id(int(user_id), int(board_id))
     return {"message": board.texts[0].words}  #для тестового случая, потом надо переписать нормально
+
