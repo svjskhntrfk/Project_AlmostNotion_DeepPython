@@ -27,12 +27,12 @@ class User(Base):
     boards: Mapped[dict[str, Any]]
 
 class Text():
-    def __int__(self):
+    def __init__(self):
         text_id: int
         text: str
 
 class Board():
-    def __int__(self):
+    def __init__(self):
         board_id: int
         texts: list[Text]
 
