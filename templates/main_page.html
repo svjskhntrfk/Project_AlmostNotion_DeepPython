@@ -5,8 +5,8 @@
         <meta charset="UTF-8">
         <title>MindSpace</title>
         <meta name="description" content="Описание страницы" />
-        <link rel="stylesheet" type="text/css" href="/static/css/style_main_page.css" />
-
+        <link rel="stylesheet" type="text/css" href="../static/css/style_main_page.css" />
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Philosopher:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
@@ -18,13 +18,17 @@
             </div>
         </header>
 
-        <main style="width: 100%">
-            <section>
-                <div class="image"><img src="https://i.pinimg.com/originals/3c/2b/ea/3c2bea01b4b02c0387fd99d330ae84eb.jpg" width="70%" height="150px"></div>
-            </section>
-            <section>
-                <div class="title">Рабочие пространства</div>
-            </section>
+        <main style="width: 100%;">
+            <div class="info">
+                <p>Рабочие пространства</p>
+                <div class="all_desks">
+                    <div class="desk"></div>
+                    <div class="desk"></div>
+                    <div class="desk"></div>
+                    <div class="desk"></div>
+                    <div class="desk_add"><a href="/main_page/{{user_id}}/add_board"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill="#e0e0e0" d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/></svg></a></div>
+                </div>
+            </div>
         </main>
         <footer>
         </footer>
