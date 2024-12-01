@@ -16,7 +16,7 @@ header{
     width: 100%;
 	background: #DD8E75;
 	height: 80px;
-    border: solid #C9C9C9;
+    border: 1px solid #C9C9C9;
     border-bottom-right-radius: 25px;
     border-bottom-left-radius: 25px;
     margin-bottom: 50px;
@@ -33,12 +33,54 @@ body {
     font-size: 30px;
 }
 
-.title{
+.info {
+    display: grid;
     color: #B14F44;
     font-size: 30px;
-    margin-top: 30px;
+    margin: 20px 100px;
 }
 
-main{
+img {
+    border-radius: 20px;
+    border: 1px solid #C9C9C9;
+}
 
+.image {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.all_desks {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.desk {
+    border-radius: 20px;
+    border: 1px solid #C9C9C9;
+    background-color: #FFFFFF;
+    height: 200px;
+    width: calc(33.33% - 10px);
+    margin-right: 10px;
+    margin-top: 10px;
+    box-sizing: border-box;
+}
+
+.desk_add {
+    border-radius: 20px;
+    border: 1px solid #C9C9C9;
+    background-color: #DD8E75;
+    height: 200px;
+    width: 33%;
+    margin-right: 10px;
+    margin-top: 10px;
+    color: #C9C9C9;
+    font-size: 120px;
+    text-align: center;
+    box-sizing: border-box;
+}
+svg {
+    width: 50px;
+    margin-top:70px;
 }
