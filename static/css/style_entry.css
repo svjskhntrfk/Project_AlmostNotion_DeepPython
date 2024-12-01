@@ -54,17 +54,26 @@ main {
     position: relative;
 }
 
-input {
+.in {
     border: 1px solid #C9C9C9;
     border-radius: 10px;
-    height: 20px;
+    height: 25px;
     color: #000000;
     font-family: "Philosopher", sans-serif;
     padding: 10px;
     margin-bottom: 10px;
+    display: block;
+    width: 95%;
 }
 
-
-label {
-    font-size: 15px;
+.sub {
+    padding: 10px 20px;
+    font-family: "Philosopher", sans-serif;
+    width: 100%;
+    background-color: #B14F44;
+    color: #F0E4D8;
+    font-size: 25px;
+    border: 1px solid #C9C9C9;
+    border-radius: 10px;
+    margin-top: 10px;
 }
