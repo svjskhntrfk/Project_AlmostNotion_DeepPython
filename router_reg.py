@@ -22,7 +22,9 @@ router = APIRouter(
 async def registration(email = Form(), username = Form(), password = Form()) :
     user_dict = {"email":email, "username":username, "password": get_password_hash(password)}
     await create_user(**user_dict)
-    return {'message': 'registration succsesful!'}
+    user = await is_email_registered(email=email)
+    return RedirectResponse("/main_page/" + str(user.id),
+                            status_code=status.HTTP_302_FOUND)
 
 @router.post("/login")
 async def login(email = Form(),password = Form()):
