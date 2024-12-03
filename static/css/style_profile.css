@@ -1,0 +1,94 @@
+body {
+    background-color: #F0E4D8;
+    font-family: "Philosopher", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    justify-content: center;
+    align-items: center;
+}
+
+.username {
+    text-decoration: none;
+    color: #F0E4D8;
+}
+
+header{
+    width: 100%;
+	background: #DD8E75;
+	height: 80px;
+    border: 1px solid #C9C9C9;
+    border-bottom-right-radius: 25px;
+    border-bottom-left-radius: 25px;
+    margin-bottom: 50px;
+}
+
+body {
+  margin: 0px;
+}
+
+.name{
+    position: absolute;
+    top: 20px;
+	right: 200px;
+    font-size: 30px;
+}
+
+.blocks {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.settings {
+    width: 27%;
+    background-color: #DD8E75;
+    height: 600px;
+    border: 1px solid #C9C9C9;
+    border-radius: 25px;
+    margin-left: 150px;
+}
+
+.info {
+    width: 50%;
+    background-color: #FFFFFF;
+    height: 600px;
+    border: 1px solid #C9C9C9;
+    border-radius: 25px;
+    margin-left: 20px;
+}
+
+a {
+    text-decoration: none;
+    color: #F0E4D8;
+}
+
+p {
+    font-size: 27px;
+    padding: 10px 20px;
+}
+
+.s1 {
+    background-color: #DD8E75;
+    transition: background-color 0.2s ease;
+}
+
+.s1:hover {
+    background-color: #B14F44;
+}
+
+.s2 {
+    background-color: #DD8E75;
+    transition: background-color 0.2s ease;
+}
+
+.s2:hover {
+    background-color: #B14F44;
+}
+
+.s3 {
+    background-color: #DD8E75;
+    transition: background-color 0.2s ease;
+}
+
+.s3:hover {
+    background-color: #B14F44;
+}

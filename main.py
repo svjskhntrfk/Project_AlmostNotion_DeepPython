@@ -49,13 +49,10 @@ async def login_page(request: Request):
 @app.get("/main_page/{user_id}", response_class=HTMLResponse)
 async def main_page(user_id: str, request: Request):
     user = await get_user_by_id(int(user_id))
-    return templates.TemplateResponse("main_page.html", {"request": request, "username": user.username, "user_id": user_id} )
+    boards_id_and_names = await get_boards_by_user_id(int(user_id))
+    context = []
+    for board in boards_id_and_names:
+        context.append({"url":"/board/main_page/" + user_id + "/" + str(board["id"]), "name": board["title"]})
 
-@app.get("/main_page/{user_id}/{board_id}")
-async def board_page(user_id: str, board_id: str, request: Request):
-    board = await get_board_by_user_id_and_board_id(int(user_id), board_id)
-    await create_text(int(user_id), board_id, "first text")
-    if len(board["texts"]) != 0:
-        return {"message": board["texts"][0]["text"] }  #для тестового случая, потом надо переписать нормально
-    else:
-        return {"message": "create text doesn't work"}
+    return templates.TemplateResponse("main_page.html", {"request": request, "username": user.username, "user_id": user_id, "links" : context})
+

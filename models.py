@@ -1,11 +1,12 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.orm import DeclarativeBase, declared_attr
 from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
-from sqlalchemy import Integer, func
-from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy import Integer, func, Table, Column
 from datetime import datetime
+from sqlalchemy import ForeignKey, JSON, text
 from typing import Any
 import enum
+
 
 class Base(AsyncAttrs, DeclarativeBase):
     __abstract__ = True  # Класс абстрактный, чтобы не создавать отдельную таблицу для него
@@ -20,21 +21,36 @@ class Base(AsyncAttrs, DeclarativeBase):
     @declared_attr.directive
     def __tablename__(cls) -> str:
         return cls.__name__.lower() + 's'
+
+
+user_board_association = Table(
+    "user_board",
+    Base.metadata,
+    Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
+    Column("board_id", Integer, ForeignKey("boards.id"), primary_key=True)
+)
+
+
 class User(Base):
     username: Mapped[str]
     email: Mapped[str] = mapped_column(unique=True)
     password: Mapped[str]
-    boards: Mapped[dict | None] = mapped_column(JSON)
 
-class Text():
-    def __init__(self):
-        text_id: int
-        text: str
-
-class Board():
-    def __init__(self):
-        board_id: int
-        texts: list[Text]
+    boards: Mapped[list["Board"]] = relationship(
+        "Board",
+        secondary=user_board_association,
+        back_populates="users",
+        lazy='joined'
+    )
 
 
-
+class Board(Base):
+    title: Mapped[str]
+    content: Mapped[dict | None] = mapped_column(JSON)
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    users: Mapped[list["User"]] = relationship(
+        "User",
+        secondary=user_board_association,  # Используем вспомогательную таблицу
+        back_populates="boards",
+        lazy='joined'
+    )
