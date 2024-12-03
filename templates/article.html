@@ -1,0 +1,26 @@
+<!DOCTYPE HTML>
+<html lang="ru">
+  <div>
+      <head>
+        <meta charset="UTF-8">
+        <title>MindSpace</title>
+        <meta name="description" content="Описание страницы" />
+        <link rel="stylesheet" type="text/css" href="../static/css/style_article.css" />
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Philosopher:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+      </head>
+      <body>
+
+        <main style="width: 100%;">
+            <form action="/main_page/{{ user_id }}/{{ board_id }}/add_text" method="post">
+                <textarea class="space" id="noteText" placeholder="Введите вашу заметку"></textarea><br>
+                <input class="space-btn" type="submit" value="Submit" />
+            </form>
+        </main>
+        <footer>
+        </footer>
+      </body>
+  </div>
+</html>
