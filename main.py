@@ -1,18 +1,15 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException
-from database1 import *
-from models import *
-from router_reg import router as reg_router
-from schemas import  UserInfoReg, UserInfoAuth
-
-from fastapi.templating import Jinja2Templates
+from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from starlette.responses import HTMLResponse
-from starlette.requests import Request
+from fastapi.templating import Jinja2Templates
 from passlib.context import CryptContext
+from starlette.requests import Request
+from starlette.responses import HTMLResponse
 
-
+from database1 import *
+from router_reg import router as reg_router
+from router_boards import router as board_router
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
@@ -31,6 +28,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(reg_router)
+app.include_router(board_router)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -49,7 +47,12 @@ async def login_page(request: Request):
     return templates.TemplateResponse("entry.html", {"request": request})
 
 @app.get("/main_page/{user_id}", response_class=HTMLResponse)
-async def read_root(user_id: str, request: Request):
+async def main_page(user_id: str, request: Request):
     user = await get_user_by_id(int(user_id))
-    return templates.TemplateResponse("main_page.html", {"request": request, "username": user.username} )
+    boards_id_and_names = await get_boards_by_user_id(int(user_id))
+    context = []
+    for board in boards_id_and_names:
+        context.append({"url":"/board/main_page/" + user_id + "/" + str(board["id"]), "name": board["title"]})
+
+    return templates.TemplateResponse("main_page.html", {"request": request, "username": user.username, "user_id": user_id, "links" : context})
 
