@@ -52,15 +52,7 @@ async def main_page(user_id: str, request: Request):
     boards_id_and_names = await get_boards_by_user_id(int(user_id))
     context = []
     for board in boards_id_and_names:
-        context.append({"url":"/main_page/" + user_id + "/" + str(board["id"]), "name": board["title"]})
+        context.append({"url":"/board/main_page/" + user_id + "/" + str(board["id"]), "name": board["title"]})
 
     return templates.TemplateResponse("main_page.html", {"request": request, "username": user.username, "user_id": user_id, "links" : context})
 
-@app.get("/main_page/{user_id}/{board_id}")
-async def board_page(user_id: str, board_id: str, request: Request):
-    board = await get_board_by_user_id_and_board_id(int(user_id), int(board_id))
-    print(board)
-    if len(board["texts"]) != 0 or board != None:
-        return {"message": board["texts"][0]["text"] }  #для тестового случая, потом надо переписать нормально
-    else:
-        return {"message": "create text doesn't work"}

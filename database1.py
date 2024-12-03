@@ -77,26 +77,31 @@ async def get_board_by_user_id_and_board_id(user_id: int, board_id: int):
 
 async def create_text(board_id: int, text: str):
     async with async_session_maker() as session:
-        query = (
-            select(Board)
-            .filter(Board.id == board_id)
-        )
-        result = await session.execute(query)
-        board = result.scalars().first()
+        async with session.begin():
+            query = (
+                select(Board)
+                .filter(Board.id == board_id)
+            )
+            result = await session.execute(query)
+            board = result.scalars().first()
 
-        if not board:
-            raise ValueError(f"Board with id {board_id} not found for user {user_id}")
+            if not board:
+                raise ValueError(f"Board with id {board_id} not found")
 
-        if board.content is None:
-            board.content = {"texts": []}
-
-        text_id = str(uuid.uuid4())
-        board.content["texts"].append({"id": text_id, "text": text})
-
-        session.add(board)
-        await session.commit()
+            if board.content is None:
+                board.content = {"texts": []}
+            
+            text_id = str(uuid.uuid4())
+            new_content = dict(board.content)
+            if "texts" not in new_content:
+                new_content["texts"] = []
+            existing_texts = new_content["texts"]
+            new_content["texts"] = existing_texts + [{"id": text_id, "text": text}]
+            board.content = new_content
+            await session.commit()
 
     return text_id
+
 
 async def get_boards_by_user_id(user_id : int):
     async with async_session_maker() as session:
