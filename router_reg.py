@@ -4,6 +4,7 @@ from fastapi import HTTPException
 from fastapi.responses import RedirectResponse
 from passlib.context import CryptContext
 
+
 from database1 import *
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -19,8 +20,15 @@ router = APIRouter(
 )
 
 @router.post("/registration")
-async def registration(email = Form(), username = Form(), password = Form()) :
-    user_dict = {"email":email, "username":username, "password": get_password_hash(password)}
+async def registration(email = Form(), username = Form(), password = Form(), password2 = Form()) :
+    user = await is_email_registered(email)
+    if password == password2 and user == None :
+        user_dict = {"email":email, "username":username, "password": get_password_hash(password)}
+    elif password != password2:
+        return {"message" : "Passwords don't match"}
+    else:
+        return {"message": "This email is already registered"}
+
     await create_user(**user_dict)
     user = await is_email_registered(email=email)
     return RedirectResponse("/main_page/" + str(user.id),
