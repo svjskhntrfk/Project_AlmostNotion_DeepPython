@@ -59,8 +59,8 @@ async def main_page(user_id: str, request: Request):
 @app.get("/main_page/{user_id}/{board_id}")
 async def board_page(user_id: str, board_id: str, request: Request):
     board = await get_board_by_user_id_and_board_id(int(user_id), int(board_id))
-    # await create_text(int(user_id), board_id, "first text")
-    if len(board["texts"]) != 0:
+    print(board)
+    if len(board["texts"]) != 0 or board != None:
         return {"message": board["texts"][0]["text"] }  #для тестового случая, потом надо переписать нормально
     else:
         return {"message": "create text doesn't work"}
