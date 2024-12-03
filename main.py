@@ -52,7 +52,7 @@ async def main_page(user_id: str, request: Request):
     boards_id_and_names = await get_boards_by_user_id(int(user_id))
     context = []
     for board in boards_id_and_names:
-        context.append({"url":"/main_page/" + user_id + "/" + board.id, "name": board.title})
+        context.append({"url":"/main_page/" + user_id + "/" + str(board["id"]), "name": board["title"]})
 
     return templates.TemplateResponse("main_page.html", {"request": request, "username": user.username, "user_id": user_id, "links" : context})
 
