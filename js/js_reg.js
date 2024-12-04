@@ -22,7 +22,7 @@ function validateForm() {
     }
 
     if (user_password !== user_password2) {
-        user_password_Error.textContent = "Passwords do not match";
+        user_password2_Error.textContent = "Passwords do not match";
         flag = false;
     }
 
