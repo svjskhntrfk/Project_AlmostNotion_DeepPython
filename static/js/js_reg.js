@@ -1,6 +1,4 @@
 function validateForm(event) {
-
-
     let user_email = document.getElementById("email").value;
     let user_name = document.getElementById("username").value;
     let user_password = document.getElementById("password").value;
@@ -19,17 +17,22 @@ function validateForm(event) {
     let flag = true;
 
     if (!validator.isEmail(user_email)) {
-        user_email_Error.textContent = "Please enter a valid email address";
+        user_email_Error.textContent = "Пожалуйста, введите правильный E-mail.";
         flag = false;
     }
 
     if (user_password !== user_password2) {
-        user_password2_Error.textContent = "Passwords do not match";
+        user_password2_Error.textContent = "Пароли не совпадают.";
         flag = false;
+    }
+
+    if (!flag) {
+        event.preventDefault();
     }
 
     return flag;
 }
+
 
 const form = document.getElementById('regForm');
 form.addEventListener('submit', function(event) {
