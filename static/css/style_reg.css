@@ -74,3 +74,14 @@ h1{
     border: 1px solid #C9C9C9;
     border-radius: 10px;
 }
+
+button {
+    border: none;
+    padding: 0px;
+    background-color: #FFFFFF;
+}
+
+.error {
+  color: red;
+  font-size: 14px;
+}
