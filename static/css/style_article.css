@@ -31,3 +31,43 @@ body {
     border: 1px solid #C9C9C9;
     border-radius: 10px;
 }
+
+.note-content {
+    min-height: 20px;
+    padding: 5px;
+    outline: none;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-family: inherit;
+    background: transparent;
+    margin: 0;
+    border: none;
+}
+
+.note-content:focus {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.note-content:empty:before {
+    content: attr(data-placeholder);
+    color: #888;
+}
+
+.text {
+    position: relative;
+    margin: 10px 0;
+}
+
+.all_texts {
+    position: relative;
+    min-height: 300px;
+}
+
+.new-note-area {
+    margin-top: 20px;
+    position: fixed;
+    bottom: 20px;
+    width: calc(100% - 40px);
+    margin-left: 20px;
+    margin-right: 20px;
+}

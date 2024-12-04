@@ -114,3 +114,29 @@ async def get_boards_by_user_id(user_id : int):
             result = await session.execute(query)
             boards = result.all()  # Получаем все результаты запроса
             return [{"id": board.id, "title": board.title} for board in boards]
+
+async def update_text(board_id: int, text_id: str, new_text: str):
+    async with async_session_maker() as session:
+        async with session.begin():
+            query = select(Board).filter(Board.id == board_id)
+            result = await session.execute(query)
+            board = result.scalars().first()
+
+            if not board:
+                raise ValueError(f"Board with id {board_id} not found")
+
+            # Create a new content dictionary
+            new_content = dict(board.content)
+            
+            # Update the specific text
+            for text in new_content["texts"]:
+                if text["id"] == text_id:
+                    text["text"] = new_text
+                    break
+
+            # Assign the new content back to the board
+            board.content = new_content
+            await session.flush()
+            await session.refresh(board)
+
+    return True
