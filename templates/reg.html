@@ -19,7 +19,7 @@
         <main>
             <div class="entry_section">
                 <p style="font-size: 30px; text-align: center">Регистрация<p>
-                <form action="users/registration" method="post">
+                <form action="users/registration" method="post" id="regForm">
                     <label for="email"><p style="text-align: left">E-mail</p></label>
                     <input class="in" type="text" id="email" name="email" required placeholder="Введите Ваш E-mail">
                     <span id="email_Error" class="error"></span><br>
@@ -32,7 +32,7 @@
                     <label for="password2"><p style="text-align: left">Повторный пароль</p></label>
                     <input class="in" type="password" id="password2" name="password2" required placeholder="Повторите Ваш пароль">
                     <span id="password2_Error" class="error"></span><br>
-                    <button onclick="validateForm()"><input class="reg" type="submit" value="Зарегистрироваться" /></button>
+                    <button onclick="validateForm()" type="submit"><input class="reg" type="submit" value="Зарегистрироваться" /></button>
 
                 </form>
             </div>
