@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Handle existing notes editing
+    // Handle existing notes editing with debounce
     const debouncedSave = debounce((textId, newText) => {
         saveNoteChanges(textId, newText);
     }, 500); // Reduced debounce time for better responsiveness

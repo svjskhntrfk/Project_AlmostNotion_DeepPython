@@ -46,22 +46,6 @@ async def update_text_on_board(
     text_id = data.get("text_id")
     new_text = data.get("text")
     
-    async with async_session_maker() as session:
-        async with session.begin():
-            query = select(Board).filter(Board.id == int(board_id))
-            result = await session.execute(query)
-            board = result.scalars().first()
-            
-            if not board:
-                raise HTTPException(status_code=404, detail="Board not found")
-            
-            content = dict(board.content)
-            for text in content["texts"]:
-                if text["id"] == text_id:
-                    text["text"] = new_text
-                    break
-            
-            board.content = content
-            await session.flush()
+    await update_text(int(board_id), text_id, new_text)
     
     return {"status": "success"}
