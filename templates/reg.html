@@ -6,9 +6,8 @@
         <title>MindSpace</title>
         <meta name="description" content="Описание страницы" />
         <link rel="stylesheet" type="text/css" href="../static/css/style_reg.css" />
-        <script src="../js/js_reg.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/validator/13.7.0/validator.min.js"></script>
-
+        <script src="../static/js/js_reg.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/validator@13.6.0/lib/index.min.js"></script>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Philosopher:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
@@ -18,22 +17,25 @@
         </header>
         <main>
             <div class="entry_section">
-                <p style="font-size: 30px; text-align: center">Регистрация<p>
+                <p style="font-size: 30px; text-align: center">Регистрация</p>
                 <form action="users/registration" method="post" id="regForm">
                     <label for="email"><p style="text-align: left">E-mail</p></label>
                     <input class="in" type="text" id="email" name="email" required placeholder="Введите Ваш E-mail">
                     <span id="email_Error" class="error"></span><br>
+
                     <label for="username"><p style="text-align: left">Имя</p></label>
                     <input class="in" type="text" id="username" name="username" required placeholder="Введите Ваше имя">
                     <span id="name_Error" class="error"></span><br>
+
                     <label for="password"><p style="text-align: left">Пароль</p></label>
                     <input class="in" type="password" id="password" name="password" required placeholder="Придумайте пароль">
                     <span id="password_Error" class="error"></span><br>
+
                     <label for="password2"><p style="text-align: left">Повторный пароль</p></label>
                     <input class="in" type="password" id="password2" name="password2" required placeholder="Повторите Ваш пароль">
                     <span id="password2_Error" class="error"></span><br>
-                    <button onclick="validateForm()" type="submit"><input class="reg" type="submit" value="Зарегистрироваться" /></button>
 
+                    <button type="submit" class="reg">Зарегистрироваться</button>
                 </form>
             </div>
         </main>
