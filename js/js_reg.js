@@ -1,4 +1,6 @@
-function validateForm() {
+function validateForm(event) {
+    
+
     let user_email = document.getElementById("email").value;
     let user_name = document.getElementById("username").value;
     let user_password = document.getElementById("password").value;
@@ -28,3 +30,10 @@ function validateForm() {
 
     return flag;
 }
+
+const form = document.getElementById('regForm');
+form.addEventListener('submit', function(event) {
+    if (!validateForm(event)) {
+        event.preventDefault();
+    }
+});
