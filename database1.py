@@ -26,7 +26,29 @@ async def create_user(username: str, email: str, password: str):
             new_user = User(username=username, email=email, password=password)
             session.add(new_user)
 
+async def add_profile_data(user_id: int, first_name: str | None = None, last_name: str | None = None, age: int | None = None):
+    async with async_session_maker() as session:
+        async with session.begin():
+            query = select(User).filter(User.id == user_id)
+            result = await session.execute(query)
+            user = result.scalars().first()
 
+            if user.profile:
+                user.profile.first_name = first_name
+                user.profile.last_name = last_name
+                user.profile.age = age
+            else:
+                new_profile = Profile(
+                    first_name=first_name,
+                    last_name=last_name,
+                    age=age
+                )
+                session.add(new_profile)
+                await session.flush()  
+               
+                user.profile_id = new_profile.id
+
+            await session.commit()
 
 async def is_email_registered(email: str):
     async with async_session_maker() as session:
