@@ -27,6 +27,11 @@ async def create_new_board(user_id: str, session: AsyncSession = Depends(get_ses
         status_code=status.HTTP_302_FOUND
     )
 
+@router.get("/main_page/{user_id}/add_board")
+async def board_title_page(user_id: str, request: Request):
+    return templates.TemplateResponse("board_title.html", {"request": request, "user_id": user_id})
+
+
 @router.get("/main_page/{user_id}/{board_id}")
 async def board_page(user_id: str, board_id: str, request: Request, session: AsyncSession = Depends(get_session)):
     board = await get_board_by_user_id_and_board_id(int(user_id), int(board_id), session)
@@ -41,6 +46,7 @@ async def board_page(user_id: str, board_id: str, request: Request, session: Asy
     )
 
 @router.post("/main_page/{user_id}/{board_id}/add_text")
+
 async def add_text_on_board(
     user_id: str,
     board_id: str,
