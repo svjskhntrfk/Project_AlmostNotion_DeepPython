@@ -58,7 +58,6 @@ body {
 .new-note-area {
     margin-top: 20px;
     position: fixed;
-    bottom: 20px;
     width: calc(100% - 40px);
     margin-left: 20px;
     margin-right: 20px;
