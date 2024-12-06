@@ -5,7 +5,7 @@ from fastapi.responses import RedirectResponse
 from passlib.context import CryptContext
 
 
-from database1 import *
+from database import *
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 def get_password_hash(password: str) -> str:
