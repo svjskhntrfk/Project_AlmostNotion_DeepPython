@@ -93,3 +93,10 @@ p {
     flex-direction: column;
     justify-content: flex-end;
 }
+
+.back_to_mp {
+    position: absolute;
+    margin-left: 10px;
+    margin-top: 10px;
+    font-size: 30px;
+}
