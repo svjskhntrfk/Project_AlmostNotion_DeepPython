@@ -14,8 +14,8 @@ body {
 
 header{
     width: 100%;
-	background: #DD8E75;
-	height: 80px;
+    background: #DD8E75;
+    height: 80px;
     border: 1px solid #C9C9C9;
     border-bottom-right-radius: 25px;
     border-bottom-left-radius: 25px;
@@ -45,6 +45,8 @@ body {
     border: 1px solid #C9C9C9;
     border-radius: 25px;
     margin-left: 150px;
+    display: flex;
+    flex-direction: column;
 }
 
 .info {
@@ -64,6 +66,7 @@ a {
 p {
     font-size: 27px;
     padding: 10px 20px;
+    margin-top: 5px;
 }
 
 .s1 {
@@ -75,20 +78,25 @@ p {
     background-color: #B14F44;
 }
 
-.s2 {
-    background-color: #DD8E75;
-    transition: background-color 0.2s ease;
+.top, .bottom {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
 }
 
-.s2:hover {
-    background-color: #B14F44;
+.top {
+    flex-grow: 1;
 }
 
-.s3 {
-    background-color: #DD8E75;
-    transition: background-color 0.2s ease;
+.bottom {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
 }
 
-.s3:hover {
-    background-color: #B14F44;
+.back_to_mp {
+    position: absolute;
+    margin-left: 10px;
+    margin-top: 10px;
+    font-size: 30px;
 }

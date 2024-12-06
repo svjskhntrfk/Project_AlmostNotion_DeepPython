@@ -5,28 +5,31 @@
         <meta charset="UTF-8">
         <title>MindSpace</title>
         <meta name="description" content="Описание страницы" />
-        <link rel="stylesheet" type="text/css" href="../static/css/style_article.css" />
+        <link rel="stylesheet" type="text/css" href="/static/css/style_article.css" />
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Philosopher:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+        <script src="/static/js/notes.js" defer></script>
       </head>
       <body>
-
         <main style="width: 100%;">
-            <div class="all_texts">
-                    {% for text in texts %}
-                        <div class="text"><a class="style_desk" style="margin: 5px;">{{ text.text }}</a></div>
-                    {% endfor %}
+            <div class="all_texts" id="notesContainer">
+                {% for text in texts %}
+                    <div class="text" data-text-id="{{ text.id }}">
+                        <pre class="note-content" contenteditable="true">{{ text.text }}</pre>
+                    </div>
+                {% endfor %}
             </div>
-            <form action="/board/main_page/{{user_id}}/{{board_id}}/add_text" method="post">
-                <input class="in" type="text" id="text" name="text" required placeholder="Введите заметку">
-
-                <input class="space-btn" type="submit" value="Submit" />
-            </form>
+            <div class="new-note-area">
+                <div class="text">
+                    <pre class="note-content" 
+                         contenteditable="true" 
+                         id="newNote" 
+                         data-placeholder="Введите заметку"></pre>
+                </div>
+            </div>
         </main>
-        <footer>
-        </footer>
       </body>
   </div>
 </html>

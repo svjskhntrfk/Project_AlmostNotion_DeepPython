@@ -3,31 +3,37 @@ body {
     font-family: "Philosopher", sans-serif;
     font-weight: 400;
     font-style: normal;
-    justify-content: center;
-    align-items: center;
 }
 
-.space {
-    border: 1px solid #C9C9C9;
-    border-radius: 10px;
-    height: 50px;
-    color: #000000;
-    font-family: "Philosopher", sans-serif;
-    padding: 10px;
-    margin-bottom: 10px;
-    display: block;
-    width: 90%;
+.note-content {
+    padding: 5px;
+    outline: none;
+    font-family: inherit;
+    margin-left: 20px;
+    border: none;
+    color: #B14F44;
+    font-size: 25px;
 }
 
-.space-btn {
-    padding: 10px 20px;
-    font-family: "Philosopher", sans-serif;
-    width: 20%;
-    margin-bottom: 25px;
-    margin-top: 10px;
-    background-color: #B14F44;
-    color: #F0E4D8;
-    font-size: 20px;
-    border: 1px solid #C9C9C9;
-    border-radius: 10px;
+.note-content:focus {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.note-content:empty:before {
+    content: attr(data-placeholder);
+    color: #888;
+}
+
+.text {
+    margin: 5px 0;
+    color: #B14F44;
+    font-size: 25px;
+}
+
+.all_texts {
+    position: relative;
+}
+
+.new-note-area {
+    width: calc(100% - 40px);
 }
