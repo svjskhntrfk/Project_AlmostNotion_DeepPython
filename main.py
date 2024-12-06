@@ -1,5 +1,5 @@
 from contextlib import asynccontextmanager
-
+from fastapi import APIRouter, Depends, Form
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -22,7 +22,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await create_tables()
+    await create_tables(engine)
     print("База готова к работе")
     yield
     print("Выключение")
@@ -49,15 +49,11 @@ async def login_page(request: Request):
     return templates.TemplateResponse("entry.html", {"request": request})
 
 @app.get("/main_page/{user_id}", response_class=HTMLResponse)
-async def main_page(user_id: str, request: Request):
-    user = await get_user_by_id(int(user_id))
-    boards_id_and_names = await get_boards_by_user_id(int(user_id))
+async def main_page(user_id: str, request: Request, session: AsyncSession = Depends(get_session)):
+    user = await get_user_by_id(int(user_id), session=session)
+    boards_id_and_names = await get_boards_by_user_id(int(user_id), session=session)
     context = []
     for board in boards_id_and_names:
         context.append({"url":"/board/main_page/" + user_id + "/" + str(board["id"]), "name": board["title"]})
-
     return templates.TemplateResponse("main_page.html", {"request": request, "username": user.username, "user_id": user_id, "links" : context})
-
-
-
 
