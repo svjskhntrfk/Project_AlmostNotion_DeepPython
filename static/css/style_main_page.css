@@ -117,7 +117,7 @@ input {
     text-align: center;
 }
 
-button {
+.confirmBtn {
     padding: 10px 20px;
     font-family: "Philosopher", sans-serif;
     width: 40%;
@@ -128,6 +128,7 @@ button {
     font-size: 15px;
     border: 1px solid #C9C9C9;
     border-radius: 10px;
+    height: 40px;
 }
 
 .plus{
