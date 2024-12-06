@@ -5,17 +5,6 @@ body {
     font-style: normal;
 }
 
-.space {
-    border: 1px solid #C9C9C9;
-    border-radius: 10px;
-    height: 50px;
-    color: #000000;
-    font-family: "Philosopher", sans-serif;
-    display: block;
-    width: 90%;
-}
-
-
 .note-content {
     padding: 5px;
     outline: none;
@@ -36,7 +25,7 @@ body {
 }
 
 .text {
-    margin: 10px 0;
+    margin: 5px 0;
     color: #B14F44;
     font-size: 25px;
 }
@@ -47,6 +36,4 @@ body {
 
 .new-note-area {
     width: calc(100% - 40px);
-    margin-left: 20px;
-    margin-right: 20px;
 }
