@@ -19,18 +19,13 @@ router = APIRouter(
     tags=["Board"]
 )
 
-@router.get("/main_page/{user_id}/add_board")
+@router.post("/main_page/{user_id}/add_board")
 async def create_new_board(user_id: str, boardName = Form(), session: AsyncSession = Depends(get_session)):
-    board_id = await create_board(int(user_id), str(boardName), session)
+    board_id = await create_board(int(user_id), boardName, session)
     return RedirectResponse(
         f"/board/main_page/{user_id}/{board_id}",
         status_code=status.HTTP_302_FOUND
     )
-
-@router.get("/main_page/{user_id}/add_board")
-async def board_title_page(user_id: str, request: Request):
-    return templates.TemplateResponse("board_title.html", {"request": request, "user_id": user_id})
-
 
 @router.get("/main_page/{user_id}/{board_id}")
 async def board_page(user_id: str, board_id: str, request: Request, session: AsyncSession = Depends(get_session)):
