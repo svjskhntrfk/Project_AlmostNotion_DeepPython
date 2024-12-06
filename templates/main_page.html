@@ -15,7 +15,7 @@
       <body>
         <header>
             <div class="name">
-                <a href="/profile/main_page/profile/{{user_id}}">{{username}}</a>
+                <a href="profile.html">{{username}}</a>
             </div>
         </header>
 
@@ -32,8 +32,10 @@
 
                     <div id="modal" class="modal">
                         <div class="content_title">
-                            <input type="text" id="boardName" placeholder="Введите название доски">
-                            <a href="/board/main_page/{{user_id}}/add_board"><button id="confirmBtn">Подтвердить</button></a>
+                            <form action="/board/main_page/{{user_id}}/add_board" method="post">
+                                <input type="text" id="boardName" placeholder="Введите название доски">
+                                <input class="confirmBtn" type="submit" value="Подтвердить">
+                            </form>
                         </div>
                     </div>
 
