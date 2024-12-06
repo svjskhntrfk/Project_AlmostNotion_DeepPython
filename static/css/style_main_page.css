@@ -91,3 +91,47 @@ svg {
     text-align: center;
     box-sizing: border-box;
 }
+
+.modal {
+    display: none;
+    border-radius: 20px;
+    border: 1px solid #C9C9C9;
+    background-color: #DD8E75;
+    height: 200px;
+    width: 33%;
+    margin-top: 10px;
+    text-align: center;
+    flex-flow: column wrap;
+}
+
+input {
+    border: 1px solid #C9C9C9;
+    border-radius: 10px;
+    height: 25px;
+    color: #000000;
+    font-family: "Philosopher", sans-serif;
+    padding: 10px;
+    margin-top: 50px;
+    margin-bottom: 10px;
+    width: 70%;
+    text-align: center;
+}
+
+button {
+    padding: 10px 20px;
+    font-family: "Philosopher", sans-serif;
+    width: 40%;
+    margin-bottom: 25px;
+    margin-top: 10px;
+    background-color: #B14F44;
+    color: #F0E4D8;
+    font-size: 15px;
+    border: 1px solid #C9C9C9;
+    border-radius: 10px;
+}
+
+.plus{
+    background-color: #DD8E75;
+    border: none;
+    margin: 0px;
+}
