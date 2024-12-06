@@ -21,7 +21,7 @@ router = APIRouter(
 
 @router.post("/registration")
 async def registration(email = Form(), username = Form(), password = Form(), password2 = Form(), session: AsyncSession = Depends(get_session)) :
-    user = await is_email_registered(email, session)
+    user = await is_email_registered(email=email, session=session)
     if password == password2 and user == None :
         user_dict = {"email":email, "username":username, "password": get_password_hash(password), 'session': session}
     elif password != password2:
