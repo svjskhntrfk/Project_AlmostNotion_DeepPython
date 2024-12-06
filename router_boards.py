@@ -20,8 +20,8 @@ router = APIRouter(
 )
 
 @router.get("/main_page/{user_id}/add_board")
-async def create_new_board(user_id: str, session: AsyncSession = Depends(get_session)):
-    board_id = await create_board(int(user_id), "board1", session)
+async def create_new_board(user_id: str, boardName = Form(), session: AsyncSession = Depends(get_session)):
+    board_id = await create_board(int(user_id), str(boardName), session)
     return RedirectResponse(
         f"/board/main_page/{user_id}/{board_id}",
         status_code=status.HTTP_302_FOUND
