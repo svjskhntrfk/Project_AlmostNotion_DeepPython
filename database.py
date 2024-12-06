@@ -1,6 +1,3 @@
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
-import uuid
 from config import settings
 from models import *
 from sqlalchemy import select

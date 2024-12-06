@@ -66,7 +66,7 @@ class Profile(Base):
     first_name: Mapped[str | None]
     last_name: Mapped[str | None]
     age: Mapped[int | None]
-    avatar: Mapped[str | None] = mapped_column(nullable=True)
+    avatar: Mapped[str | None] = mapped_column(nullable=True) 
     user: Mapped["User"] = relationship(
         "User",
         back_populates="profile",

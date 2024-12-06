@@ -6,6 +6,9 @@ from database import create_board, get_board_by_user_id_and_board_id, create_tex
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.templating import Jinja2Templates
 
+
+from database import *
+
 templates = Jinja2Templates(directory="templates")
 
 router = APIRouter(
