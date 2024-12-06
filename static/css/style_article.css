@@ -19,18 +19,6 @@ body {
     width: 90%;
 }
 
-.space-btn {
-    padding: 10px 20px;
-    font-family: "Philosopher", sans-serif;
-    width: 20%;
-    margin-bottom: 25px;
-    margin-top: 10px;
-    background-color: #B14F44;
-    color: #F0E4D8;
-    font-size: 20px;
-    border: 1px solid #C9C9C9;
-    border-radius: 10px;
-}
 
 .note-content {
     min-height: 20px;
@@ -40,8 +28,10 @@ body {
     word-wrap: break-word;
     font-family: inherit;
     background: transparent;
-    margin: 0;
+    margin-left: 20px;
     border: none;
+    color: #B14F44;
+    font-size: 25px;
 }
 
 .note-content:focus {
@@ -56,6 +46,8 @@ body {
 .text {
     position: relative;
     margin: 10px 0;
+    color: #B14F44;
+    font-size: 25px;
 }
 
 .all_texts {
