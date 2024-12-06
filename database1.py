@@ -114,3 +114,56 @@ async def get_boards_by_user_id(user_id : int):
             result = await session.execute(query)
             boards = result.all()  # Получаем все результаты запроса
             return [{"id": board.id, "title": board.title} for board in boards]
+
+async def update_text(board_id: int, text_id: str, new_text: str):
+    async with async_session_maker() as session:
+        async with session.begin():
+            # Get the board
+            query = select(Board).filter(Board.id == board_id)
+            result = await session.execute(query)
+            board = result.scalars().first()
+
+            if not board:
+                raise ValueError(f"Board with id {board_id} not found")
+
+            # Make a completely new copy of the content
+            new_content = {
+                "texts": []
+            }
+            
+            # Copy all texts, updating the one that matches
+            text_found = False
+            for text in board.content["texts"]:
+                if text["id"] == text_id:
+                    new_content["texts"].append({
+                        "id": text_id,
+                        "text": new_text
+                    })
+                    text_found = True
+                else:
+                    new_content["texts"].append(dict(text))
+
+            if not text_found:
+                raise ValueError(f"Text with id {text_id} not found")
+
+            # Force SQLAlchemy to detect the change by reassigning the entire content
+            board.content = new_content
+            
+            # Explicitly commit and make sure changes are saved
+            await session.flush()
+            await session.commit()
+            
+            # Verify the changes were saved
+            await session.refresh(board)
+            query2 = select(Board).filter(Board.id == board_id)
+            result2 = await session.execute(query)
+            board2 = result.scalars().first()
+            # Double-check the content was updated
+            for text in board2.content["texts"]:
+                if text["id"] == text_id:
+                    if text["text"] != new_text:
+                        raise ValueError("Failed to save changes")
+                    else:
+                        print(text["text"])
+
+    return True
