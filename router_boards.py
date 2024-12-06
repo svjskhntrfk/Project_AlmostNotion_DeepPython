@@ -56,7 +56,7 @@ async def update_text_on_board(
     user_id: str,
     board_id: str,
     data: Dict = Body(...),
-        session: AsyncSession = Depends(get_session)
+    session: AsyncSession = Depends(get_session)
 ):
     text_id = data.get("text_id")
     new_text = data.get("text")

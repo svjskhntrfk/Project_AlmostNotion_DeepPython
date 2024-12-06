@@ -16,11 +16,22 @@ async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
 
 
 async def get_session() -> AsyncGenerator[AsyncSession, None]:
+    """
+    Создает и предоставляет асинхронный сеанс SQLAlchemy для взаимодействия с базой данных.
+
+    :return: Асинхронный генератор сессий SQLAlchemy.
+    """
     async with async_session_maker() as session:
         yield session
 
 
 async def create_tables(engine):
+    """
+    Создает все таблицы в базе данных, используя предоставленный SQLAlchemy движок.
+
+    :param engine: SQLAlchemy AsyncEngine для подключения к базе данных.
+    :raises RuntimeError: Если произошла ошибка при создании таблиц.
+    """
     try:
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
@@ -30,6 +41,15 @@ async def create_tables(engine):
 
 
 async def create_user(username: str, email: str, password: str, session: AsyncSession):
+    """
+    Создает нового пользователя в базе данных.
+
+    :param username: Имя пользователя.
+    :param email: Электронная почта пользователя.
+    :param password: Пароль пользователя.
+    :param session: Асинхронная сессия SQLAlchemy.
+    :raises RuntimeError: Если произошла ошибка при создании пользователя.
+    """
     try:
         new_user = User(username=username, email=email, password=password)
         session.add(new_user)
@@ -39,7 +59,16 @@ async def create_user(username: str, email: str, password: str, session: AsyncSe
         raise RuntimeError("An error occurred while creating a user.")
 
 
+
 async def is_email_registered(email: str, session: AsyncSession):
+    """
+    Проверяет, зарегистрирован ли пользователь с указанной электронной почтой.
+
+    :param email: Электронная почта пользователя.
+    :param session: Асинхронная сессия SQLAlchemy.
+    :return: True, если пользователь найден; иначе False.
+    :raises RuntimeError: Если произошла ошибка при проверке электронной почты.
+    """
     try:
         query = select(User).filter_by(email=email)
         result = await session.execute(query)
@@ -51,6 +80,15 @@ async def is_email_registered(email: str, session: AsyncSession):
 
 
 async def get_user_by_id(id: int, session: AsyncSession):
+    """
+    Возвращает пользователя по его ID.
+
+    :param id: ID пользователя.
+    :param session: Асинхронная сессия SQLAlchemy.
+    :return: Объект User, если пользователь найден.
+    :raises ValueError: Если пользователь не найден.
+    :raises RuntimeError: Если произошла ошибка при получении пользователя.
+    """
     try:
         query = select(User).filter_by(id=id)
         result = await session.execute(query)
@@ -64,6 +102,16 @@ async def get_user_by_id(id: int, session: AsyncSession):
 
 
 async def create_board(user_id: int, title: str, session: AsyncSession):
+    """
+    Создает новую доску для пользователя.
+
+    :param user_id: ID пользователя.
+    :param title: Название доски.
+    :param session: Асинхронная сессия SQLAlchemy.
+    :return: ID созданной доски.
+    :raises ValueError: Если пользователь не найден.
+    :raises RuntimeError: Если произошла ошибка при создании доски.
+    """
     try:
         query = select(User).filter_by(id=user_id)
         result = await session.execute(query)
@@ -84,7 +132,16 @@ async def create_board(user_id: int, title: str, session: AsyncSession):
 
 
 async def get_board_by_user_id_and_board_id(user_id: int, board_id: int, session: AsyncSession):
-    """Возвращает данные доски по user_id и board_id"""
+    """
+    Возвращает данные доски по ID пользователя и ID доски.
+
+    :param user_id: ID пользователя.
+    :param board_id: ID доски.
+    :param session: Асинхронная сессия SQLAlchemy.
+    :return: Содержимое доски в виде словаря.
+    :raises ValueError: Если доска не найдена.
+    :raises RuntimeError: Если произошла ошибка при получении данных доски.
+    """
     try:
         query = (
             select(Board.content)
@@ -103,6 +160,16 @@ async def get_board_by_user_id_and_board_id(user_id: int, board_id: int, session
 
 
 async def create_text(board_id: int, text: str, session: AsyncSession):
+    """
+    Добавляет новый текст в доску.
+
+    :param board_id: ID доски.
+    :param text: Текст для добавления.
+    :param session: Асинхронная сессия SQLAlchemy.
+    :return: ID добавленного текста.
+    :raises ValueError: Если доска не найдена.
+    :raises RuntimeError: Если произошла ошибка при добавлении текста.
+    """
     try:
         query = select(Board).filter(Board.id == board_id)
         result = await session.execute(query)
@@ -128,8 +195,16 @@ async def create_text(board_id: int, text: str, session: AsyncSession):
         logger.error(f"Error adding text to board_id {board_id}: {e}")
         raise RuntimeError("An error occurred while adding text to the board.")
 
+async def get_boards_by_user_id(user_id: int, session: AsyncSession) -> list[dict]:
+    """
+    Получает список досок, связанных с указанным пользователем.
 
-async def get_boards_by_user_id(user_id: int, session: AsyncSession):
+    :param user_id: ID пользователя.
+    :param session: Асинхронная сессия SQLAlchemy.
+    :return: Список словарей, содержащих ID и названия досок.
+             Пример: [{"id": 1, "title": "Board 1"}, {"id": 2, "title": "Board 2"}].
+    :raises RuntimeError: Если произошла ошибка базы данных.
+    """
     try:
         query = (
             select(Board.id, Board.title)
@@ -137,7 +212,7 @@ async def get_boards_by_user_id(user_id: int, session: AsyncSession):
             .filter(user_board_association.c.user_id == user_id)
         )
         result = await session.execute(query)
-        boards = result.all()  # Получаем все результаты запроса
+        boards = result.all()
         return [{"id": board.id, "title": board.title} for board in boards]
 
     except SQLAlchemyError as e:
@@ -145,60 +220,57 @@ async def get_boards_by_user_id(user_id: int, session: AsyncSession):
         raise RuntimeError("Failed to fetch boards due to a database error.") from e
 
 
-async def update_text(board_id: int, text_id: str, new_text: str, session: AsyncSession):
+async def update_text(board_id: int, text_id: str, new_text: str, session: AsyncSession) -> bool:
+    """
+    Обновляет текст в указанной доске.
+
+    :param board_id: ID доски, где нужно обновить текст.
+    :param text_id: ID текста, который нужно обновить.
+    :param new_text: Новый текст для замены.
+    :param session: Асинхронная сессия SQLAlchemy.
+    :return: True, если текст успешно обновлен.
+    :raises ValueError: Если доска или текст не найдены.
+    :raises RuntimeError: Если произошла ошибка базы данных при обновлении текста.
+    """
     try:
-        async with async_session_maker() as session:
-            async with session.begin():
-                # Get the board
-                query = select(Board).filter(Board.id == board_id)
-                result = await session.execute(query)
-                board = result.scalars().first()
+        async with session.begin():
+            # Получаем доску
+            query = select(Board).filter(Board.id == board_id)
+            result = await session.execute(query)
+            board = result.scalars().first()
 
-                if not board:
-                    raise ValueError(f"Board with id {board_id} not found")
+            if not board:
+                raise ValueError(f"Board with id {board_id} not found")
 
-                # Make a completely new copy of the content
-                new_content = {
-                    "texts": []
-                }
+            # Создаем новую копию контента
+            new_content = {"texts": []}
 
-                # Copy all texts, updating the one that matches
-                text_found = False
-                for text in board.content["texts"]:
-                    if text["id"] == text_id:
-                        new_content["texts"].append({
-                            "id": text_id,
-                            "text": new_text
-                        })
-                        text_found = True
-                    else:
-                        new_content["texts"].append(dict(text))
+            text_found = False
+            for text in board.content["texts"]:
+                if text["id"] == text_id:
+                    new_content["texts"].append({
+                        "id": text_id,
+                        "text": new_text
+                    })
+                    text_found = True
+                else:
+                    new_content["texts"].append(dict(text))
 
-                if not text_found:
-                    raise ValueError(f"Text with id {text_id} not found")
+            if not text_found:
+                raise ValueError(f"Text with id {text_id} not found")
 
-                # Force SQLAlchemy to detect the change by reassigning the entire content
-                board.content = new_content
+            # Обновляем контент
+            board.content = new_content
+            await session.flush()  # Применяем изменения
 
-                # Explicitly commit and make sure changes are saved
-                await session.flush()
-                await session.commit()
-
-                # Verify the changes were saved
-                await session.refresh(board)
-                query2 = select(Board).filter(Board.id == board_id)
-                result2 = await session.execute(query)
-                board2 = result.scalars().first()
-                # Double-check the content was updated
-                for text in board2.content["texts"]:
-                    if text["id"] == text_id:
-                        if text["text"] != new_text:
-                            raise ValueError("Failed to save changes")
-                        else:
-                            print(text["text"])
+            # Проверяем изменения
+            await session.refresh(board)
+            for text in board.content["texts"]:
+                if text["id"] == text_id and text["text"] != new_text:
+                    raise ValueError("Failed to save changes")
 
         return True
-    
+
     except SQLAlchemyError as e:
         logger.error(f"Database error while updating text with text_id={text_id} in board_id={board_id}: {e}")
         raise RuntimeError("Failed to update text due to a database error.") from e
