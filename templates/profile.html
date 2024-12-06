@@ -13,6 +13,7 @@
       </head>
       <body>
         <header>
+            <p class="back_to_mp"><a href="/main_page/{user_id}"><svg xmlns="http://www.w3.org/2000/svg" height="45" width="60" viewBox="0 0 320 512"><!--!Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill="#f0e4d8" d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z"/></svg></a></p>
             <div class="name">
                 <a class="username" href="profile.html">{{username}}</a>
             </div>
@@ -21,16 +22,22 @@
         <main style="width: 100%;">
             <div class="blocks">
                 <div class="settings">
-                    <p class="s1"><a href="">Основные настройки</a></p>
-                    <p class="s2"><a href="">Профиль</a></p>
-                    <p class="s3"><a href="">Уведомления</a></p>
-                    <button class="back_to_landing" style="font-size: 20px;"><a href="/">Выйти из аккаунта</a></button>
-                    <button class="back_to_landing" style="font-size: 20px;"><a href="/main_page/{{user_id}}">Вернуться на главную страницу</a></button>
+                    <div class="top">
+                        <p><a>Основные настройки:</a></p>
+                        <p class="s1"><a href="">Профиль</a></p>
+                        <p class="s1"><a href="">Уведомления</a></p>
+                    </div>
+                    <div class="bottom">
+                        <p class="s1" style="margin-bottom:25px;"><a href="/landing">Выйти из аккаунта</a></p>
+                    </div>
+
+
                 </div>
                 <div class="info">
 
                 </div>
             </div>
+
 
         </main>
         <footer>
