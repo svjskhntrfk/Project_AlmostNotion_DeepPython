@@ -62,5 +62,4 @@ async def update_text_on_board(
     new_text = data.get("text")
 
     await update_text(int(board_id), text_id, new_text,session)
-
     return {"status": "success"}
