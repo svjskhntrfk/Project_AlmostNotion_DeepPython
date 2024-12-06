@@ -1,0 +1,93 @@
+body {
+    background-color: #F0E4D8;
+    font-family: "Philosopher", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    justify-content: center;
+    align-items: center;
+}
+
+.username {
+    text-decoration: none;
+    color: #F0E4D8;
+}
+
+header{
+    width: 100%;
+	background: #DD8E75;
+	height: 80px;
+    border: 1px solid #C9C9C9;
+    border-bottom-right-radius: 25px;
+    border-bottom-left-radius: 25px;
+    margin-bottom: 50px;
+}
+
+body {
+  margin: 0px;
+}
+
+.name{
+    position: absolute;
+    top: 20px;
+	right: 200px;
+    font-size: 30px;
+}
+
+.info {
+    display: grid;
+    color: #B14F44;
+    font-size: 30px;
+    margin: 20px 100px;
+}
+
+img {
+    border-radius: 20px;
+    border: 1px solid #C9C9C9;
+}
+
+.image {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.all_desks {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.desk {
+    border-radius: 20px;
+    border: 1px solid #C9C9C9;
+    background-color: #FFFFFF;
+    height: 200px;
+    width: calc(33.33% - 10px);
+    margin-right: 10px;
+    margin-top: 10px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.desk_add {
+    border-radius: 20px;
+    border: 1px solid #C9C9C9;
+    background-color: #DD8E75;
+    height: 200px;
+    width: 33%;
+    margin-top: 10px;
+    text-align: center;
+    box-sizing: border-box;
+}
+svg {
+    width: 50px;
+    margin-top:70px;
+}
+
+.style_desk {
+    text-decoration: none;
+    color: #B14F44;
+    text-align: center;
+    box-sizing: border-box;
+}
