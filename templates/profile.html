@@ -35,17 +35,17 @@
                 </div>
                 <div class="info">
                     <p class="s1"><a href="">Изменить имя</a></p>
-                    <form action="/main_page/profile/{{user_id}}/change_name" method="post">
+                    <form action="/profile/main_page/profile/{{user_id}}/change_name" method="post">
                         <label for="first_name"><p style="text-align: left">Имя</p></label>
                         <input class="in" type="text" id="first_name" name="first_name" required placeholder="Введите Ваше имя">
                         <input class="sub" type="submit" value="Изменить" />
                     </form>
                     <p class="s1"><a href="">Изменить пароль</a></p>
-                    <form action="/main_page/profile/{user_id}/change_password" method="post">
+                    <form action="/profile/main_page/profile/{{user_id}}/change_password" method="post">
                         <label for="old_password"><p style="text-align: left">Текущий пароль</p></label>
                         <input class="in" type="text" id="old_password" name="old_password" required placeholder="Введите Ваш текущий пароль">
                         <label for="new_password"><p style="text-align: left">Новый пароль</p></label>
-                        <input class="in" type="password" id="new_password" name="password" required placeholder="Введите Ваш новый пароль">
+                        <input class="in" type="password" id="new_password" name="new_password" required placeholder="Введите Ваш новый пароль">
                         <input class="sub" type="submit" value="Изменить" />
                     </form>
                 </div>

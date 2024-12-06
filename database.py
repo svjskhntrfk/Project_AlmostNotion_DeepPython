@@ -275,8 +275,42 @@ async def update_text(board_id: int, text_id: str, new_text: str, session: Async
         logger.error(f"Database error while updating text with text_id={text_id} in board_id={board_id}: {e}")
         raise RuntimeError("Failed to update text due to a database error.") from e
 
-async  def add_profile_data(user_id:int, new_username: str, session: AsyncSession):
-    pass
+async  def change_username(user_id:int, new_username: str, session: AsyncSession):
+    try:
+        async with session.begin():
+            user = await get_user_by_id(user_id, session)
+            user.username = new_username
+            await session.flush()  # Применяем изменения
+
+            # Проверяем изменения
+            await session.refresh(user)
+
+            user = await get_user_by_id(user_id, session)
+            if user.username != new_username:
+                    raise ValueError("Failed to save changes")
+            return True
+
+    except SQLAlchemyError as e:
+        user = await get_user_by_id(user_id, session)
+        logger.error(f"Error editing user {user.id}: {e}")
+        raise RuntimeError("An error occurred while changing a user's name.")
 
 async  def change_password(user_id:int, new_password: str, session: AsyncSession):
-    pass
+    try:
+        async with session.begin():
+            user = await get_user_by_id(user_id, session)
+            user.password = new_password
+            await session.flush()  # Применяем изменения
+
+            # Проверяем изменения
+            await session.refresh(user)
+
+            user = await get_user_by_id(user_id, session)
+            if user.password != new_password:
+                raise ValueError("Failed to save changes")
+            return True
+
+    except SQLAlchemyError as e:
+        user = await get_user_by_id(user_id, session)
+        logger.error(f"Error editing user {user.id}: {e}")
+        raise RuntimeError("An error occurred while changing a user's password.")
