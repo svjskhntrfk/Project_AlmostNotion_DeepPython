@@ -13,7 +13,7 @@
       </head>
       <body>
         <header>
-            <p class="back_to_mp"><a href="/main_page/{user_id}"><svg xmlns="http://www.w3.org/2000/svg" height="45" width="60" viewBox="0 0 320 512"><!--!Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill="#f0e4d8" d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z"/></svg></a></p>
+            <p class="back_to_mp"><a href="/main_page/{{user_id}}"><svg xmlns="http://www.w3.org/2000/svg" height="45" width="60" viewBox="0 0 320 512"><!--!Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill="#f0e4d8" d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z"/></svg></a></p>
             <div class="name">
                 <a class="username" href="profile.html">{{username}}</a>
             </div>
@@ -28,13 +28,26 @@
                         <p class="s1"><a href="">Уведомления</a></p>
                     </div>
                     <div class="bottom">
-                        <p class="s1" style="margin-bottom:25px;"><a href="/landing">Выйти из аккаунта</a></p>
+                        <p class="s1" style="margin-bottom:25px;"><a href="/">Выйти из аккаунта</a></p>
                     </div>
 
 
                 </div>
                 <div class="info">
-
+                    <p class="s1"><a href="">Изменить имя</a></p>
+                    <form action="/main_page/profile/{{user_id}}/change_name" method="post">
+                        <label for="first_name"><p style="text-align: left">Имя</p></label>
+                        <input class="in" type="text" id="first_name" name="first_name" required placeholder="Введите Ваше имя">
+                        <input class="sub" type="submit" value="Изменить" />
+                    </form>
+                    <p class="s1"><a href="">Изменить пароль</a></p>
+                    <form action="/main_page/profile/{user_id}/change_password" method="post">
+                        <label for="old_password"><p style="text-align: left">Текущий пароль</p></label>
+                        <input class="in" type="text" id="old_password" name="old_password" required placeholder="Введите Ваш текущий пароль">
+                        <label for="new_password"><p style="text-align: left">Новый пароль</p></label>
+                        <input class="in" type="password" id="new_password" name="password" required placeholder="Введите Ваш новый пароль">
+                        <input class="sub" type="submit" value="Изменить" />
+                    </form>
                 </div>
             </div>
 

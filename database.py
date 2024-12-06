@@ -274,3 +274,9 @@ async def update_text(board_id: int, text_id: str, new_text: str, session: Async
     except SQLAlchemyError as e:
         logger.error(f"Database error while updating text with text_id={text_id} in board_id={board_id}: {e}")
         raise RuntimeError("Failed to update text due to a database error.") from e
+
+async  def add_profile_data(user_id:int, new_username: str, session: AsyncSession):
+    pass
+
+async  def change_password(user_id:int, new_password: str, session: AsyncSession):
+    pass
