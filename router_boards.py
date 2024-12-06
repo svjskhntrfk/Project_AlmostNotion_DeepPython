@@ -30,13 +30,16 @@ async def create_new_board(user_id: str, session: AsyncSession = Depends(get_ses
 @router.get("/main_page/{user_id}/{board_id}")
 async def board_page(user_id: str, board_id: str, request: Request, session: AsyncSession = Depends(get_session)):
     board = await get_board_by_user_id_and_board_id(int(user_id), int(board_id), session)
+    user = await get_user_by_id(int(user_id), session)
     return templates.TemplateResponse(
         "article.html",
         {
             "request": request,
             "user_id": user_id,
             "board_id": board_id,
-            "texts": board["texts"]
+            "texts": board[1]["texts"],
+            "username" : user.username,
+            "title" : board[0]
         }
     )
 

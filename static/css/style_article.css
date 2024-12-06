@@ -5,6 +5,26 @@ body {
     font-style: normal;
 }
 
+.username {
+    text-decoration: none;
+    color: #F0E4D8;
+}
+
+.title {
+    text-decoration: none;
+    color: #F0E4D8;
+}
+
+header{
+    width: 100%;
+    background: #DD8E75;
+    height: 80px;
+    border: 1px solid #C9C9C9;
+    border-bottom-right-radius: 25px;
+    border-bottom-left-radius: 25px;
+    margin-bottom: 50px;
+}
+
 .note-content {
     padding: 5px;
     outline: none;
