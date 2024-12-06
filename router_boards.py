@@ -1,10 +1,13 @@
-from fastapi import APIRouter, Depends, Form
+import starlette.status as status
+from fastapi import APIRouter, Form, Body
+from fastapi.responses import RedirectResponse
 from starlette.requests import Request
 from fastapi.responses import RedirectResponse
 from starlette import status
 from database import create_board, get_board_by_user_id_and_board_id, create_text, get_session
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.templating import Jinja2Templates
+from typing import Dict
 
 
 from database import *
@@ -38,9 +41,26 @@ async def board_page(user_id: str, board_id: str, request: Request, session: Asy
     )
 
 @router.post("/main_page/{user_id}/{board_id}/add_text")
-async def add_text_on_board(user_id: str, board_id: str, text: str = Form(...), session: AsyncSession = Depends(get_session)):
+async def add_text_on_board(
+    user_id: str,
+    board_id: str,
+    data: Dict = Body(...),
+    session: AsyncSession = Depends(get_session)
+):
+    text = data.get("text")
     text_id = await create_text(int(board_id), text, session)
-    return RedirectResponse(
-        f"/board/main_page/{user_id}/{board_id}",
-        status_code=status.HTTP_302_FOUND
-    )
+    return {"text_id": text_id}
+
+@router.post("/main_page/{user_id}/{board_id}/update_text")
+async def update_text_on_board(
+    user_id: str,
+    board_id: str,
+    data: Dict = Body(...),
+        session: AsyncSession = Depends(get_session)
+):
+    text_id = data.get("text_id")
+    new_text = data.get("text")
+
+    await update_text(int(board_id), text_id, new_text,session)
+
+    return {"status": "success"}
