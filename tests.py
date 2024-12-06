@@ -82,29 +82,6 @@ async def test_get_user_by_id(db_session):
     assert fetched_user.id == user.id
     assert fetched_user.email == user.email
 
-@pytest.mark.asyncio
-async def test_add_profile_data(db_session):
-    # Создаём пользователя без профиля
-    username = "profile_user"
-    email = "profile_user@example.com"
-    password = "prof_pass"
-    await create_user(username, email, password, db_session)
-
-    # Получаем ID вновь созданного пользователя
-    result = await db_session.execute(select(User).filter_by(email=email))
-    user = result.scalars().first()
-    assert user is not None
-
-    # Добавляем данные профиля
-    await add_profile_data(user_id=user.id, session=db_session, first_name="John", last_name="Doe", age=30)
-
-    # Проверяем, что данные профиля были добавлены
-    result = await db_session.execute(select(User).filter_by(id=user.id))
-    user_with_profile = result.scalars().first()
-    assert user_with_profile.profile is not None
-    assert user_with_profile.profile.first_name == "John"
-    assert user_with_profile.profile.last_name == "Doe"
-    assert user_with_profile.profile.age == 30
 
 @pytest.mark.asyncio
 async def test_create_board(db_session):

@@ -39,32 +39,6 @@ async def create_user(username: str, email: str, password: str, session: AsyncSe
         raise RuntimeError("An error occurred while creating a user.")
 
 
-async def add_profile_data(user_id: int, session: AsyncSession, first_name: str | None = None,
-                           last_name: str | None = None, age: int | None = None):
-    try:
-        query = select(User).filter(User.id == user_id)
-        result = await session.execute(query)
-        user = result.scalars().first()
-
-        if not user:
-            raise ValueError(f"User with id {user_id} not found.")
-
-        if user.profile:
-            user.profile.first_name = first_name
-            user.profile.last_name = last_name
-            user.profile.age = age
-        else:
-            new_profile = Profile(first_name=first_name, last_name=last_name, age=age)
-            session.add(new_profile)
-            await session.flush()
-            user.profile_id = new_profile.id
-
-        await session.commit()
-    except SQLAlchemyError as e:
-        logger.error(f"Database error occurred: {e}")
-        raise RuntimeError("An unexpected database error occurred.")
-
-
 async def is_email_registered(email: str, session: AsyncSession):
     try:
         query = select(User).filter_by(email=email)
