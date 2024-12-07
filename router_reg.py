@@ -3,7 +3,7 @@ from fastapi import APIRouter, Form, Depends, Request
 from fastapi import HTTPException
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
-
+from sqlalchemy.ext.asyncio import AsyncSession
 from passlib.context import CryptContext
 from database import create_board, get_board_by_user_id_and_board_id, create_text, get_session
 
@@ -43,17 +43,16 @@ async def registration(
     username: str = Form(...),
     password: str = Form(...),
     password2: str = Form(...), 
-    session: AsyncSession = Depends(get_session)
-):
-  """
-    Post-запрос, забираем данные пользователя с регистрации. Проверяем, что пользователь не был зарегистрирован ранее и совпадение повторного пароля с изначальным
+    session: AsyncSession = Depends(get_session)):
+    """
+        Post-запрос, забираем данные пользователя с регистрации. Проверяем, что пользователь не был зарегистрирован ранее и совпадение повторного пароля с изначальным
 
-    Параметры:
-        email (Form): Почта пользователя
-        username (Form): Имя пользователя
-        password (Form): Пароль
-        password2 (Form): Подтверждение пароля
-        session (AsyncSession): Сессия в базе данных
+        Параметры:
+            email (Form): Почта пользователя
+            username (Form): Имя пользователя
+            password (Form): Пароль
+            password2 (Form): Подтверждение пароля
+            session (AsyncSession): Сессия в базе данных
     """
     try:
         # Проверяем, что пароли совпадают
@@ -87,8 +86,8 @@ async def registration(
             "password": get_password_hash(password)
         }
 
-        await create_user(**user_dict, session)
-        user = await is_email_registered(email=email, session)
+        await create_user(**user_dict, session=session)
+        user = await is_email_registered(email=email, session=session)
         return RedirectResponse(
             f"/main_page/{user.id}",
             status_code=status.HTTP_302_FOUND
@@ -107,7 +106,7 @@ async def registration(
 
 @router.post("/login")
 async def login(request: Request, email: str = Form(...), password: str = Form(...), session: AsyncSession = Depends(get_session)):
-  """
+    """
     Авторизация пользователя
 
     Параметры:
@@ -117,7 +116,7 @@ async def login(request: Request, email: str = Form(...), password: str = Form(.
     """
     try:
         # Проверяем существование пользователя
-        user = await is_email_registered(email=email,session)
+        user = await is_email_registered(email=email, session=session)
         if not user:
             return templates.TemplateResponse(
                 "login.html",
@@ -152,6 +151,6 @@ async def login(request: Request, email: str = Form(...), password: str = Form(.
         )
 
 @router.get("/check_email/{email}")
-async def check_email(email: str, , session: AsyncSession = Depends(get_session)):
+async def check_email(email: str, session: AsyncSession = Depends(get_session)):
     user = await is_email_registered(email, session)
     return {"exists": user is not None}
