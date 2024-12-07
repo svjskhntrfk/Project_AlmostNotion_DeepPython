@@ -1,13 +1,17 @@
 import starlette.status as status
-from fastapi import APIRouter, Form, Depends
+from fastapi import APIRouter, Form, Depends, Request
 from fastapi import HTTPException
 from fastapi.responses import RedirectResponse
+from fastapi.templating import Jinja2Templates
+
 from passlib.context import CryptContext
 from database import create_board, get_board_by_user_id_and_board_id, create_text, get_session
 
 from database import *
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+templates = Jinja2Templates(directory="templates")
+
 def get_password_hash(password: str) -> str:
     """
     Хэшируем пароль пользователя
@@ -33,8 +37,15 @@ router = APIRouter(
 )
 
 @router.post("/registration")
-async def registration(email = Form(), username = Form(), password = Form(), password2 = Form(), session: AsyncSession = Depends(get_session)) :
-    """
+async def registration(
+    request: Request,
+    email: str = Form(...),
+    username: str = Form(...),
+    password: str = Form(...),
+    password2: str = Form(...), 
+    session: AsyncSession = Depends(get_session)
+):
+  """
     Post-запрос, забираем данные пользователя с регистрации. Проверяем, что пользователь не был зарегистрирован ранее и совпадение повторного пароля с изначальным
 
     Параметры:
@@ -44,22 +55,59 @@ async def registration(email = Form(), username = Form(), password = Form(), pas
         password2 (Form): Подтверждение пароля
         session (AsyncSession): Сессия в базе данных
     """
-    user = await is_email_registered(email=email, session=session)
-    if password == password2 and user == None :
-        user_dict = {"email":email, "username":username, "password": get_password_hash(password), 'session': session}
-    elif password != password2:
-        return {"message" : "Passwords don't match"}
-    else:
-        return {"message": "This email is already registered"}
+    try:
+        # Проверяем, что пароли совпадают
+        if password != password2:
+            return templates.TemplateResponse(
+                "reg.html",
+                {
+                    "request": request,
+                    "password2_error": "Пароли не совпадают",
+                    "email": email,
+                    "username": username
+                }
+            )
 
-    await create_user(**user_dict)
-    user = await is_email_registered(email=email, session=session)
-    return RedirectResponse("/main_page/" + str(user.id),
-                            status_code=status.HTTP_302_FOUND)
+        # Проверяем, что email не занят
+        existing_user = await is_email_registered(email, session)
+        if existing_user:
+            return templates.TemplateResponse(
+                "reg.html",
+                {
+                    "request": request,
+                    "email_error": "Этот email уже зарегистрирован",
+                    "username": username
+                }
+            )
+
+        # Создаем пользователя
+        user_dict = {
+            "email": email,
+            "username": username,
+            "password": get_password_hash(password)
+        }
+
+        await create_user(**user_dict, session)
+        user = await is_email_registered(email=email, session)
+        return RedirectResponse(
+            f"/main_page/{user.id}",
+            status_code=status.HTTP_302_FOUND
+        )
+
+    except Exception as e:
+        return templates.TemplateResponse(
+            "reg.html",
+            {
+                "request": request,
+                "error": "Произошла ошибка при регистрации",
+                "email": email,
+                "username": username
+            }
+        )
 
 @router.post("/login")
-async def login(email = Form(),password = Form(), session: AsyncSession = Depends(get_session)):
-    """
+async def login(request: Request, email: str = Form(...), password: str = Form(...), session: AsyncSession = Depends(get_session)):
+  """
     Авторизация пользователя
 
     Параметры:
@@ -67,10 +115,43 @@ async def login(email = Form(),password = Form(), session: AsyncSession = Depend
         password (Form): Пароль пользователя
         session (AsyncSession): Сессия в базе данных
     """
-    user = await is_email_registered(email=email, session=session)
-    if not user:
-        raise HTTPException(status_code=404, detail="Email not found")
-    if not verify_password(password, user.password):
-        raise HTTPException(status_code=404, detail="Wrong password")
-    return RedirectResponse("/main_page/" + str(user.id),
-        status_code=status.HTTP_302_FOUND)
+    try:
+        # Проверяем существование пользователя
+        user = await is_email_registered(email=email,session)
+        if not user:
+            return templates.TemplateResponse(
+                "login.html",
+                {
+                    "request": request,
+                    "email_error": "Пользователь с таким email не найден"
+                }
+            )
+
+        # Проверяем правильность пароля
+        if not verify_password(password, user.password):
+            return templates.TemplateResponse(
+                "login.html",
+                {
+                    "request": request,
+                    "password_error": "Неверный пароль",
+                    "email": email  # Сохраняем введенный email
+                }
+            )
+
+        return RedirectResponse(
+            f"/main_page/{user.id}",
+            status_code=status.HTTP_302_FOUND
+        )
+    except Exception as e:
+        return templates.TemplateResponse(
+            "login.html",
+            {
+                "request": request,
+                "error": "Произошла ошибка при входе в систему"
+            }
+        )
+
+@router.get("/check_email/{email}")
+async def check_email(email: str, , session: AsyncSession = Depends(get_session)):
+    user = await is_email_registered(email, session)
+    return {"exists": user is not None}

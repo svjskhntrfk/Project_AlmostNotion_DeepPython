@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>MindSpace</title>
+    <meta name="description" content="Описание страницы" />
+    <link rel="stylesheet" type="text/css" href="../static/css/style_reg.css">
+    <script src="../static/js/js_login.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/validator/13.7.0/validator.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Philosopher:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="entry_section">
+            <h1 style="font-size: 30px; text-align: center; margin-bottom: 20px;">Вход</h1>
+            <form id="loginForm" action="login" method="post">
+                <div class="form-group">
+                    <label for="email"><p style="text-align: left">E-mail</p></label>
+                    <input class="in" type="text" id="email" name="email" required 
+                           placeholder="Введите Ваш E-mail" 
+                           value="{{ email if email else '' }}">
+                    <span id="email_Error" class="error">{{ email_error if email_error else '' }}</span>
+                </div>
+                <div class="form-group">
+                    <label for="password"><p style="text-align: left">Пароль</p></label>
+                    <input class="in" type="password" id="password" name="password" required 
+                           placeholder="Введите пароль">
+                    <span id="password_Error" class="error">{{ password_error if password_error else '' }}</span>
+                </div>
+                {% if error %}
+                <div class="error-message">
+                    {{ error }}
+                </div>
+                {% endif %}
+                <button type="submit" class="reg">Войти</button>
+            </form>
+            <p class="login-link">Нет аккаунта? <a href="/users/registration">Зарегистрироваться</a></p>
+        </div>
+    </div>
+</body>
+</html> 
