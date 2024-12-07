@@ -1,12 +1,15 @@
 import starlette.status as status
-from fastapi import APIRouter, Form, HTTPException
-from fastapi.responses import RedirectResponse
+from fastapi import APIRouter, Form, HTTPException, Request
+from fastapi.responses import RedirectResponse, HTMLResponse
+from fastapi.templating import Jinja2Templates
 from passlib.context import CryptContext
 
 
 from database1 import *
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+templates = Jinja2Templates(directory="templates")
+
 def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
@@ -61,26 +64,39 @@ async def registration(
         )
 
 @router.post("/login")
-async def login(
-    email: str = Form(...),
-    password: str = Form(...)
-):
-    # Проверяем существование пользователя
-    user = await is_email_registered(email=email)
-    if not user:
-        raise HTTPException(
-            status_code=400,
-            detail="Email not found"
-        )
+async def login(request: Request, email: str = Form(...), password: str = Form(...)):
+    try:
+        # Проверяем существование пользователя
+        user = await is_email_registered(email=email)
+        if not user:
+            return templates.TemplateResponse(
+                "login.html",
+                {
+                    "request": request,
+                    "email_error": "Пользователь с таким email не найден"
+                }
+            )
 
-    # Проверяем правильность пароля
-    if not verify_password(password, user.password):
-        raise HTTPException(
-            status_code=400,
-            detail="Incorrect password"
-        )
+        # Проверяем правильность пароля
+        if not verify_password(password, user.password):
+            return templates.TemplateResponse(
+                "login.html",
+                {
+                    "request": request,
+                    "password_error": "Неверный пароль",
+                    "email": email  # Сохраняем введенный email
+                }
+            )
 
-    return RedirectResponse(
-        f"/main_page/{user.id}",
-        status_code=status.HTTP_302_FOUND
-    )
+        return RedirectResponse(
+            f"/main_page/{user.id}",
+            status_code=status.HTTP_302_FOUND
+        )
+    except Exception as e:
+        return templates.TemplateResponse(
+            "login.html",
+            {
+                "request": request,
+                "error": "Произошла ошибка при входе в систему"
+            }
+        )

@@ -77,3 +77,12 @@ button {
   color: red;
   font-size: 14px;
 }
+
+.error-message {
+    color: #B14F44;
+    background-color: rgba(177, 79, 68, 0.1);
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: center;
+}
