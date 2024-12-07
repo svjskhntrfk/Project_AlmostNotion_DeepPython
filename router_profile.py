@@ -3,6 +3,7 @@ from fastapi import APIRouter, Form, Depends
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from starlette.requests import Request
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import HTMLResponse
 from passlib.context import CryptContext
 

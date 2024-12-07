@@ -296,6 +296,7 @@ async def change_username(user_id: int, new_username: str, session: AsyncSession
 
         user.username = new_username
         await session.flush()  # Применяем изменения в текущей транзакции
+        await session.commit()
 
         # Проверяем изменения
         await session.refresh(user)  # Обновляем объект из базы данных
