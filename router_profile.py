@@ -23,4 +23,11 @@ router = APIRouter(
 
 @router.get("/main_page/profile/{user_id}", response_class=HTMLResponse)
 async def profile_page(user_id: str, request: Request):
+    """
+    Get-запрос, переходим на HTML страничку профиля
+
+    Параметры:
+        user_id (str): ID пользователя
+        request (Request): Запрос на переход
+    """
     return templates.TemplateResponse("profile.html", {"request": request, "user_id" : user_id})
