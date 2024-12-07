@@ -39,7 +39,7 @@ async def profile_page(user_id : str, old_password = Form(), new_password = Form
 
 @router.get("/main_page/profile/{user_id}", response_class=HTMLResponse)
 async def profile_page(user_id: str, request: Request, session: AsyncSession = Depends(get_session)):
-  """
+    """
     Get-запрос, переходим на HTML страничку профиля
 
     Параметры:
