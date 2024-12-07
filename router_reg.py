@@ -23,44 +23,60 @@ router = APIRouter(
 
 @router.post("/registration")
 async def registration(
+    request: Request,
     email: str = Form(...),
     username: str = Form(...),
     password: str = Form(...),
     password2: str = Form(...)
 ):
-    # Проверяем, что пароли совпадают
-    if password != password2:
-        raise HTTPException(
-            status_code=400,
-            detail="Passwords don't match"
-        )
-
-    # Проверяем, что email не занят
-    existing_user = await is_email_registered(email)
-    if existing_user:
-        raise HTTPException(
-            status_code=400,
-            detail="Email already registered"
-        )
-
-    # Создаем пользователя
-    user_dict = {
-        "email": email,
-        "username": username,
-        "password": get_password_hash(password)
-    }
-
     try:
+        # Проверяем, что пароли совпадают
+        if password != password2:
+            return templates.TemplateResponse(
+                "reg.html",
+                {
+                    "request": request,
+                    "password2_error": "Пароли не совпадают",
+                    "email": email,
+                    "username": username
+                }
+            )
+
+        # Проверяем, что email не занят
+        existing_user = await is_email_registered(email)
+        if existing_user:
+            return templates.TemplateResponse(
+                "reg.html",
+                {
+                    "request": request,
+                    "email_error": "Этот email уже зарегистрирован",
+                    "username": username
+                }
+            )
+
+        # Создаем пользователя
+        user_dict = {
+            "email": email,
+            "username": username,
+            "password": get_password_hash(password)
+        }
+
         await create_user(**user_dict)
         user = await is_email_registered(email=email)
         return RedirectResponse(
             f"/main_page/{user.id}",
             status_code=status.HTTP_302_FOUND
         )
+
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=str(e)
+        return templates.TemplateResponse(
+            "reg.html",
+            {
+                "request": request,
+                "error": "Произошла ошибка при регистрации",
+                "email": email,
+                "username": username
+            }
         )
 
 @router.post("/login")
@@ -100,3 +116,8 @@ async def login(request: Request, email: str = Form(...), password: str = Form(.
                 "error": "Произошла ошибка при входе в систему"
             }
         )
+
+@router.get("/check_email/{email}")
+async def check_email(email: str):
+    user = await is_email_registered(email)
+    return {"exists": user is not None}
