@@ -16,13 +16,20 @@ function validateForm(event) {
 
     let flag = true;
 
-    if (!validator.isEmail(user_email)) {
-        user_email_Error.textContent = "Пожалуйста, введите правильный E-mail.";
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    
+    if (!emailRegex.test(user_email)) {
+        user_email_Error.textContent = "Пожалуйста, введите правильный E-mail (например: example@domain.com)";
         flag = false;
     }
 
     if (user_password !== user_password2) {
         user_password2_Error.textContent = "Пароли не совпадают.";
+        flag = false;
+    }
+
+    if (user_password.length < 6) {
+        user_password_Error.textContent = "Пароль должен содержать минимум 6 символов.";
         flag = false;
     }
 

@@ -1,6 +1,5 @@
 import starlette.status as status
-from fastapi import APIRouter, Form
-from fastapi import HTTPException
+from fastapi import APIRouter, Form, HTTPException
 from fastapi.responses import RedirectResponse
 from passlib.context import CryptContext
 
@@ -20,26 +19,68 @@ router = APIRouter(
 )
 
 @router.post("/registration")
-async def registration(email = Form(), username = Form(), password = Form(), password2 = Form()) :
-    user = await is_email_registered(email)
-    if password == password2 and user == None :
-        user_dict = {"email":email, "username":username, "password": get_password_hash(password)}
-    elif password != password2:
-        return {"message" : "Passwords don't match"}
-    else:
-        return {"message": "This email is already registered"}
+async def registration(
+    email: str = Form(...),
+    username: str = Form(...),
+    password: str = Form(...),
+    password2: str = Form(...)
+):
+    # Проверяем, что пароли совпадают
+    if password != password2:
+        raise HTTPException(
+            status_code=400,
+            detail="Passwords don't match"
+        )
 
-    await create_user(**user_dict)
-    user = await is_email_registered(email=email)
-    return RedirectResponse("/main_page/" + str(user.id),
-                            status_code=status.HTTP_302_FOUND)
+    # Проверяем, что email не занят
+    existing_user = await is_email_registered(email)
+    if existing_user:
+        raise HTTPException(
+            status_code=400,
+            detail="Email already registered"
+        )
+
+    # Создаем пользователя
+    user_dict = {
+        "email": email,
+        "username": username,
+        "password": get_password_hash(password)
+    }
+
+    try:
+        await create_user(**user_dict)
+        user = await is_email_registered(email=email)
+        return RedirectResponse(
+            f"/main_page/{user.id}",
+            status_code=status.HTTP_302_FOUND
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
 
 @router.post("/login")
-async def login(email = Form(),password = Form()):
+async def login(
+    email: str = Form(...),
+    password: str = Form(...)
+):
+    # Проверяем существование пользователя
     user = await is_email_registered(email=email)
     if not user:
-        raise HTTPException(status_code=404, detail="Email not found")
+        raise HTTPException(
+            status_code=400,
+            detail="Email not found"
+        )
+
+    # Проверяем правильность пароля
     if not verify_password(password, user.password):
-        raise HTTPException(status_code=404, detail="Wrong password")
-    return RedirectResponse("/main_page/" + str(user.id),
-        status_code=status.HTTP_302_FOUND)
+        raise HTTPException(
+            status_code=400,
+            detail="Incorrect password"
+        )
+
+    return RedirectResponse(
+        f"/main_page/{user.id}",
+        status_code=status.HTTP_302_FOUND
+    )
