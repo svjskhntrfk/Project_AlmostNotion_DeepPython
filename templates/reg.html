@@ -1,37 +1,46 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html lang="ru">
-  <div>
-      <head>
-        <meta charset="UTF-8">
-        <title>MindSpace</title>
-        <meta name="description" content="Описание страницы" />
-        <link rel="stylesheet" type="text/css" href="../static/css/style_reg.css" />
-
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Philosopher:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
-      </head>
-      <body>
-        <header>
-        </header>
-        <main>
-            <div class="entry_section">
-                <p style="font-size: 30px; text-align: center">Регистрация<p>
-                <form action="users/registration" method="post">
-                    <label for="email"><p style="text-align: left">E-mail</p></label>
-                    <input class="in" type="text" id="email" name="email" required placeholder="Введите Ваш E-mail">
-                    <label for="username"><p style="text-align: left">Имя</p></label>
-                    <input class="in" type="text" id="username" name="username" required placeholder="Введите Ваше имя">
-                    <label for="password"><p style="text-align: left">Пароль</p></label>
-                    <input class="in" type="password" id="password" name="password" required placeholder="Придумайте пароль">
-                    <label for="password2"><p style="text-align: left">Повторный пароль</p></label>
-                    <input class="in" type="password" id="password2" name="password2" required placeholder="Повторите Ваш пароль">
-                    <input class="reg" type="submit" value="Зарегистрироваться" />
-                </form>
-            </div>
-        </main>
-        <footer>
-        </footer>
-      </body>
-  </div>
+<head>
+    <meta charset="UTF-8">
+    <title>MindSpace</title>
+    <meta name="description" content="Описание страницы" />
+    <link rel="stylesheet" type="text/css" href="../static/css/style_reg.css?v=2">
+    <script src="../static/js/js_reg.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/validator/13.7.0/validator.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Philosopher:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+  </header>
+  <main>
+    <div class="entry_section">
+        <p style="font-size: 30px; text-align: center">Регистрация</p>
+          <form id="regForm" action="/users/registration" method="post">
+              <div class="form-group">
+                  <label for="email"><p style="text-align: left">E-mail</p></label>
+                  <input class="in" type="text" id="email" name="email" required placeholder="Введите Ваш E-mail">
+                  <span id="email_Error" class="error"></span>
+              </div>
+              <div class="form-group">
+                  <label for="username"><p style="text-align: left">Имя</p></label>
+                  <input class="in" type="text" id="username" name="username" required placeholder="Введите Ваше имя">
+                  <span id="name_Error" class="error"></span>
+              </div>
+              <div class="form-group">
+                  <label for="password"><p style="text-align: left">Пароль</p></label>
+                  <input class="in" type="password" id="password" name="password" required placeholder="Придумайте пароль">
+                  <span id="password_Error" class="error"></span>
+              </div>
+              <div class="form-group">
+                  <label for="password2"><p style="text-align: left">Повторный пароль</p></label>
+                  <input class="in" type="password" id="password2" name="password2" required placeholder="Повторите Ваш пароль">
+                  <span id="password2_Error" class="error"></span>
+              </div>
+              <button type="submit" class="reg">Зарегистрироваться</button>
+          </form>
+          <p class="login-link">Уже есть аккаунт? <a href="/users/login">Войти</a></p>
+    </div>
+</body>
 </html>

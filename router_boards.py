@@ -19,9 +19,17 @@ router = APIRouter(
     tags=["Board"]
 )
 
-@router.get("/main_page/{user_id}/add_board")
-async def create_new_board(user_id: str, session: AsyncSession = Depends(get_session)):
-    board_id = await create_board(int(user_id), "board1", session)
+@router.post("/main_page/{user_id}/add_board")
+async def create_new_board(user_id: str, boardName = Form(), session: AsyncSession = Depends(get_session)):
+    """
+    Создает новую доску для пользователя.
+
+    Параметры:
+        user_id (str): ID пользователя, который создает доску
+        boardName (Form): имя доски
+        session (AsyncSession): Сессия в базе данных
+    """
+    board_id = await create_board(int(user_id), boardName, session)
     return RedirectResponse(
         f"/board/main_page/{user_id}/{board_id}",
         status_code=status.HTTP_302_FOUND
@@ -29,14 +37,26 @@ async def create_new_board(user_id: str, session: AsyncSession = Depends(get_ses
 
 @router.get("/main_page/{user_id}/{board_id}")
 async def board_page(user_id: str, board_id: str, request: Request, session: AsyncSession = Depends(get_session)):
+    """
+    Get-запрос, переходит на доску
+
+    Параметры:
+        user_id (str): ID пользователя
+        board_id (str): ID доски
+        request (Request): Исходящий запрос с сервера
+        session (AsyncSession): Сессия в базе данных
+    """
     board = await get_board_by_user_id_and_board_id(int(user_id), int(board_id), session)
+    user = await get_user_by_id(int(user_id), session)
     return templates.TemplateResponse(
         "article.html",
         {
             "request": request,
             "user_id": user_id,
             "board_id": board_id,
-            "texts": board["texts"]
+            "texts": board[1]["texts"],
+            "username" : user.username,
+            "title" : board[0]
         }
     )
 
@@ -47,6 +67,15 @@ async def add_text_on_board(
     data: Dict = Body(...),
     session: AsyncSession = Depends(get_session)
 ):
+    """
+    Добавляет текст на текущую доску
+
+    Параметры:
+        user_id (str): ID пользователя
+        board_id (str): ID текущей доски
+        data (Dict): текст, который вводит пользователь
+        session (AsyncSession): Сессия в базе данных
+    """
     text = data.get("text")
     text_id = await create_text(int(board_id), text, session)
     return {"text_id": text_id}
@@ -58,9 +87,18 @@ async def update_text_on_board(
     data: Dict = Body(...),
     session: AsyncSession = Depends(get_session)
 ):
+    """
+    Обновление текста на доске
+
+    Параметры:
+        user_id (str): ID пользователя
+        board_id (str): ID текущей доски
+        data (Dict): Текст и его ID
+        session (AsyncSession): Сессия в базе данных
+    """
+
     text_id = data.get("text_id")
     new_text = data.get("text")
 
     await update_text(int(board_id), text_id, new_text,session)
-
     return {"status": "success"}

@@ -39,5 +39,13 @@ async def profile_page(user_id : str, old_password = Form(), new_password = Form
 
 @router.get("/main_page/profile/{user_id}", response_class=HTMLResponse)
 async def profile_page(user_id: str, request: Request, session: AsyncSession = Depends(get_session)):
+  """
+    Get-запрос, переходим на HTML страничку профиля
+
+    Параметры:
+        user_id (str): ID пользователя
+        request (Request): Запрос на переход
+    """
     user = await get_user_by_id(int(user_id), session=session)
     return templates.TemplateResponse("profile.html", {"request": request, "user_id" : user_id, "username": user.username })
+

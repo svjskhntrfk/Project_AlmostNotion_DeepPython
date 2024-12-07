@@ -15,13 +15,29 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def get_password_hash(password: str) -> str:
+    """
+    Хэшируем пароль с использованием bcrypt.
+
+    Параметры:
+        password (str): Пароль, который нужно хэшировать.
+    """
     return pwd_context.hash(password)
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """
+    Проверяет соответствие пароля его хэшированному значению
+
+    Параметры:
+        plain_password (str): Исходный пароль.
+        hashed_password (str): Хэшированное значение пароля
+    """
     return pwd_context.verify(plain_password, hashed_password)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """
+    Контекстный менеджер, который управляет жизненным циклом приложения
+    """
     await create_tables(engine)
     print("База готова к работе")
     yield
@@ -38,18 +54,44 @@ templates = Jinja2Templates(directory="templates")
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
+    """
+    Get-запрос, отображает главную страницу
+
+    Параметры:
+        request (Request): Объект HTTP-запроса
+    """
     return templates.TemplateResponse("landing.html", {"request": request})
 
 @app.get("/registration", response_class=HTMLResponse)
 async def registration_page(request: Request):
+    """
+    Get-запрос, отображает страницу регистрации
+
+    Параметры:
+        request (Request): Объект HTTP-запроса
+    """
     return templates.TemplateResponse("reg.html", {"request": request})
 
 @app.get("/login", response_class=HTMLResponse)
 async def login_page(request: Request):
+    """
+    Отображает страницу входа
+
+    Параметры:
+        request (Request): Объект HTTP-запроса.
+    """
     return templates.TemplateResponse("entry.html", {"request": request})
 
 @app.get("/main_page/{user_id}", response_class=HTMLResponse)
 async def main_page(user_id: str, request: Request, session: AsyncSession = Depends(get_session)):
+    """
+    Отображает главную страницу пользователя с его досками.
+
+    Параметры:
+        user_id (str): ID пользователя
+        request (Request): Объект HTTP-запроса
+        session (AsyncSession): Сессия в базе данных
+    """
     user = await get_user_by_id(int(user_id), session=session)
     boards_id_and_names = await get_boards_by_user_id(int(user_id), session=session)
     context = []

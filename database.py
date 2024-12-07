@@ -144,16 +144,19 @@ async def get_board_by_user_id_and_board_id(user_id: int, board_id: int, session
     """
     try:
         query = (
-            select(Board.content)
+            select(Board.title, Board.content)
             .join(user_board_association, user_board_association.c.board_id == Board.id)
             .filter(user_board_association.c.user_id == user_id)
             .filter(user_board_association.c.board_id == board_id)
         )
         result = await session.execute(query)
-        content = result.all()  # Получаем все результаты запроса
+        result = result.all()[0]
+        print(result)
+        content = result.content  # Получаем все результаты запроса
+        print(content)
         if not content:
             raise ValueError(f"No board found for user_id {user_id} and board_id {board_id}.")
-        return content[0][0]
+        return result
     except SQLAlchemyError as e:
         logger.error(f"Error retrieving board for user_id {user_id} and board_id {board_id}: {e}")
         raise RuntimeError("An error occurred while retrieving the board.")
@@ -274,6 +277,7 @@ async def update_text(board_id: int, text_id: str, new_text: str, session: Async
     except SQLAlchemyError as e:
         logger.error(f"Database error while updating text with text_id={text_id} in board_id={board_id}: {e}")
         raise RuntimeError("Failed to update text due to a database error.") from e
+
 
 async def change_username(user_id: int, new_username: str, session: AsyncSession):
     """
