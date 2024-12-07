@@ -1,8 +1,40 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    width: 100%;
+    overflow-x: hidden;
+}
+
 body {
     background-color: #F0E4D8;
     font-family: "Philosopher", sans-serif;
     font-weight: 400;
     font-style: normal;
+}
+
+header {
+    width: 100%;
+    background: #DD8E75;
+    height: 80px;
+    border: 1px solid #C9C9C9;
+    border-bottom-right-radius: 25px;
+    border-bottom-left-radius: 25px;
+    margin-bottom: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+main {
+    width: 100%;
+    max-width: 1200px;
+    margin-left: 20px;
+    padding: 0;
 }
 
 .username {
@@ -15,24 +47,49 @@ body {
     color: #F0E4D8;
 }
 
-header{
-    width: 100%;
-    background: #DD8E75;
-    height: 80px;
-    border: 1px solid #C9C9C9;
-    border-bottom-right-radius: 25px;
-    border-bottom-left-radius: 25px;
-    margin-bottom: 50px;
+.back_to_mp {
+    flex: 0 0 auto;
+    margin-right: 20px;
+}
+
+.back_to_mp a {
+    display: flex;
+    align-items: center;
+}
+
+.title {
+    flex: 1;
+    text-align: center;
+    font-size: 28px;
+    color: #F0E4D8;
+}
+
+.name {
+    flex: 0 0 auto;
+    margin-left: 20px;
+}
+
+.username {
+    text-decoration: none;
+    color: #F0E4D8;
+    font-size: 20px;
+    transition: color 0.3s ease;
+}
+
+.username:hover {
+    color: #B14F44;
 }
 
 .note-content {
+    width: 100%;
     padding: 5px;
     outline: none;
     font-family: inherit;
-    margin-left: 20px;
     border: none;
     color: #B14F44;
     font-size: 25px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
 .note-content:focus {
@@ -48,10 +105,14 @@ header{
     margin: 5px 0;
     color: #B14F44;
     font-size: 25px;
+    width: 100%;
+    word-wrap: break-word;
+    text-align: left;
 }
 
 .all_texts {
     position: relative;
+    width: 100%;
 }
 
 .new-note-area {
