@@ -1,33 +1,120 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    width: 100%;
+    overflow-x: hidden;
+}
+
 body {
     background-color: #F0E4D8;
     font-family: "Philosopher", sans-serif;
     font-weight: 400;
     font-style: normal;
-    justify-content: center;
+}
+
+header {
+    width: 100%;
+    background: #DD8E75;
+    height: 80px;
+    border: 1px solid #C9C9C9;
+    border-bottom-right-radius: 25px;
+    border-bottom-left-radius: 25px;
+    margin-bottom: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+main {
+    width: 100%;
+    max-width: 1200px;
+    margin-left: 20px;
+    padding: 0;
+}
+
+.username {
+    text-decoration: none;
+    color: #F0E4D8;
+}
+
+.title {
+    text-decoration: none;
+    color: #F0E4D8;
+}
+
+.back_to_mp {
+    flex: 0 0 auto;
+    margin-right: 20px;
+}
+
+.back_to_mp a {
+    display: flex;
     align-items: center;
 }
 
-.space {
-    border: 1px solid #C9C9C9;
-    border-radius: 10px;
-    height: 50px;
-    color: #000000;
-    font-family: "Philosopher", sans-serif;
-    padding: 10px;
-    margin-bottom: 10px;
-    display: block;
-    width: 90%;
+.title {
+    flex: 1;
+    text-align: center;
+    font-size: 28px;
+    color: #F0E4D8;
 }
 
-.space-btn {
-    padding: 10px 20px;
-    font-family: "Philosopher", sans-serif;
-    width: 20%;
-    margin-bottom: 25px;
-    margin-top: 10px;
-    background-color: #B14F44;
+.name {
+    flex: 0 0 auto;
+    margin-left: 20px;
+}
+
+.username {
+    text-decoration: none;
     color: #F0E4D8;
     font-size: 20px;
-    border: 1px solid #C9C9C9;
-    border-radius: 10px;
+    transition: color 0.3s ease;
+}
+
+.username:hover {
+    color: #B14F44;
+}
+
+.note-content {
+    width: 100%;
+    padding: 5px;
+    outline: none;
+    font-family: inherit;
+    border: none;
+    color: #B14F44;
+    font-size: 25px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.note-content:focus {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.note-content:empty:before {
+    content: attr(data-placeholder);
+    color: #888;
+}
+
+.text {
+    margin: 5px 0;
+    color: #B14F44;
+    font-size: 25px;
+    width: 100%;
+    word-wrap: break-word;
+    text-align: left;
+}
+
+.all_texts {
+    position: relative;
+    width: 100%;
+}
+
+.new-note-area {
+    width: calc(100% - 40px);
 }
