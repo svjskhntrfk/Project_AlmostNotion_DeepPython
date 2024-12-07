@@ -42,7 +42,14 @@ class User(Base):
         back_populates="users",
         lazy='joined'
     )
+    profile_id: Mapped[int | None] = mapped_column(ForeignKey('profiles.id'))
 
+    profile: Mapped["Profile"] = relationship(
+        "Profile",
+        back_populates="user",
+        uselist=False,  # Обеспечивает связь один-к-одному
+        lazy="joined"  # Автоматически загружает связанные данные из Profile при запросе User
+    )
 
 class Board(Base):
     title: Mapped[str]
@@ -53,4 +60,15 @@ class Board(Base):
         secondary=user_board_association,  # Используем вспомогательную таблицу
         back_populates="boards",
         lazy='joined'
+    )
+
+class Profile(Base):
+    first_name: Mapped[str | None]
+    last_name: Mapped[str | None]
+    age: Mapped[int | None]
+    avatar: Mapped[str | None] = mapped_column(nullable=True) 
+    user: Mapped["User"] = relationship(
+        "User",
+        back_populates="profile",
+        uselist=False
     )

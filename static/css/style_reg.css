@@ -2,7 +2,6 @@ body {
     background-color: #F0E4D8;
     font-family: "Philosopher", sans-serif;
 }
-
 .entry_section {
     background-color: #FFFFFF;
     position: fixed;
@@ -17,12 +16,10 @@ body {
     transform: translate(-50%, -50%);
     width: 30%;
 }
-
 .input{
     display: grid;
     text-align: left;
 }
-
 .entry_button{
     background-color: #B14F44;
     color: #F0E4D8;
@@ -34,17 +31,14 @@ body {
     width: 100%;
     margin: 15px 0px;
 }
-
 a {
     text-decoration: none;
     color: #F0E4D8;
     font-size: 15px;
 }
-
 main {
     position: relative;
 }
-
 .in {
     border: 1px solid #C9C9C9;
     border-radius: 10px;
@@ -56,12 +50,10 @@ main {
     display: block;
     width: 95%;
 }
-
 h1{
     font-size: 35xpx;
     font-weight: 100px;
 }
-
 .reg {
     padding: 10px 20px;
     font-family: "Philosopher", sans-serif;
@@ -73,4 +65,24 @@ h1{
     font-size: 25px;
     border: 1px solid #C9C9C9;
     border-radius: 10px;
+}
+
+button {
+    border: none;
+    padding: 0px;
+    background-color: #FFFFFF;
+}
+
+.error {
+  color: red;
+  font-size: 14px;
+}
+
+.error-message {
+    color: #B14F44;
+    background-color: rgba(177, 79, 68, 0.1);
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: center;
 }
