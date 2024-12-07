@@ -278,3 +278,74 @@ async def update_text(board_id: int, text_id: str, new_text: str, session: Async
         logger.error(f"Database error while updating text with text_id={text_id} in board_id={board_id}: {e}")
         raise RuntimeError("Failed to update text due to a database error.") from e
 
+
+async def change_username(user_id: int, new_username: str, session: AsyncSession):
+    """
+    Изменяет имя пользователя в базе данных.
+
+    :param user_id: ID пользователя.
+    :param new_username: Новое имя пользователя.
+    :param session: Асинхронная сессия SQLAlchemy.
+    :return: True, если имя пользователя успешно изменено.
+    :raises ValueError: Если изменения не удалось сохранить или пользователь не найден.
+    :raises RuntimeError: Если произошла ошибка базы данных.
+    """
+    try:
+        query = select(User).filter(User.id == user_id)
+        result = await session.execute(query)
+        user = result.scalars().first()
+
+        if not user:
+            raise ValueError(f"User with ID {user_id} not found.")
+
+        user.username = new_username
+        await session.flush()  # Применяем изменения в текущей транзакции
+        await session.commit()
+
+        # Проверяем изменения
+        await session.refresh(user)  # Обновляем объект из базы данных
+        if user.username != new_username:
+            raise ValueError("Failed to save changes")
+
+        return True
+
+    except SQLAlchemyError as e:
+        logger.error(f"Error editing username for user_id={user_id}: {e}")
+        raise RuntimeError("An error occurred while changing the username.") from e
+
+
+
+async def change_password(user_id: int, new_password: str, session: AsyncSession):
+    """
+    Изменяет пароль пользователя в базе данных.
+
+    :param user_id: ID пользователя.
+    :param new_password: Новый пароль пользователя (хэшированный).
+    :param session: Асинхронная сессия SQLAlchemy.
+    :return: True, если пароль успешно изменен.
+    :raises ValueError: Если изменения не удалось сохранить или пользователь не найден.
+    :raises RuntimeError: Если произошла ошибка базы данных.
+    """
+    try:
+        query = select(User).filter(User.id == user_id)
+        result = await session.execute(query)
+        user = result.scalars().first()
+
+        if not user:
+            raise ValueError(f"User with ID {user_id} not found.")
+
+        user.password = new_password
+        await session.flush()  
+        await session.commit()  
+
+        await session.refresh(user)
+        if user.password != new_password:
+            raise ValueError("Failed to save changes")
+
+        return True
+
+    except SQLAlchemyError as e:
+        logger.error(f"Error editing password for user_id={user_id}: {e}")
+        raise RuntimeError("An error occurred while changing the password.") from e
+    
+

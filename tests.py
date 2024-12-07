@@ -50,18 +50,15 @@ async def test_create_user(db_session):
 
 @pytest.mark.asyncio
 async def test_is_email_registered(db_session):
-    # Создаём пользователя
     username = "check_user"
     email = "check_user@example.com"
     password = "check_pass"
     await create_user(username, email, password, db_session)
 
-    # Проверяем, что email зарегистрирован
     user = await is_email_registered(email, db_session)
     assert user is not None
     assert user.email == email
 
-    # Проверяем несуществующий email
     no_user = await is_email_registered("no_exist@example.com", db_session)
     assert no_user is None
 
@@ -183,3 +180,67 @@ async def test_get_boards_by_user_id(db_session):
     assert len(boards) == 3
     returned_titles = [b["title"] for b in boards]
     assert set(returned_titles) == set(board_titles)
+
+@pytest.mark.asyncio
+async def test_change_username_success(db_session: AsyncSession):
+    # Создаём пользователя
+    username = "old_username"
+    email = "test_user@example.com"
+    password = "password123"
+    await create_user(username, email, password, db_session)
+
+    # Получаем пользователя
+    result = await db_session.execute(select(User).filter_by(email=email))
+    user = result.scalars().first()
+    assert user is not None
+
+    # Меняем имя пользователя
+    new_username = "new_username"
+    success = await change_username(user_id=user.id, new_username=new_username, session=db_session)
+
+    # Проверяем изменения
+    assert success is True
+    updated_user = await db_session.execute(select(User).filter_by(id=user.id))
+    updated_user = updated_user.scalars().first()
+    assert updated_user.username == new_username
+
+
+@pytest.mark.asyncio
+async def test_change_username_user_not_found(db_session: AsyncSession):
+    # Попытка изменить имя пользователя для несуществующего ID
+    invalid_user_id = 99999
+    with pytest.raises(ValueError, match=f"User with ID {invalid_user_id} not found."):
+        await change_username(user_id=invalid_user_id, new_username="nonexistent", session=db_session)
+
+
+@pytest.mark.asyncio
+async def test_change_password_success(db_session: AsyncSession):
+    # Создаём пользователя
+    username = "test_user"
+    email = "password_user@example.com"
+    password = "old_password"
+    await create_user(username, email, password, db_session)
+
+    # Получаем пользователя
+    result = await db_session.execute(select(User).filter_by(email=email))
+    user = result.scalars().first()
+    assert user is not None
+
+    # Меняем пароль пользователя
+    new_password = "new_password"
+    success = await change_password(user_id=user.id, new_password=new_password, session=db_session)
+
+    # Проверяем изменения
+    assert success is True
+    updated_user = await db_session.execute(select(User).filter_by(id=user.id))
+    updated_user = updated_user.scalars().first()
+    assert updated_user.password == new_password
+
+
+@pytest.mark.asyncio
+async def test_change_password_user_not_found(db_session: AsyncSession):
+    # Попытка изменить пароль для несуществующего ID
+    invalid_user_id = 99999
+    with pytest.raises(ValueError, match=f"User with ID {invalid_user_id} not found."):
+        await change_password(user_id=invalid_user_id, new_password="new_password", session=db_session)
+
