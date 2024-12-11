@@ -262,11 +262,9 @@ async def update_text(board_id: int, text_id: str, new_text: str, session: Async
             if not text_found:
                 raise ValueError(f"Text with id {text_id} not found")
 
-            # Обновляем контент
             board.content = new_content
-            await session.flush()  # Применяем изменения
+            await session.flush()  
 
-            # Проверяем изменения
             await session.refresh(board)
             for text in board.content["texts"]:
                 if text["id"] == text_id and text["text"] != new_text:

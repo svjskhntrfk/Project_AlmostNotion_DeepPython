@@ -9,7 +9,7 @@ import enum
 
 
 class Base(AsyncAttrs, DeclarativeBase):
-    __abstract__ = True  # Класс абстрактный, чтобы не создавать отдельную таблицу для него
+    __abstract__ = True  
     type_annotation_map = {
         dict[str, Any]: JSON
     }
@@ -47,8 +47,8 @@ class User(Base):
     profile: Mapped["Profile"] = relationship(
         "Profile",
         back_populates="user",
-        uselist=False,  # Обеспечивает связь один-к-одному
-        lazy="joined"  # Автоматически загружает связанные данные из Profile при запросе User
+        uselist=False,  
+        lazy="joined"  
     )
 
 class Board(Base):
@@ -57,7 +57,7 @@ class Board(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
     users: Mapped[list["User"]] = relationship(
         "User",
-        secondary=user_board_association,  # Используем вспомогательную таблицу
+        secondary=user_board_association,  
         back_populates="boards",
         lazy='joined'
     )
