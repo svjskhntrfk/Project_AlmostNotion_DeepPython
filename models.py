@@ -91,6 +91,7 @@ class IssuedJWTToken(Base):
     
     device_id: Mapped[str] = mapped_column(String(36))
     revoked: Mapped[bool] = mapped_column(default=False)
+    expired_time: Mapped[int] = mapped_column(Integer, nullable=False)
 
     def __str__(self) -> str:
         return f'{self.subject}: {self.jti}'
