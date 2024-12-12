@@ -1,5 +1,5 @@
 from contextlib import asynccontextmanager
-from fastapi import APIRouter, Depends, Form
+from fastapi import Depends
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -8,7 +8,7 @@ from starlette.requests import Request
 from starlette.responses import HTMLResponse
 
 from database import *
-from router_reg import router as reg_router
+from auth.transport.router_reg import router as reg_router
 from router_boards import router as board_router
 from router_profile import router as profile_router
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

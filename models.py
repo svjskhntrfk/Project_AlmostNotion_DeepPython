@@ -1,11 +1,11 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.orm import DeclarativeBase, declared_attr
 from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
-from sqlalchemy import Integer, func, Table, Column
+from sqlalchemy import Integer, func, Table, Column, String
 from datetime import datetime
 from sqlalchemy import ForeignKey, JSON, text
 from typing import Any
-import enum
+import enum 
 
 
 class Base(AsyncAttrs, DeclarativeBase):
@@ -51,6 +51,12 @@ class User(Base):
         lazy="joined"  
     )
 
+    tokens: Mapped[list["IssuedJWTToken"]] = relationship(
+        "IssuedJWTToken",
+        back_populates="subject",
+        lazy="joined"
+    )
+
 class Board(Base):
     title: Mapped[str]
     content: Mapped[dict | None] = mapped_column(JSON)
@@ -72,3 +78,19 @@ class Profile(Base):
         back_populates="profile",
         uselist=False
     )
+
+class IssuedJWTToken(Base):
+    jti: Mapped[str] = mapped_column(String(36), primary_key=True)
+    
+    subject_id: Mapped[int] = mapped_column(ForeignKey('users.id', ondelete='CASCADE'))
+    subject: Mapped["User"] = relationship(
+        "User",
+        back_populates="tokens",
+        lazy="joined"
+    )
+    
+    device_id: Mapped[str] = mapped_column(String(36))
+    revoked: Mapped[bool] = mapped_column(default=False)
+
+    def __str__(self) -> str:
+        return f'{self.subject}: {self.jti}'

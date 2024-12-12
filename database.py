@@ -347,3 +347,30 @@ async def change_password(user_id: int, new_password: str, session: AsyncSession
         raise RuntimeError("An error occurred while changing the password.") from e
     
 
+async def create_jwt_tokens(
+    tokens: list[dict], 
+    user: User, 
+    device_id: str, 
+    session: AsyncSession
+) -> None:
+    """
+    Create multiple JWT tokens in database
+    
+    Args:
+        tokens: List of token payloads containing 'jti' and 'exp'
+        user: User instance
+        device_id: Device identifier
+        session: AsyncSession instance
+    """
+    issued_tokens = [
+        IssuedJWTToken(
+            subject=user,
+            jti=token['jti'],
+            device_id=device_id,
+            expired_time=token['exp']
+        )
+        for token in tokens
+    ]
+    
+    session.add_all(issued_tokens)
+    await session.commit()

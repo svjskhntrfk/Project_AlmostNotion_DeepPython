@@ -6,11 +6,35 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 from passlib.context import CryptContext
 from database import create_board, get_board_by_user_id_and_board_id, create_text, get_session
+from fastapi import APIRouter, Depends, Request, Security
+from fastapi.responses import JSONResponse
+
+from auth.middlewares.jwt.service import check_access_token
+from auth.service import AuthService
+from auth.middlewares.jwt.base.auth import JWTAuth
+from auth.transport.responses import TokensOut
+from auth.errors import AuthErrorTypes
+from auth.jwt_settings import jwt_config
+
+from pydantic import BaseModel
+
+
+class SuccessOut(BaseModel):
+    success: bool = True
+
+
+class ErrorOut(BaseModel):
+    type: str
+    message: str
 
 from database import *
+from auth.dto import UserCredentialsDTO
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 templates = Jinja2Templates(directory="templates")
+
+def get_auth_service() -> AuthService:
+    return AuthService(jwt_auth=JWTAuth(config=jwt_config))
 
 def get_password_hash(password: str) -> str:
     """
@@ -36,26 +60,25 @@ router = APIRouter(
     tags=["Users"]
 )
 
-@router.post("/registration")
+@router.post(
+    path='/registration',
+    responses={
+        200: {'model': TokensOut},
+        400: {'model': ErrorOut},
+    },
+)
 async def registration(
     request: Request,
     email: str = Form(...),
     username: str = Form(...),
     password: str = Form(...),
     password2: str = Form(...), 
-    session: AsyncSession = Depends(get_session)):
+    session: AsyncSession = Depends(get_session),
+    auth_service: AuthService = Depends(get_auth_service)):
     """
-        Post-запрос, забираем данные пользователя с регистрации. Проверяем, что пользователь не был зарегистрирован ранее и совпадение повторного пароля с изначальным
-
-        Параметры:
-            email (Form): Почта пользователя
-            username (Form): Имя пользователя
-            password (Form): Пароль
-            password2 (Form): Подтверждение пароля
-            session (AsyncSession): Сессия в базе данных
+    Post-запрос, забираем данные пользователя с регистрации.
     """
     try:
-        # Проверяем, что пароли совпадают
         if password != password2:
             return templates.TemplateResponse(
                 "reg.html",
@@ -67,27 +90,39 @@ async def registration(
                 }
             )
 
-        # Проверяем, что email не занят
-        existing_user = await is_email_registered(email, session)
-        if existing_user:
+        user_credentials = UserCredentialsDTO(
+            email=email,
+            password=password
+        )
+
+        # Use AuthService to register the user
+        print(user_credentials)
+        tokens, error = await auth_service.register(user_credentials, username, session)
+        print(tokens)
+        print(error)
+        if error:
+            if error.type == AuthErrorTypes.EMAIL_OCCUPIED:
+                return templates.TemplateResponse(
+                    "reg.html",
+                    {
+                        "request": request,
+                        "email_error": "Этот email уже зарегистрирован",
+                        "username": username
+                    }
+                )
             return templates.TemplateResponse(
                 "reg.html",
                 {
                     "request": request,
-                    "email_error": "Этот email уже зарегистрирован",
+                    "error": error.message,
+                    "email": email,
                     "username": username
                 }
             )
 
-        # Создаем пользователя
-        user_dict = {
-            "email": email,
-            "username": username,
-            "password": get_password_hash(password)
-        }
-
-        await create_user(**user_dict, session=session)
+        # Получаем созданного пользователя
         user = await is_email_registered(email=email, session=session)
+        
         return RedirectResponse(
             f"/main_page/{user.id}",
             status_code=status.HTTP_302_FOUND
@@ -103,44 +138,57 @@ async def registration(
                 "username": username
             }
         )
+    
 
 @router.post("/login")
-async def login(request: Request, email: str = Form(...), password: str = Form(...), session: AsyncSession = Depends(get_session)):
+async def login(
+    request: Request, 
+    email: str = Form(...), 
+    password: str = Form(...), 
+    session: AsyncSession = Depends(get_session),
+    auth_service: AuthService = Depends(get_auth_service)):
     """
     Авторизация пользователя
-
-    Параметры:
-        email (Form): Почта пользователя
-        password (Form): Пароль пользователя
-        session (AsyncSession): Сессия в базе данных
     """
     try:
-        # Проверяем существование пользователя
+        # Создаем DTO для входа
+        user_credentials = UserCredentialsDTO(
+            email=email,
+            password=password
+        )
+
+        # Пытаемся войти через AuthService
+        tokens, error = await auth_service.login(user_credentials)
+        
+        if error:
+            # Если неверные учетные данные
+            if error.type == AuthErrorTypes.INVALID_CREDENTIALS:
+                return templates.TemplateResponse(
+                    "login.html",
+                    {
+                        "request": request,
+                        "password_error": "Неверный email или пароль",
+                        "email": email
+                    }
+                )
+            # Если другая ошибка
+            return templates.TemplateResponse(
+                "login.html",
+                {
+                    "request": request,
+                    "error": error.message,
+                    "email": email
+                }
+            )
+
+        # Получаем пользователя для редиректа
         user = await is_email_registered(email=email, session=session)
-        if not user:
-            return templates.TemplateResponse(
-                "login.html",
-                {
-                    "request": request,
-                    "email_error": "Пользователь с таким email не найден"
-                }
-            )
-
-        # Проверяем правильность пароля
-        if not verify_password(password, user.password):
-            return templates.TemplateResponse(
-                "login.html",
-                {
-                    "request": request,
-                    "password_error": "Неверный пароль",
-                    "email": email  # Сохраняем введенный email
-                }
-            )
-
+        
         return RedirectResponse(
             f"/main_page/{user.id}",
             status_code=status.HTTP_302_FOUND
         )
+
     except Exception as e:
         return templates.TemplateResponse(
             "login.html",
