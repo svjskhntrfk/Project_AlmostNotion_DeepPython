@@ -353,6 +353,7 @@ async def create_jwt_tokens(
     device_id: str, 
     session: AsyncSession
 ) -> None:
+    print('in database')
     """
     Create multiple JWT tokens in database
     
@@ -371,6 +372,7 @@ async def create_jwt_tokens(
         )
         for token in tokens
     ]
-    
+    print(issued_tokens)
+    print('end')
     session.add_all(issued_tokens)
     await session.commit()

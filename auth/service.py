@@ -25,6 +25,7 @@ class AuthService:
         self._jwt_auth = jwt_auth
 
     async def register(self, body: UserCredentialsDTO, username: str, session: AsyncSession) -> tuple[TokensDTO, None] | tuple[None, ErrorObj]:
+        print("Starting registration...")
         if await is_email_registered(email=body.email, session=session):
             return None, AuthError.get_email_occupied_error()
 
@@ -33,20 +34,28 @@ class AuthService:
             "username": username,
             "password": get_sha256_hash(body.password)
         }
+
         await create_user(**user_dict, session=session)
         user = await is_email_registered(email=body.email, session=session)
-        print(user)
+        print(f"User created: {user}")
 
-        access_token, refresh_token = await self._issue_tokens_for_user(user=user, session=session)
+        print(f"About to create tokens for user {user.id}")
+        access_token, refresh_token = await self._issue_tokens_for_user(
+            user=user, 
+            device_id=generate_device_id(),
+            session=session
+        )
 
-        print(access_token  , refresh_token)
+        print(access_token, refresh_token)
         return TokensDTO(access_token=access_token, refresh_token=refresh_token), None
 
     async def login(self, body: UserCredentialsDTO, session: AsyncSession) -> tuple[TokensDTO, None] | tuple[None, ErrorObj]:
+        print("Starting login...")
         user = await is_email_registered(email=body.email, session=session)
         if not user or user.password != get_sha256_hash(body.password):
             return None, AuthError.get_invalid_credentials_error()
 
+        print(f"User found: {user}")
         access_token, refresh_token = await self._issue_tokens_for_user(user=user, session=session)
 
         return TokensDTO(access_token=access_token, refresh_token=refresh_token), None
@@ -79,14 +88,49 @@ class AuthService:
         return TokensDTO(access_token=access_token, refresh_token=refresh_token), None
 
     async def _issue_tokens_for_user(self, user: User, device_id: str, session: AsyncSession) -> tuple[str, str]:
-        print('started creating tokens')
-        access_token = self._jwt_auth.generate_access_token(subject=str(user.id), payload={'device_id': device_id})
-        refresh_token = self._jwt_auth.generate_refresh_token(subject=str(user.id), payload={'device_id': device_id})
+        try:
+            import sys
+            print('started creating tokens')
+            sys.stdout.flush()
+            
+            # Добавим проверку параметров
+            print(f"User: {user}, ID: {user.id}, Device ID: {device_id}")
+            sys.stdout.flush()
+            
+            try:
+                access_token = self._jwt_auth.generate_access_token(subject=str(user.id), payload={'device_id': device_id})
+                print("Access token generated")
+            except Exception as e:
+                print(f"Error generating access token: {str(e)}")
+                raise
+                
+            try:
+                refresh_token = self._jwt_auth.generate_refresh_token(subject=str(user.id), payload={'device_id': device_id})
+                print("Refresh token generated")
+            except Exception as e:
+                print(f"Error generating refresh token: {str(e)}")
+                raise
 
-        raw_tokens = [self._jwt_auth.get_raw_jwt(token) for token in [access_token, refresh_token]]
-        
-        await create_jwt_tokens(raw_tokens, user, device_id, session)
-        
-        print('tokens created')
-        print(access_token, refresh_token)
-        return access_token, refresh_token
+            try:
+                raw_tokens = [self._jwt_auth.get_raw_jwt(token) for token in [access_token, refresh_token]]
+                print("Raw tokens extracted")
+            except Exception as e:
+                print(f"Error getting raw tokens: {str(e)}")
+                raise
+            
+            try:
+                await create_jwt_tokens(raw_tokens, user, device_id, session)
+                print("Tokens saved to database")
+            except Exception as e:
+                print(f"Error saving tokens to database: {str(e)}")
+                raise
+            
+            print('tokens created')
+            print(access_token, refresh_token)
+            return access_token, refresh_token
+        except Exception as e:
+            print(f"Error in _issue_tokens_for_user: {str(e)}")
+            print(f"Error type: {type(e)}")
+            import traceback
+            print(f"Traceback: {traceback.format_exc()}")
+            raise
