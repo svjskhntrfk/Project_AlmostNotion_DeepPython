@@ -1,11 +1,12 @@
 import starlette.status as status
-from fastapi import APIRouter, Form, Depends
+from fastapi import APIRouter, Form, Depends, Security
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from starlette.requests import Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import HTMLResponse
 from passlib.context import CryptContext
+from auth.middlewares.jwt.service import check_access_token
 
 from database import *
 
@@ -13,7 +14,8 @@ templates = Jinja2Templates(directory="templates")
 
 router = APIRouter(
     prefix="/profile",
-    tags=["Profile"]
+    tags=["Profile"],
+    dependencies=[Security(check_access_token)]
 )
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -23,6 +25,27 @@ def get_password_hash(password: str) -> str:
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
+
+
+@router.get("/main_page", response_class=HTMLResponse)
+async def main_page(request: Request, session: AsyncSession = Depends(get_session)):
+    """
+    Отображает главную страницу пользователя с его досками.
+
+    Параметры:
+        user_id (str): ID пользователя
+        request (Request): Объект HTTP-запроса
+        session (AsyncSession): Сессия в базе данных
+    """
+    print("Request state:", request.state.__dict__) 
+    user = request.state.user
+    user_id = user.id
+    boards_id_and_names = await get_boards_by_user_id(int(user_id), session=session)
+    context = []
+    for board in boards_id_and_names:
+        context.append({"url":"/board/main_page/" + user_id + "/" + str(board["id"]), "name": board["title"]})
+    return templates.TemplateResponse("main_page.html", {"request": request, "username": user.username, "user_id": user_id, "links" : context})
+
 @router.post("/main_page/profile/{user_id}/change_name")
 async def profile_page(user_id : str, first_name = Form(), session: AsyncSession = Depends(get_session)) :
     await change_username(int(user_id), first_name, session=session)

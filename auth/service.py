@@ -10,6 +10,7 @@ from hashlib import sha256
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import create_user, is_email_registered, create_jwt_tokens
 
+
 def get_sha256_hash(line: str) -> str:
     return sha256(str.encode(line)).hexdigest()
 
@@ -45,7 +46,6 @@ class AuthService:
             device_id=generate_device_id(),
             session=session
         )
-
         print(access_token, refresh_token)
         return TokensDTO(access_token=access_token, refresh_token=refresh_token), None
 
@@ -56,7 +56,7 @@ class AuthService:
             return None, AuthError.get_invalid_credentials_error()
 
         print(f"User found: {user}")
-        access_token, refresh_token = await self._issue_tokens_for_user(user=user, session=session)
+        access_token, refresh_token = await self._issue_tokens_for_user(user=user, session=session, device_id=generate_device_id())
 
         return TokensDTO(access_token=access_token, refresh_token=refresh_token), None
 

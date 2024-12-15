@@ -76,7 +76,7 @@ async def registration(
     session: AsyncSession = Depends(get_session),
     auth_service: AuthService = Depends(get_auth_service)):
     """
-    Post-запрос, забираем данные пользователя с регистрации.
+    Post-запрос, забиваем данные пользователя с регистрации.
     """
     try:
         if password != password2:
@@ -94,12 +94,7 @@ async def registration(
             email=email,
             password=password
         )
-
-        # Use AuthService to register the user
-        print(user_credentials)
         tokens, error = await auth_service.register(user_credentials, username, session)
-        print(tokens)
-        print(error)
         if error:
             if error.type == AuthErrorTypes.EMAIL_OCCUPIED:
                 return templates.TemplateResponse(
@@ -120,11 +115,9 @@ async def registration(
                 }
             )
 
-        # Получаем созданного пользователя
-        user = await is_email_registered(email=email, session=session)
         
         return RedirectResponse(
-            f"/main_page/{user.id}",
+            url=f"/login",
             status_code=status.HTTP_302_FOUND
         )
 
@@ -151,17 +144,14 @@ async def login(
     Авторизация пользователя
     """
     try:
-        # Создаем DTO для входа
         user_credentials = UserCredentialsDTO(
             email=email,
             password=password
         )
 
-        # Пытаемся войти через AuthService
-        tokens, error = await auth_service.login(user_credentials)
+        tokens, error = await auth_service.login(user_credentials, session=session)
         
         if error:
-            # Если неверные учетные данные
             if error.type == AuthErrorTypes.INVALID_CREDENTIALS:
                 return templates.TemplateResponse(
                     "login.html",
@@ -171,7 +161,6 @@ async def login(
                         "email": email
                     }
                 )
-            # Если другая ошибка
             return templates.TemplateResponse(
                 "login.html",
                 {
@@ -180,23 +169,27 @@ async def login(
                     "email": email
                 }
             )
-
-        # Получаем пользователя для редиректа
-        user = await is_email_registered(email=email, session=session)
         
-        return RedirectResponse(
-            f"/main_page/{user.id}",
+        response = RedirectResponse(
+            f"/profile/main_page",
             status_code=status.HTTP_302_FOUND
         )
+        
+        response.set_cookie(
+            key="Authorization",
+            value=f"Bearer {tokens.access_token}",
+            httponly=True
+        )
+        
+        return response
 
     except Exception as e:
-        return templates.TemplateResponse(
-            "login.html",
-            {
+        return {
                 "request": request,
-                "error": "Произошла ошибка при входе в систему"
+                "user":request.state.user,
+                "error": e
             }
-        )
+
 
 @router.get("/check_email/{email}")
 async def check_email(email: str, session: AsyncSession = Depends(get_session)):

@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import AsyncGenerator
 import uuid
 import logging
+from sqlalchemy import cast, Integer
 from sqlalchemy.exc import SQLAlchemyError
 from models import Base, User, Profile, Board, user_board_association
 
@@ -79,23 +80,30 @@ async def is_email_registered(email: str, session: AsyncSession):
         raise RuntimeError("An error occurred while checking email registration.")
 
 
-async def get_user_by_id(id: int, session: AsyncSession):
+async def get_user_by_id(id: int | str, session: AsyncSession):
     """
     Возвращает пользователя по его ID.
 
-    :param id: ID пользователя.
-    :param session: Асинхронная сессия SQLAlchemy.
-    :return: Объект User, если пользователь найден.
-    :raises ValueError: Если пользователь не найден.
-    :raises RuntimeError: Если произошла ошибка при получении пользователя.
+    :param id: ID пользователя (может быть строкой или целым числом)
+    :param session: Асинхронная сессия SQLAlchemy
+    :return: Объект User, если пользователь найден
+    :raises ValueError: Если пользователь не найден
+    :raises RuntimeError: Если произошла ошибка при получении пользователя
     """
     try:
-        query = select(User).filter_by(id=id)
+        user_id = int(id)
+        query = (
+            select(User)
+            .filter(User.id == cast(user_id, Integer))
+        )
         result = await session.execute(query)
         user = result.scalars().first()
         if not user:
             raise ValueError(f"User with id {id} not found.")
         return user
+    except ValueError as e:
+        logger.error(f"Invalid user ID format: {id}")
+        raise ValueError(f"Invalid user ID format: {id}")
     except SQLAlchemyError as e:
         logger.error(f"Error retrieving user with id {id}: {e}")
         raise RuntimeError("An error occurred while retrieving the user.")
@@ -279,7 +287,7 @@ async def update_text(board_id: int, text_id: str, new_text: str, session: Async
 
 async def change_username(user_id: int, new_username: str, session: AsyncSession):
     """
-    Изменяет имя пользователя в базе данных.
+    Изменяет имя по��ьзователя в базе данных.
 
     :param user_id: ID пользователя.
     :param new_username: Новое имя пользователя.

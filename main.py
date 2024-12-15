@@ -82,20 +82,4 @@ async def login_page(request: Request):
     """
     return templates.TemplateResponse("entry.html", {"request": request})
 
-@app.get("/main_page/{user_id}", response_class=HTMLResponse)
-async def main_page(user_id: str, request: Request, session: AsyncSession = Depends(get_session)):
-    """
-    Отображает главную страницу пользователя с его досками.
-
-    Параметры:
-        user_id (str): ID пользователя
-        request (Request): Объект HTTP-запроса
-        session (AsyncSession): Сессия в базе данных
-    """
-    user = await get_user_by_id(int(user_id), session=session)
-    boards_id_and_names = await get_boards_by_user_id(int(user_id), session=session)
-    context = []
-    for board in boards_id_and_names:
-        context.append({"url":"/board/main_page/" + user_id + "/" + str(board["id"]), "name": board["title"]})
-    return templates.TemplateResponse("main_page.html", {"request": request, "username": user.username, "user_id": user_id, "links" : context})
 
