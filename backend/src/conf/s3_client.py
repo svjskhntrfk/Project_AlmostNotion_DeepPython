@@ -9,8 +9,8 @@ import filetype
 from botocore.exceptions import ClientError
 from fastapi import HTTPException, UploadFile
 from PIL import Image, UnidentifiedImageError
-from backend.src.conf import settings
-
+from config import settings
+from database import logger
 class S3AsyncClient:
     _cached_session = None
 

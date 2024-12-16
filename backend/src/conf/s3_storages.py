@@ -1,4 +1,4 @@
-from backend.src.conf.fastapi import settings
+from config import settings
 from backend.src.conf.s3_client import S3StorageManager
 
 

@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 from backend.src.conf.logging import logger
-from backend.src.conf.fastapi import settings
+from config import settings
 from backend.src.crud.image_crud import image_dao
 from src.db.deps import get_user_db
 from models import Image, User

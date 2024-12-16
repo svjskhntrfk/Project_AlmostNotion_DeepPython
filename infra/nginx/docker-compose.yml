@@ -32,5 +32,11 @@ services:
     env_file:
       - ../../.env
 
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
 volumes:
   minio_volume:

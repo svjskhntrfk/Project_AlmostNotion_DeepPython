@@ -1,6 +1,12 @@
 #!/bin/bash
 
+set -e
+
 HOSTS_FILE="/etc/hosts"
+BACKUP_FILE="/etc/hosts.bak"
+
+sudo cp "$HOSTS_FILE" "$BACKUP_FILE"
+
 ENTRIES=(
     "127.0.0.1 www.localhost"
     "127.0.0.1 aws.localhost"

@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_
 from sqlalchemy import Integer, func, Table, Column
 from datetime import datetime
 from sqlalchemy import ForeignKey, JSON, text
-from typing import Any
+from typing import Any, List
 from pydantic import BaseModel
 from backend.src.conf.s3_storages import media_storage
 import uuid

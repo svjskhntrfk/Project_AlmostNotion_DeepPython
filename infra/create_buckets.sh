@@ -1,6 +1,19 @@
 #!/bin/sh
 
-# Список бакетов
+set -e
+
+TIMEOUT=30
+ELAPSED=0
+
+while ! curl -s http://localhost:9000/minio/health/live; do
+    if [ $ELAPSED -ge $TIMEOUT ]; then
+        echo "Timeout waiting for MinIO to start"
+        exit 1
+    fi
+    sleep 1
+    ELAPSED=$((ELAPSED+1))
+done
+
 BUCKETS=()
 while IFS='=' read -r name value; do
     if [ "${name#*_BUCKET}" != "$name" ]; then
