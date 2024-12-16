@@ -9,6 +9,8 @@ from pydantic import BaseModel
 from backend.src.conf.s3_storages import media_storage
 import uuid
 from sqlalchemy.dialects.postgresql import UUID
+from sql_decorator import FilePath
+from sqlalchemy import Boolean
 import enum
 
 

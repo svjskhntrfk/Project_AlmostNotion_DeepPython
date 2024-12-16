@@ -10,7 +10,7 @@ from botocore.exceptions import ClientError
 from fastapi import HTTPException, UploadFile
 from PIL import Image, UnidentifiedImageError
 from config import settings
-from database import logger
+#from database import logger
 class S3AsyncClient:
     _cached_session = None
 
@@ -69,8 +69,63 @@ class S3StorageManager(S3AsyncClient):
             if value is None:
                 raise ValueError(f"The '{attr}' class attribute is required and cannot be None.")
 
+    def _prepare_path(self, path: str) -> str:
+        if path and not path.endswith('/'):
+            path += '/'
+        return path
+
+    async def _read_file(self, file: UploadFile) -> tuple[bytes, str]:
+        file_content = await file.read()
+        file_name = file.filename
+        return file_content, file_name
+
+    async def _generate_unique_key(self, s3_client, file_name: str) -> str:
+        base_name, extension = os.path.splitext(file_name)
+        key = file_name
+        counter = 1
+        while True:
+            try:
+                await s3_client.head_object(Bucket=self.bucket_name, Key=key)
+                key = f"{base_name}_{counter}{extension}"
+                counter += 1
+            except ClientError as e:
+                if e.response['Error']['Code'] == '404':
+                    break
+                else:
+                    raise
+        return key
+
+    def _convert_to_webp(self, file_content: bytes) -> tuple[bytes, str]:
+        try:
+            image = Image.open(io.BytesIO(file_content))
+            image.load()
+            output = io.BytesIO()
+            image.save(output, format="WEBP")
+            return output.getvalue(), "image/webp"
+        except UnidentifiedImageError:
+            raise HTTPException(status_code=400, detail="Invalid image file")
+        except Exception as e:
+            raise HTTPException(status_code=500, detail="An error occurred while processing the image") from e
+
+    async def generate_url(self, key: str, expiration: int = 3600) -> str:
+        async with self.client as s3_client:
+            protocol = "https" if self.use_ssl else "http"
+            if self.custom_domain:
+                return f"{protocol}://{self.custom_domain}/{key}"
+            if self.default_acl == 'public-read':
+                return f"{protocol}://{self.endpoint_domain}/{self.bucket_name}/{key}"
+            try:
+                url = await s3_client.generate_presigned_url(
+                    'get_object',
+                    Params={'Bucket': self.bucket_name, 'Key': key},
+                    ExpiresIn=expiration
+                )
+                return url
+            except ClientError as e:
+                raise HTTPException(status_code=500, detail="Error generating presigned URL") from e
+
     async def put_object(self, file: UploadFile, path: str = "", file_type: str = "image") -> str:
-        logger.info("Начало загрузки файла: %s", file.filename)
+        #logger.info("Начало загрузки файла: %s", file.filename)
 
         async with self.client as s3_client:
             try:
@@ -82,7 +137,7 @@ class S3StorageManager(S3AsyncClient):
 
                 if file_type == "image":
                     if not is_image:
-                        logger.error("Файл %s не является допустимым изображением", file.filename)
+                        #logger.error("Файл %s не является допустимым изображением", file.filename)
                         raise HTTPException(status_code=400, detail="Invalid image file")
                     file_content, content_type = self._convert_to_webp(file_content)
                     file_name = os.path.splitext(file_name)[0] + ".webp"
@@ -98,25 +153,19 @@ class S3StorageManager(S3AsyncClient):
                     ACL=self.default_acl
                 )
 
-                logger.info("Файл успешно загружен в S3: %s", key)
+                #logger.info("Файл успешно загружен в S3: %s", key)
                 return key
 
             except ClientError as e:
-                logger.error("Ошибка при загрузке файла %s: %s", file.filename, e)
+                #logger.error("Ошибка при загрузке файла %s: %s", file.filename, e)
                 raise HTTPException(status_code=500, detail="Error uploading file to S3") from e
 
 
     async def delete_object(self, key: str) -> None:
-        logger.info("Удаление объекта из S3: %s", key)
-
         async with self.client as s3_client:
             try:
                 await s3_client.delete_object(Bucket=self.bucket_name, Key=key)
-                logger.info("Объект успешно удален: %s", key)
             except ClientError as e:
                 error_code = e.response['Error']['Code']
                 if error_code != 'NoSuchKey':
-                    logger.error("Ошибка при удалении объекта %s: %s", key, e)
                     raise HTTPException(status_code=500, detail="Error deleting file from S3") from e
-                else:
-                    logger.warning("Объект не найден в S3 при попытке удаления: %s", key)
