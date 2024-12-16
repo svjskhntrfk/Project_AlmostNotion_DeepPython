@@ -4,7 +4,6 @@ from fastapi import HTTPException
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
-from passlib.context import CryptContext
 from database import create_board, get_board_by_user_id_and_board_id, create_text, get_session
 from fastapi import APIRouter, Depends, Request, Security
 from fastapi.responses import JSONResponse
@@ -30,30 +29,11 @@ class ErrorOut(BaseModel):
 from database import *
 from auth.dto import UserCredentialsDTO
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 templates = Jinja2Templates(directory="templates")
 
 def get_auth_service() -> AuthService:
     return AuthService(jwt_auth=JWTAuth(config=jwt_config))
 
-def get_password_hash(password: str) -> str:
-    """
-    Хэшируем пароль пользователя
-
-    Параметры:
-        password (str): Пароль, который надо хэшировать
-    """
-    return pwd_context.hash(password)
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """
-    Проверяем пароль при входе в аккаунт с помощью хэшей
-
-    Параметры:
-        plain_password (str): Пароль, который надо проверить на совпадение
-        hashed_password (str): Хэшированный пароль
-    """
-    return pwd_context.verify(plain_password, hashed_password)
 
 router = APIRouter(
     prefix="/users",

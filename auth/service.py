@@ -9,6 +9,7 @@ from auth.dto import TokensDTO, UserCredentialsDTO
 from hashlib import sha256
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import create_user, is_email_registered, create_jwt_tokens
+from sqlalchemy import update
 
 
 def get_sha256_hash(line: str) -> str:
@@ -61,7 +62,14 @@ class AuthService:
         return TokensDTO(access_token=access_token, refresh_token=refresh_token), None
 
     async def logout(self, user: User, device_id: str, session: AsyncSession) -> None:
-        await user.tokens.filter(device_id=device_id).update(revoked=True)
+        stmt = (
+            update(IssuedJWTToken)
+            .where(IssuedJWTToken.subject_id == user.id)
+            .where(IssuedJWTToken.device_id == device_id)
+            .values(revoked=True)
+        )
+        await session.execute(stmt)
+        await session.commit()
 
     async def update_tokens(self, user: User, refresh_token: str, session: AsyncSession) -> tuple[TokensDTO, None] | tuple[None, ErrorObj]:
         payload, error = try_decode_token(jwt_auth=self._jwt_auth, token=refresh_token)

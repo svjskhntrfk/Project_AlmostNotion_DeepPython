@@ -244,39 +244,40 @@ async def update_text(board_id: int, text_id: str, new_text: str, session: Async
     :raises RuntimeError: Если произошла ошибка базы данных при обновлении текста.
     """
     try:
-        async with session.begin():
-            # Получаем доску
-            query = select(Board).filter(Board.id == board_id)
-            result = await session.execute(query)
-            board = result.scalars().first()
+        # Получаем доску
+        query = select(Board).filter(Board.id == board_id)
+        result = await session.execute(query)
+        board = result.scalars().first()
 
-            if not board:
-                raise ValueError(f"Board with id {board_id} not found")
+        if not board:
+            raise ValueError(f"Board with id {board_id} not found")
 
-            # Создаем новую копию контента
-            new_content = {"texts": []}
+        # Создаем новую копию контента
+        new_content = {"texts": []}
 
-            text_found = False
-            for text in board.content["texts"]:
-                if text["id"] == text_id:
-                    new_content["texts"].append({
-                        "id": text_id,
-                        "text": new_text
-                    })
-                    text_found = True
-                else:
-                    new_content["texts"].append(dict(text))
+        text_found = False
+        for text in board.content["texts"]:
+            if text["id"] == text_id:
+                new_content["texts"].append({
+                    "id": text_id,
+                    "text": new_text
+                })
+                text_found = True
+            else:
+                new_content["texts"].append(dict(text))
 
-            if not text_found:
-                raise ValueError(f"Text with id {text_id} not found")
+        if not text_found:
+            raise ValueError(f"Text with id {text_id} not found")
 
-            board.content = new_content
-            await session.flush()  
+        board.content = new_content
+        await session.flush()  
+        await session.commit()  
 
-            await session.refresh(board)
-            for text in board.content["texts"]:
-                if text["id"] == text_id and text["text"] != new_text:
-                    raise ValueError("Failed to save changes")
+        await session.refresh(board)
+
+        for text in board.content["texts"]:
+            if text["id"] == text_id and text["text"] != new_text:
+                raise ValueError("Failed to save changes")
 
         return True
 

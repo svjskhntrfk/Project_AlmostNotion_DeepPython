@@ -27,6 +27,7 @@ async def check_access_token(
     authorization_header: str = Security(APIKeyHeader(name='Authorization', auto_error=False)),
     session: AsyncSession = Depends(get_session)
 ) -> str:
+    # Пробуем полу��ить токен из заголовка или из кук
     token = authorization_header or request.cookies.get("Authorization")
     
     clear_token = __try_to_get_clear_token(authorization_header=token)
@@ -38,19 +39,14 @@ async def check_access_token(
     except Exception:
         raise JsonHTTPException(content=dict(AccessError.get_invalid_token_error()), status_code=403)
 
-    if await check_revoked(payload['jti'], session):
+    if await check_revoked(payload['jti'], session=session):
         raise JsonHTTPException(content=dict(AccessError.get_token_revoked_error()), status_code=403)
 
-    try:
-        user = await get_user_by_id(id=payload['sub'], session=session)
-    except ValueError:
-        raise JsonHTTPException(content=dict(AccessError.get_token_owner_not_found()), status_code=403)
-    except RuntimeError:
-        raise JsonHTTPException(content=dict(AccessError.get_invalid_token_error()), status_code=403)
-
+    user = await get_user_by_id(id=payload['sub'], session=session)
+    print("got user in access token", user)
     if not user:
         raise JsonHTTPException(content=dict(AccessError.get_token_owner_not_found()), status_code=403)
 
     request.state.user = user
     request.state.device_id = payload['device_id']
-    return token
+    return token  # возвращаем оригинальный токен, а не authorization_header

@@ -1,5 +1,5 @@
 import starlette.status as status
-from fastapi import APIRouter, Form, Body, Depends
+from fastapi import APIRouter, Form, Body, Depends, Security
 from fastapi.responses import RedirectResponse
 from starlette.requests import Request
 from fastapi.responses import RedirectResponse
@@ -8,7 +8,7 @@ from database import create_board, get_board_by_user_id_and_board_id, create_tex
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.templating import Jinja2Templates
 from typing import Dict
-
+from auth.middlewares.jwt.service import check_access_token
 
 from database import *
 
@@ -16,11 +16,12 @@ templates = Jinja2Templates(directory="templates")
 
 router = APIRouter(
     prefix="/board",
-    tags=["Board"]
+    tags=["Board"],
+    dependencies=[Security(check_access_token)]
 )
 
-@router.post("/main_page/{user_id}/add_board")
-async def create_new_board(user_id: str, boardName = Form(), session: AsyncSession = Depends(get_session)):
+@router.post("/main_page/add_board")
+async def create_new_board(request: Request, boardName = Form(), session: AsyncSession = Depends(get_session)):
     """
     Создает новую доску для пользователя.
 
@@ -29,14 +30,15 @@ async def create_new_board(user_id: str, boardName = Form(), session: AsyncSessi
         boardName (Form): имя доски
         session (AsyncSession): Сессия в базе данных
     """
-    board_id = await create_board(int(user_id), boardName, session)
+    user = request.state.user
+    board_id = await create_board(int(user.id), boardName, session)
     return RedirectResponse(
-        f"/board/main_page/{user_id}/{board_id}",
+        f"/board/main_page/{board_id}",
         status_code=status.HTTP_302_FOUND
     )
 
-@router.get("/main_page/{user_id}/{board_id}")
-async def board_page(user_id: str, board_id: str, request: Request, session: AsyncSession = Depends(get_session)):
+@router.get("/main_page/{board_id}")
+async def board_page(board_id: str, request: Request, session: AsyncSession = Depends(get_session)):
     """
     Get-запрос, переходит на доску
 
@@ -46,13 +48,13 @@ async def board_page(user_id: str, board_id: str, request: Request, session: Asy
         request (Request): Исходящий запрос с сервера
         session (AsyncSession): Сессия в базе данных
     """
-    board = await get_board_by_user_id_and_board_id(int(user_id), int(board_id), session)
-    user = await get_user_by_id(int(user_id), session)
+    user = request.state.user
+    board = await get_board_by_user_id_and_board_id(int(user.id), int(board_id), session)
     return templates.TemplateResponse(
         "article.html",
         {
             "request": request,
-            "user_id": user_id,
+            "user_id": user.id,
             "board_id": board_id,
             "texts": board[1]["texts"],
             "username" : user.username,
@@ -60,9 +62,8 @@ async def board_page(user_id: str, board_id: str, request: Request, session: Asy
         }
     )
 
-@router.post("/main_page/{user_id}/{board_id}/add_text")
+@router.post("/main_page/{board_id}/add_text")
 async def add_text_on_board(
-    user_id: str,
     board_id: str,
     data: Dict = Body(...),
     session: AsyncSession = Depends(get_session)
@@ -80,9 +81,8 @@ async def add_text_on_board(
     text_id = await create_text(int(board_id), text, session)
     return {"text_id": text_id}
 
-@router.post("/main_page/{user_id}/{board_id}/update_text")
+@router.post("/main_page/{board_id}/update_text")
 async def update_text_on_board(
-    user_id: str,
     board_id: str,
     data: Dict = Body(...),
     session: AsyncSession = Depends(get_session)

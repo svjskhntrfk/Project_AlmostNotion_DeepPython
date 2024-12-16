@@ -7,8 +7,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import HTMLResponse
 from passlib.context import CryptContext
 from auth.middlewares.jwt.service import check_access_token
-
+from hashlib import sha256
 from database import *
+from auth.service import AuthService
+from auth.middlewares.jwt.base.auth import JWTAuth
+from auth.jwt_settings import jwt_config
+
+def get_auth_service() -> AuthService:
+    return AuthService(jwt_auth=JWTAuth(config=jwt_config))
 
 templates = Jinja2Templates(directory="templates")
 
@@ -18,13 +24,8 @@ router = APIRouter(
     dependencies=[Security(check_access_token)]
 )
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+def get_sha256_hash(line: str) -> str:
+    return sha256(str.encode(line)).hexdigest()
 
 
 @router.get("/main_page", response_class=HTMLResponse)
@@ -43,25 +44,28 @@ async def main_page(request: Request, session: AsyncSession = Depends(get_sessio
     boards_id_and_names = await get_boards_by_user_id(int(user_id), session=session)
     context = []
     for board in boards_id_and_names:
-        context.append({"url":"/board/main_page/" + user_id + "/" + str(board["id"]), "name": board["title"]})
-    return templates.TemplateResponse("main_page.html", {"request": request, "username": user.username, "user_id": user_id, "links" : context})
+        context.append({"url":"/board/main_page/" + str(board["id"]), "name": board["title"]})
+    return templates.TemplateResponse("main_page.html", {"request": request, "username": user.username, "links" : context})
 
-@router.post("/main_page/profile/{user_id}/change_name")
-async def profile_page(user_id : str, first_name = Form(), session: AsyncSession = Depends(get_session)) :
+@router.post("/main_page/profile/change_name")
+async def profile_page(request: Request, first_name = Form(), session: AsyncSession = Depends(get_session)) :
+    user = request.state.user
+    user_id = user.id
     await change_username(int(user_id), first_name, session=session)
-    return RedirectResponse("/profile/main_page/profile/" + str(user_id),
+    return RedirectResponse("/profile/main_page/profile/",
                             status_code=status.HTTP_302_FOUND)
 
-@router.post("/main_page/profile/{user_id}/change_password")
-async def profile_page(user_id : str, old_password = Form(), new_password = Form(), session: AsyncSession = Depends(get_session)) :
-    user = await get_user_by_id(int(user_id), session)
-    if verify_password(old_password, user.password):
-        await change_password(int(user_id), get_password_hash(new_password), session=session)
-    return RedirectResponse("/profile/main_page/profile/" + str(user_id),
+@router.post("/main_page/profile/change_password")
+async def profile_page(request: Request, old_password = Form(), new_password = Form(), session: AsyncSession = Depends(get_session)) :
+    user = request.state.user
+    user_id = user.id
+    if user.password == get_sha256_hash(old_password):
+        await change_password(int(user_id), get_sha256_hash(new_password), session=session)
+    return RedirectResponse("/login",
                             status_code=status.HTTP_302_FOUND)
 
-@router.get("/main_page/profile/{user_id}", response_class=HTMLResponse)
-async def profile_page(user_id: str, request: Request, session: AsyncSession = Depends(get_session)):
+@router.get("/main_page/profile", response_class=HTMLResponse)
+async def profile_page(request: Request, session: AsyncSession = Depends(get_session)):
     """
     Get-запрос, переходим на HTML страничку профиля
 
@@ -69,6 +73,13 @@ async def profile_page(user_id: str, request: Request, session: AsyncSession = D
         user_id (str): ID пользователя
         request (Request): Запрос на переход
     """
-    user = await get_user_by_id(int(user_id), session=session)
-    return templates.TemplateResponse("profile.html", {"request": request, "user_id" : user_id, "username": user.username })
+    user = request.state.user
+    return templates.TemplateResponse("profile.html", {"request": request, "user_id" : user.id, "username": user.username })
 
+@router.get("/logout")
+async def logout(request: Request, session: AsyncSession = Depends(get_session),auth_service: AuthService = Depends(get_auth_service)   ):
+    user = request.state.user
+    device_id = request.state.device_id
+    await auth_service.logout(user, device_id, session=session)
+    return RedirectResponse("/",
+                            status_code=status.HTTP_302_FOUND)
