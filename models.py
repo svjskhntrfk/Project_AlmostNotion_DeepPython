@@ -5,6 +5,10 @@ from sqlalchemy import Integer, func, Table, Column
 from datetime import datetime
 from sqlalchemy import ForeignKey, JSON, text
 from typing import Any
+from pydantic import BaseModel
+from backend.src.conf.s3_storages import media_storage
+import uuid
+from sqlalchemy.dialects.postgresql import UUID
 import enum
 
 
@@ -30,11 +34,19 @@ user_board_association = Table(
     Column("board_id", Integer, ForeignKey("boards.id"), primary_key=True)
 )
 
+user_image_association = Table(
+    'user_image_association', Base.metadata,
+    Column('user_id', UUID(as_uuid=True), ForeignKey('user.id'), primary_key=True),
+    Column('image_id', UUID(as_uuid=True), ForeignKey('image.id'), primary_key=True)
+)
+
 
 class User(Base):
     username: Mapped[str]
     email: Mapped[str] = mapped_column(unique=True)
     password: Mapped[str]
+
+    image_files = relationship("Image", secondary=user_image_association, back_populates="users")
 
     boards: Mapped[list["Board"]] = relationship(
         "Board",
@@ -72,3 +84,31 @@ class Profile(Base):
         back_populates="profile",
         uselist=False
     )
+
+class Image(Base):
+    __tablename__ = "images"
+    _file_storage = media_storage
+
+    file: Mapped[str] = mapped_column(FilePath(_file_storage), nullable=True)
+    is_main: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+
+    users: Mapped[List["User"]] = relationship(
+        "User",
+        secondary=user_image_association,
+        back_populates="image_files"
+    )
+
+    def __repr__(self):
+        return f"<Media(id={self.id}, file={self.file}, is_main={self.is_main})>"
+
+    @property
+    def storage(self) -> "S3StorageManager":
+        """Возвращает объект storage, чтобы использовать его методы напрямую."""
+        return self._file_storage
+
+class ImageCreate(BaseModel):
+    file: str
+    is_main: bool
+
+class ImageUpdate(ImageCreate):
+    id: uuid.UUID
