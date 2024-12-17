@@ -35,31 +35,31 @@
                 </div>
                 <div class="info">
                     <div class="form-section">
-                        <h2 class="section-title">Изменить имя</h2>
+                        <h class="section-title">Изменить имя</h>
                         <form action="/profile/main_page/profile/change_name" method="post">
                             <div class="form-group">
-                                <label for="first_name">Имя</label>
+                                <label for="first_name"><p class="txt">Имя</p></label>
                                 <input class="in" type="text" id="first_name" name="first_name" 
                                        required placeholder="Введите Ваше имя">
                             </div>
-                            <input class="reg" type="submit" value="Изменить" />
+                            <button type="submit" class="change">Изменить</button>
                         </form>
                     </div>
 
                     <div class="form-section">
-                        <h2 class="section-title">Изменить пароль</h2>
+                        <h class="section-title">Изменить пароль</h>
                         <form action="/profile/main_page/profile/change_password" method="post">
                             <div class="form-group">
-                                <label for="old_password">Текущий пароль</label>
+                                <label for="old_password"><p class="txt">Текущий пароль</p></label>
                                 <input class="in" type="password" id="old_password" name="old_password" 
                                        required placeholder="Введите Ваш текущий пароль">
                             </div>
                             <div class="form-group">
-                                <label for="new_password">Новый пароль</label>
+                                <label for="new_password"><p class="txt">Новый пароль</p></label>
                                 <input class="in" type="password" id="new_password" name="new_password" 
                                        required placeholder="Введите Ваш новый пароль">
                             </div>
-                            <input class="reg" type="submit" value="Изменить" />
+                            <button type="submit" class="change">Изменить</button>
                         </form>
                     </div>
                 </div>
