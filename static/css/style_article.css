@@ -1,18 +1,22 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    width: 100%;
+    overflow-x: hidden;
+}
+
 body {
     background-color: #F0E4D8;
     font-family: "Philosopher", sans-serif;
     font-weight: 400;
     font-style: normal;
-    justify-content: center;
-    align-items: center;
 }
 
-.username {
-    text-decoration: none;
-    color: #F0E4D8;
-}
-
-header{
+header {
     width: 100%;
     background: #DD8E75;
     height: 80px;
@@ -20,50 +24,37 @@ header{
     border-bottom-right-radius: 25px;
     border-bottom-left-radius: 25px;
     margin-bottom: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
 }
 
-body {
-  margin: 0px;
+main {
+    width: 100%;
+    max-width: 1200px;
+    margin-left: 20px;
+    padding: 0;
 }
 
-.name{
-    position: absolute;
-    top: 20px;
-	right: 200px;
-    font-size: 30px;
-}
-
-a {
+.username {
     text-decoration: none;
     color: #F0E4D8;
 }
 
-p {
-    font-size: 27px;
-    padding: 10px 20px;
-    margin-top: 5px;
+.title {
+    text-decoration: none;
+    color: #F0E4D8;
 }
-
 
 .back_to_mp {
-    position: absolute;
-    margin-left: 10px;
-    margin-top: 10px;
-    font-size: 30px;
+    flex: 0 0 auto;
+    margin-right: 20px;
 }
 
-h {
-    font-size: 27px;
-    font-weight: 300px;
-    margin-left: 20px;
-}
-
-
-.section-title {
-    font-family: "Philosopher", sans-serif;
-    font-weight: 300px;
-    margin: 0px;
-    font-size: 27px;
+.back_to_mp a {
+    display: flex;
+    align-items: center;
 }
 
 .title {
@@ -71,10 +62,22 @@ h {
     text-align: center;
     font-size: 28px;
     color: #F0E4D8;
-    position: absolute;
-    top: 20px;
-	right: 800px;
-    font-size: 30px;
+}
+
+.name {
+    flex: 0 0 auto;
+    margin-left: 20px;
+}
+
+.username {
+    text-decoration: none;
+    color: #F0E4D8;
+    font-size: 20px;
+    transition: color 0.3s ease;
+}
+
+.username:hover {
+    color: #B14F44;
 }
 
 .note-content {
@@ -102,16 +105,16 @@ h {
     margin: 5px 0;
     color: #B14F44;
     font-size: 25px;
-    width: calc(100% - 20px)
+    width: 100%;
     word-wrap: break-word;
     text-align: left;
 }
 
 .all_texts {
     position: relative;
-    width: calc(100% - 20px);
+    width: 100%;
 }
 
 .new-note-area {
-    width: 100%;
+    width: calc(100% - 40px);
 }
