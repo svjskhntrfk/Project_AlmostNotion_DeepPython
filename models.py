@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+﻿from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.orm import DeclarativeBase, declared_attr
 from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
 from sqlalchemy import Integer, func, Table, Column
@@ -38,8 +38,8 @@ user_board_association = Table(
 
 user_image_association = Table(
     'user_image_association', Base.metadata,
-    Column('user_id', UUID(as_uuid=True), ForeignKey('user.id'), primary_key=True),
-    Column('image_id', UUID(as_uuid=True), ForeignKey('image.id'), primary_key=True)
+    Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
+    Column("image_id", Integer, ForeignKey("images.id"), primary_key=True)
 )
 
 
@@ -48,7 +48,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(unique=True)
     password: Mapped[str]
 
-    image_files = relationship("Image", secondary=user_image_association, back_populates="users")
+    image_files : Mapped[List["Image"]] = relationship("Image", secondary=user_image_association, back_populates="users", lazy="joined")
 
     boards: Mapped[list["Board"]] = relationship(
         "Board",
@@ -93,11 +93,12 @@ class Image(Base):
 
     file: Mapped[str] = mapped_column(FilePath(_file_storage), nullable=True)
     is_main: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
     users: Mapped[List["User"]] = relationship(
         "User",
         secondary=user_image_association,
-        back_populates="image_files"
+        back_populates="image_files",
+        lazy="joined"
     )
 
     def __repr__(self):
@@ -105,7 +106,7 @@ class Image(Base):
 
     @property
     def storage(self) -> "S3StorageManager":
-        """Возвращает объект storage, чтобы использовать его методы напрямую."""
+        """Возвращает объект storage, чтобы иcпользовать его методы напрямую."""
         return self._file_storage
 
 class ImageCreate(BaseModel):
