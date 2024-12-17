@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import AsyncGenerator
 import uuid
 import logging
+from sqlalchemy import cast, Integer
 from sqlalchemy.exc import SQLAlchemyError
 from models import Base, User, Profile, Board, user_board_association
 
@@ -79,23 +80,30 @@ async def is_email_registered(email: str, session: AsyncSession):
         raise RuntimeError("An error occurred while checking email registration.")
 
 
-async def get_user_by_id(id: int, session: AsyncSession):
+async def get_user_by_id(id: int | str, session: AsyncSession):
     """
     Возвращает пользователя по его ID.
 
-    :param id: ID пользователя.
-    :param session: Асинхронная сессия SQLAlchemy.
-    :return: Объект User, если пользователь найден.
-    :raises ValueError: Если пользователь не найден.
-    :raises RuntimeError: Если произошла ошибка при получении пользователя.
+    :param id: ID пользователя (может быть строкой или целым числом)
+    :param session: Асинхронная сессия SQLAlchemy
+    :return: Объект User, если пользователь найден
+    :raises ValueError: Если пользователь не найден
+    :raises RuntimeError: Если произошла ошибка при получении пользователя
     """
     try:
-        query = select(User).filter_by(id=id)
+        user_id = int(id)
+        query = (
+            select(User)
+            .filter(User.id == cast(user_id, Integer))
+        )
         result = await session.execute(query)
         user = result.scalars().first()
         if not user:
             raise ValueError(f"User with id {id} not found.")
         return user
+    except ValueError as e:
+        logger.error(f"Invalid user ID format: {id}")
+        raise ValueError(f"Invalid user ID format: {id}")
     except SQLAlchemyError as e:
         logger.error(f"Error retrieving user with id {id}: {e}")
         raise RuntimeError("An error occurred while retrieving the user.")
@@ -236,39 +244,40 @@ async def update_text(board_id: int, text_id: str, new_text: str, session: Async
     :raises RuntimeError: Если произошла ошибка базы данных при обновлении текста.
     """
     try:
-        async with session.begin():
-            # Получаем доску
-            query = select(Board).filter(Board.id == board_id)
-            result = await session.execute(query)
-            board = result.scalars().first()
+        # Получаем доску
+        query = select(Board).filter(Board.id == board_id)
+        result = await session.execute(query)
+        board = result.scalars().first()
 
-            if not board:
-                raise ValueError(f"Board with id {board_id} not found")
+        if not board:
+            raise ValueError(f"Board with id {board_id} not found")
 
-            # Создаем новую копию контента
-            new_content = {"texts": []}
+        # Создаем новую копию контента
+        new_content = {"texts": []}
 
-            text_found = False
-            for text in board.content["texts"]:
-                if text["id"] == text_id:
-                    new_content["texts"].append({
-                        "id": text_id,
-                        "text": new_text
-                    })
-                    text_found = True
-                else:
-                    new_content["texts"].append(dict(text))
+        text_found = False
+        for text in board.content["texts"]:
+            if text["id"] == text_id:
+                new_content["texts"].append({
+                    "id": text_id,
+                    "text": new_text
+                })
+                text_found = True
+            else:
+                new_content["texts"].append(dict(text))
 
-            if not text_found:
-                raise ValueError(f"Text with id {text_id} not found")
+        if not text_found:
+            raise ValueError(f"Text with id {text_id} not found")
 
-            board.content = new_content
-            await session.flush()  
+        board.content = new_content
+        await session.flush()  
+        await session.commit()  
 
-            await session.refresh(board)
-            for text in board.content["texts"]:
-                if text["id"] == text_id and text["text"] != new_text:
-                    raise ValueError("Failed to save changes")
+        await session.refresh(board)
+
+        for text in board.content["texts"]:
+            if text["id"] == text_id and text["text"] != new_text:
+                raise ValueError("Failed to save changes")
 
         return True
 
@@ -279,7 +288,7 @@ async def update_text(board_id: int, text_id: str, new_text: str, session: Async
 
 async def change_username(user_id: int, new_username: str, session: AsyncSession):
     """
-    Изменяет имя пользователя в базе данных.
+    Изменяет имя по��ьзователя в базе данных.
 
     :param user_id: ID пользователя.
     :param new_username: Новое имя пользователя.
@@ -347,3 +356,32 @@ async def change_password(user_id: int, new_password: str, session: AsyncSession
         raise RuntimeError("An error occurred while changing the password.") from e
     
 
+async def create_jwt_tokens(
+    tokens: list[dict], 
+    user: User, 
+    device_id: str, 
+    session: AsyncSession
+) -> None:
+    print('in database')
+    """
+    Create multiple JWT tokens in database
+    
+    Args:
+        tokens: List of token payloads containing 'jti' and 'exp'
+        user: User instance
+        device_id: Device identifier
+        session: AsyncSession instance
+    """
+    issued_tokens = [
+        IssuedJWTToken(
+            subject=user,
+            jti=token['jti'],
+            device_id=device_id,
+            expired_time=token['exp']
+        )
+        for token in tokens
+    ]
+    print(issued_tokens)
+    print('end')
+    session.add_all(issued_tokens)
+    await session.commit()
