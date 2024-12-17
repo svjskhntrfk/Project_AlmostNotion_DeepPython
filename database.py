@@ -6,8 +6,8 @@ from typing import AsyncGenerator
 import uuid
 import logging
 from sqlalchemy.exc import SQLAlchemyError
-from models import Base, User, Profile, Board, user_board_association, Image, ImageCreate, ImageUpdate
-from image_schemas import ImageDAOResponse
+from models import (Base, User, Profile, Board, user_board_association, Image)
+from image_schemas import ImageDAOResponse, ImageCreate, ImageUpdate
 from sqlalchemy import UUID, Table, select, update
 from fastapi import HTTPException, UploadFile
 from typing import Type
@@ -374,11 +374,6 @@ async def _reset_is_main(self, model_name: str, model_instance: Base, associatio
         await db_session.execute(stmt)
         await db_session.commit()
 
-async def _get_image_url(self, db_obj: Image) -> ImageDAOResponse:
-    """Получает URL к экземпляру Image."""
-    url = await db_obj.storage.generate_url(db_obj.file)
-    return ImageDAOResponse(image=db_obj, url=url)
-
 
 async def create_with_file(
     self, *, file: UploadFile, is_main: bool, model_instance: Type[Base], path: str = "", db_session: AsyncSession | None = None
@@ -410,4 +405,3 @@ async def save_user_image(self, file: UploadFile, is_main: bool) -> Image:
         file=file, is_main=is_main, model_instance=self.user, path=self.image_path, db_session=self.db_session
     )
     return image
-

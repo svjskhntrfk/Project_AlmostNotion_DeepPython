@@ -12,6 +12,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sql_decorator import FilePath
 from sqlalchemy import Boolean
 import enum
+from backend.src.conf.s3_client import S3StorageManager
 
 
 class Base(AsyncAttrs, DeclarativeBase):
@@ -109,9 +110,3 @@ class Image(Base):
         """Возвращает объект storage, чтобы иcпользовать его методы напрямую."""
         return self._file_storage
 
-class ImageCreate(BaseModel):
-    file: str
-    is_main: bool
-
-class ImageUpdate(ImageCreate):
-    id: uuid.UUID

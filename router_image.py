@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, File, Form, UploadFile, HTTPException
 from pydantic import UUID4
-from database import save_user_image
+from database import *
 from image_schemas import (ImageDAOResponse, UploadImageResponse, UploadUrlImageResponse)
 from starlette import status
 import filetype
@@ -27,7 +27,7 @@ def validate_image_file(file: UploadFile):
 @router.post("/upload-image")
 async def upload_user_image(
     file: UploadFile = File(...),
-    is_main: bool = Form(...),
+    is_main: bool = Form(...)
 ):
     image = await save_user_image(file=file, is_main=is_main)
     return UploadImageResponse(id=image.id, file=image.file, is_main=image.is_main)
