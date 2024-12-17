@@ -1,22 +1,22 @@
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-html, body {
-    width: 100%;
-    overflow-x: hidden;
-}
-
 body {
     background-color: #F0E4D8;
     font-family: "Philosopher", sans-serif;
     font-weight: 400;
     font-style: normal;
+    justify-content: center;
+    align-items: center;
 }
 
-header {
+.username {
+    text-decoration: none;
+    color: #F0E4D8;
+}
+
+.username:hover {
+    color: #B14F44;
+}
+
+header{
     width: 100%;
     background: #DD8E75;
     height: 80px;
@@ -24,32 +24,35 @@ header {
     border-bottom-right-radius: 25px;
     border-bottom-left-radius: 25px;
     margin-bottom: 50px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 20px;
 }
 
-main {
-    width: 100%;
-    max-width: 1200px;
-    margin-left: 20px;
-    padding: 0;
+body {
+  margin: 0px;
 }
 
-.username {
+.name{
+    position: absolute;
+    top: 20px;
+	right: 200px;
+    font-size: 30px;
+}
+
+a {
     text-decoration: none;
     color: #F0E4D8;
 }
 
-.title {
-    text-decoration: none;
-    color: #F0E4D8;
+p {
+    font-size: 27px;
+    padding: 10px 20px;
+    margin-top: 5px;
 }
 
 .back_to_mp {
-    flex: 0 0 auto;
-    margin-right: 20px;
+    position: absolute;
+    margin-left: 10px;
+    margin-top: 10px;
+    font-size: 30px;
 }
 
 .back_to_mp a {
@@ -57,27 +60,36 @@ main {
     align-items: center;
 }
 
+h {
+    font-size: 27px;
+    font-weight: 300px;
+    margin-left: 20px;
+}
+
 .title {
     flex: 1;
     text-align: center;
     font-size: 28px;
     color: #F0E4D8;
+    position: absolute;
+    top: 20px;
+	right: 800px;
+    font-size: 30px;
 }
 
-.name {
-    flex: 0 0 auto;
+.all_texts {
+    position: relative;
+    width: calc(100% - 20px);
     margin-left: 20px;
 }
 
-.username {
-    text-decoration: none;
-    color: #F0E4D8;
-    font-size: 20px;
-    transition: color 0.3s ease;
-}
-
-.username:hover {
+.text {
+    margin: 5px 0;
     color: #B14F44;
+    font-size: 25px;
+    width: 100%;
+    word-wrap: break-word;
+    text-align: left;
 }
 
 .note-content {
@@ -101,20 +113,7 @@ main {
     color: #888;
 }
 
-.text {
-    margin: 5px 0;
-    color: #B14F44;
-    font-size: 25px;
-    width: 100%;
-    word-wrap: break-word;
-    text-align: left;
-}
-
-.all_texts {
-    position: relative;
-    width: 100%;
-}
-
 .new-note-area {
-    width: calc(100% - 40px);
+    width: calc(100% - 20px);
+    margin-left: 20px;
 }
