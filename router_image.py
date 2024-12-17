@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, File, Form, UploadFile, HTTPException
 from pydantic import UUID4
 from backend.src.crud.user_crud import UserManager, get_current_active_user_and_manager
-from src.schemas.image_schema import (ImageDAOResponse, UploadImageResponse, UploadUrlImageResponse)
+from image_schemas import (ImageDAOResponse, UploadImageResponse, UploadUrlImageResponse)
 from starlette import status
 import filetype
 
