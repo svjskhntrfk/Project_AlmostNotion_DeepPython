@@ -1,11 +1,21 @@
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+﻿from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.orm import DeclarativeBase, declared_attr
 from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
 from sqlalchemy import Integer, func, Table, Column, String
 from datetime import datetime
 from sqlalchemy import ForeignKey, JSON, text
-from typing import Any
-import enum 
+
+from typing import Any, List
+from pydantic import BaseModel
+from backend.src.conf.s3_storages import media_storage
+import uuid
+from sqlalchemy.dialects.postgresql import UUID
+from sql_decorator import FilePath
+from sqlalchemy import Boolean
+import enum
+from backend.src.conf.s3_client import S3StorageManager
+
+
 
 
 class Base(AsyncAttrs, DeclarativeBase):
@@ -30,11 +40,19 @@ user_board_association = Table(
     Column("board_id", Integer, ForeignKey("boards.id"), primary_key=True)
 )
 
+user_image_association = Table(
+    'user_image_association', Base.metadata,
+    Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
+    Column("image_id", Integer, ForeignKey("images.id"), primary_key=True)
+)
+
 
 class User(Base):
     username: Mapped[str]
     email: Mapped[str] = mapped_column(unique=True)
     password: Mapped[str]
+
+    image_files : Mapped[List["Image"]] = relationship("Image", secondary=user_image_association, back_populates="users", lazy="joined")
 
     boards: Mapped[list["Board"]] = relationship(
         "Board",
@@ -79,6 +97,28 @@ class Profile(Base):
         uselist=False
     )
 
+class Image(Base):
+    __tablename__ = "images"
+    _file_storage = media_storage
+
+    file: Mapped[str] = mapped_column(FilePath(_file_storage), nullable=True)
+    is_main: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    users: Mapped[List["User"]] = relationship(
+        "User",
+        secondary=user_image_association,
+        back_populates="image_files",
+        lazy="joined"
+    )
+
+    def __repr__(self):
+        return f"<Media(id={self.id}, file={self.file}, is_main={self.is_main})>"
+
+    @property
+    def storage(self) -> "S3StorageManager":
+        """Возвращает объект storage, чтобы иcпользовать его методы напрямую."""
+        return self._file_storage
+
 class IssuedJWTToken(Base):
     jti: Mapped[str] = mapped_column(String(36), primary_key=True)
     
@@ -95,3 +135,4 @@ class IssuedJWTToken(Base):
 
     def __str__(self) -> str:
         return f'{self.subject}: {self.jti}'
+
