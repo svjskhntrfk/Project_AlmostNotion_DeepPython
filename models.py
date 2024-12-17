@@ -8,6 +8,7 @@ from typing import Any
 import enum
 from typing import List, Optional
 
+
 class Base(AsyncAttrs, DeclarativeBase):
     __abstract__ = True  
     type_annotation_map = {
@@ -55,6 +56,12 @@ class User(Base):
         back_populates="user",
         uselist=False,  
         lazy="joined"  
+    )
+
+    tokens: Mapped[list["IssuedJWTToken"]] = relationship(
+        "IssuedJWTToken",
+        back_populates="subject",
+        lazy="joined"
     )
 
 class Board(Base):
@@ -124,3 +131,20 @@ class Profile(Base):
         uselist=False,
         lazy='joined'
     )
+
+class IssuedJWTToken(Base):
+    jti: Mapped[str] = mapped_column(String(36), primary_key=True)
+    
+    subject_id: Mapped[int] = mapped_column(ForeignKey('users.id', ondelete='CASCADE'))
+    subject: Mapped["User"] = relationship(
+        "User",
+        back_populates="tokens",
+        lazy="joined"
+    )
+    
+    device_id: Mapped[str] = mapped_column(String(36))
+    revoked: Mapped[bool] = mapped_column(default=False)
+    expired_time: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    def __str__(self) -> str:
+        return f'{self.subject}: {self.jti}'

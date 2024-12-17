@@ -1,8 +1,12 @@
 document.addEventListener('DOMContentLoaded', function() {
     const notesContainer = document.getElementById('notesContainer');
     const newNote = document.getElementById('newNote');
-    const userId = window.location.pathname.split('/')[3];
-    const boardId = window.location.pathname.split('/')[4];
+    const boardId = window.location.pathname.split('/')[3];
+
+    if (!boardId) {
+        console.error('Board ID not found in URL');
+        return;
+    }
 
     function debounce(func, wait) {
         let timeout;
@@ -18,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function saveNoteChanges(textId, newText) {
         try {
-            const response = await fetch(`/board/main_page/${userId}/${boardId}/update_text`, {
+            const response = await fetch(`/board/main_page/${boardId}/update_text`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -39,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function createNewNote(text) {
         try {
-            const response = await fetch(`/board/main_page/${userId}/${boardId}/add_text`, {
+            const response = await fetch(`/board/main_page/${boardId}/add_text`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
