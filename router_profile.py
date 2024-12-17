@@ -61,6 +61,8 @@ async def profile_page(request: Request, old_password = Form(), new_password = F
     user_id = user.id
     if user.password == get_sha256_hash(old_password):
         await change_password(int(user_id), get_sha256_hash(new_password), session=session)
+    else:
+        return {"message": "Неверный email или пароль"}
     return RedirectResponse("/login",
                             status_code=status.HTTP_302_FOUND)
 
