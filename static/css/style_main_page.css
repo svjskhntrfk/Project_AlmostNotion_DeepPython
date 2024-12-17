@@ -148,3 +148,8 @@ input {
     align-items: center;
     border-radius: 10px;
 }
+
+a {
+    color: #F0E4D8;
+    text-decoration: none;
+}
