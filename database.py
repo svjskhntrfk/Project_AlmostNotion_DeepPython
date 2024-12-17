@@ -7,7 +7,9 @@ import uuid
 import logging
 from sqlalchemy import cast, Integer
 from sqlalchemy.exc import SQLAlchemyError
-from models import Base, User, Profile, Board, user_board_association
+from models import *
+from typing import List, Dict
+
 
 logger = logging.getLogger(__name__)
 DATABASE_URL = settings.get_db_url()
@@ -67,7 +69,7 @@ async def is_email_registered(email: str, session: AsyncSession):
 
     :param email: Электронная почта пользователя.
     :param session: Асинхронная сессия SQLAlchemy.
-    :return: True, если пользователь найден; иначе False.
+    :return: User если пользователь найден; иначе False.
     :raises RuntimeError: Если произошла ошибка при проверке электронной почты.
     """
     try:
@@ -78,6 +80,8 @@ async def is_email_registered(email: str, session: AsyncSession):
     except SQLAlchemyError as e:
         logger.error(f"Error checking if email {email} is registered: {e}")
         raise RuntimeError("An error occurred while checking email registration.")
+    
+
 
 
 async def get_user_by_id(id: int | str, session: AsyncSession):
@@ -153,9 +157,9 @@ async def get_board_by_user_id_and_board_id(user_id: int, board_id: int, session
     try:
         query = (
             select(Board.title, Board.content)
-            .join(user_board_association, user_board_association.c.board_id == Board.id)
-            .filter(user_board_association.c.user_id == user_id)
-            .filter(user_board_association.c.board_id == board_id)
+            .join(board_collaborators, board_collaborators.c.board_id == Board.id)
+            .filter(board_collaborators.c.user_id == user_id)
+            .filter(board_collaborators.c.board_id == board_id)
         )
         result = await session.execute(query)
         result = result.all()[0]
@@ -219,8 +223,8 @@ async def get_boards_by_user_id(user_id: int, session: AsyncSession) -> list[dic
     try:
         query = (
             select(Board.id, Board.title)
-            .join(user_board_association, user_board_association.c.board_id == Board.id)
-            .filter(user_board_association.c.user_id == user_id)
+            .join(board_collaborators, board_collaborators.c.board_id == Board.id)
+            .filter(board_collaborators.c.user_id == user_id)
         )
         result = await session.execute(query)
         boards = result.all()
@@ -385,3 +389,14 @@ async def create_jwt_tokens(
     print('end')
     session.add_all(issued_tokens)
     await session.commit()
+
+async def add_collaborator(user_id: int, board_id: int, session: AsyncSession):
+    try:
+        query = select(Board).filter(Board.id == board_id)
+        result = await session.execute(query)
+        board = result.scalars().first()
+        board.collaborators.append(user_id)
+        await session.commit()
+    except SQLAlchemyError as e:
+        logger.error(f"Error adding collaborator to board_id={board_id}: {e}")
+        raise RuntimeError("An error occurred while adding a collaborator to the board.") from e
