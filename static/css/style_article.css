@@ -105,16 +105,16 @@ main {
     margin: 5px 0;
     color: #B14F44;
     font-size: 25px;
-    width: 100%;
+    width: calc(100% - 20px)
     word-wrap: break-word;
     text-align: left;
 }
 
 .all_texts {
     position: relative;
-    width: 100%;
+    width: calc(100% - 20px);
 }
 
 .new-note-area {
-    width: calc(100% - 40px);
+    width: 100%;
 }
