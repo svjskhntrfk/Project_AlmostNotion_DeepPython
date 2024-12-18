@@ -1,13 +1,16 @@
-from fastapi import APIRouter, Depends, File, Form, UploadFile, HTTPException
+from fastapi import APIRouter, Depends, File, Form, UploadFile, HTTPException, Security
 from pydantic import UUID4
 from database import *
 from image_schemas import (ImageDAOResponse, UploadImageResponse, UploadUrlImageResponse)
 from starlette import status
 import filetype
+from auth.middlewares.jwt.service import check_access_token
+from starlette.requests import Request
 
 router = APIRouter(
     prefix="/image",
-    tags=["Image"]
+    tags=["Image"],
+    dependencies=[Security(check_access_token)]
 )
 
 MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 5 MB
@@ -26,9 +29,12 @@ def validate_image_file(file: UploadFile):
 
 @router.post("/upload-image")
 async def upload_user_image(
+    request : Request,
     file: UploadFile = File(...),
-    is_main: bool = Form(...)
+    is_main: bool = Form(...),
+    session: AsyncSession = Depends(get_session)
 ):
-    image = await save_user_image(file=file, is_main=is_main)
-    return UploadImageResponse(id=image.id, file=image.file, is_main=image.is_main)
+    user = request.state.user
+    image = await save_user_image(user_id=user.id, file=file, is_main=is_main, session=session)
+    return UploadImageResponse(id=uuid.UUID(str(image.id)), is_main=image.is_main)
 

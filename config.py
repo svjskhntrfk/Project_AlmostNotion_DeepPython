@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     DB_PORT: int
     DB_NAME: str
 
-    MODE : str
+    #MODE : str
     MINIO_ROOT_USER : str
     MINIO_ROOT_PASSWORD : str
 
@@ -28,8 +28,8 @@ class Settings(BaseSettings):
     MINIO_DATABASE_BUCKET: str
     MINIO_USE_SSL: bool
 
-    SECRET_KEY: str
-    ENCRYPT_KEY: str
+    #SECRET_KEY: str
+    #ENCRYPT_KEY: str
     API_SECRET: str
     HASH_SALT: str
     JWT_SECRET: str 

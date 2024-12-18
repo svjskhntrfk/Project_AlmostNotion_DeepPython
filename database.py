@@ -13,6 +13,7 @@ from sqlalchemy import UUID, Table, select, update
 from fastapi import HTTPException, UploadFile
 from typing import Type
 from sqlalchemy.orm import aliased
+from backend.src.crud.image_crud import image_dao
 
 logger = logging.getLogger(__name__)
 DATABASE_URL = settings.get_db_url()
@@ -392,3 +393,10 @@ async def create_jwt_tokens(
   await session.commit()
 
 
+async def save_user_image(user_id : int, file: UploadFile, is_main: bool, session: AsyncSession) -> Image:
+    user =  await get_user_by_id(user_id, session)
+    image_path = "Users"
+    image = await image_dao.create_with_file(
+        file=file, is_main=is_main, model_instance=user, path=image_path, db_session=session
+    )
+    return image

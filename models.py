@@ -98,7 +98,6 @@ class Profile(Base):
     )
 
 class Image(Base):
-    __tablename__ = "images"
     _file_storage = media_storage
 
     file: Mapped[str] = mapped_column(FilePath(_file_storage), nullable=True)
