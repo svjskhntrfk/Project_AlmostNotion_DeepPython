@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+﻿from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.orm import DeclarativeBase, declared_attr
 from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
 from sqlalchemy import Integer, func, Table, Column, String
@@ -36,6 +36,8 @@ class User(Base):
     email: Mapped[str] = mapped_column(unique=True)
     password: Mapped[str]
 
+    owned_boards: Mapped[list["Board"]] = relationship("Board", back_populates="owner")
+
     boards: Mapped[list["Board"]] = relationship(
         "Board",
         secondary=user_board_association,
@@ -60,7 +62,8 @@ class User(Base):
 class Board(Base):
     title: Mapped[str]
     content: Mapped[dict | None] = mapped_column(JSON)
-    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    owner_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    owner: Mapped["User"] = relationship("User", back_populates="owned_boards")
     users: Mapped[list["User"]] = relationship(
         "User",
         secondary=user_board_association,  
