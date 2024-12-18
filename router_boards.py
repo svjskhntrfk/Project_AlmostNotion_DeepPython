@@ -102,13 +102,6 @@ async def update_text_on_board(
     await update_text(int(board_id), text_id, new_text,session)
     return {"status": "success"}
 
-
-@router.post("/main_page/{board_id}/add_collaborator")
-async def add_board_collaborator( board_id: str, email_collaborator = Form(), session: AsyncSession = Depends(get_session)):
-    new_collaborator = await is_email_registered(str(email_collaborator), session)
-    await add_collaborator(int(new_collaborator.id), int(board_id), session)
-    return {'status': 'success'}
-
 @router.post("/main_page/{board_id}/add_to_do_list")
 async def add_text_on_board(
     board_id: str,
@@ -201,5 +194,4 @@ async def add_text_on_board(
     to_do_list_id = data.get("to_do_list_id")
     await delete_todo_list(int(to_do_list_id), session)
     return {"status": "success"}
-
 
