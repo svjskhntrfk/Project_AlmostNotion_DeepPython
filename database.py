@@ -75,22 +75,17 @@ async def is_email_registered(email: str, session: AsyncSession):
 
     :param email: Электронная почта пользователя.
     :param session: Асинхронная сессия SQLAlchemy.
-    :return: User если пользователь найден; иначе False.
+    :return: True, если пользователь найден; иначе False.
     :raises RuntimeError: Если произошла ошибка при проверке электронной почты.
     """
     try:
-        print('in email reg', email)
         query = select(User).filter_by(email=email)
         result = await session.execute(query)
         user = result.scalars().first()
-        print('in is_email_registered', user)
-        print(user.id, user.email)
         return user
     except SQLAlchemyError as e:
         logger.error(f"Error checking if email {email} is registered: {e}")
         raise RuntimeError("An error occurred while checking email registration.")
-    
-
 
 
 async def get_user_by_id(id: int | str, session: AsyncSession):
@@ -714,29 +709,4 @@ async def create_jwt_tokens(
     print('end')
     session.add_all(issued_tokens)
     await session.commit()
-
-
-async def add_collaborator(user_id: int, board_id: int, session: AsyncSession):
-    try:
-
-        board_query = select(Board).filter(Board.id == board_id)
-        board_result = await session.execute(board_query)
-        board = board_result.scalars().first()
-        
-        if not board:
-            raise ValueError(f"Board with ID {board_id} not found")
-
-        user = await get_user_by_id(user_id, session)
-        print('in add_collaborator', user   )
-        
-        if not user:
-            raise ValueError(f"User with ID {user_id} not found")
-
-
-        board.collaborators.append(user)
-        await session.commit()
-        
-    except SQLAlchemyError as e:
-        logger.error(f"Error adding collaborator to board_id={board_id}: {e}")
-        raise RuntimeError("An error occurred while adding a collaborator to the board.") from e
 

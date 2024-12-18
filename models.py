@@ -78,13 +78,11 @@ class Board(Base):
     # Пользователи, имеющие доступ к доске
     collaborators: Mapped[List["User"]] = relationship(
         "User",
-
         secondary=board_collaborators,
         back_populates="boards",
         lazy='joined'
     )
     
-
     # "To-Do" списки на доске
     todos: Mapped[List["TodoList"]] = relationship(
         "TodoList",
