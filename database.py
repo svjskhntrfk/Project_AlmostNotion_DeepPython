@@ -8,7 +8,7 @@ import logging
 from sqlalchemy import cast, Integer
 from sqlalchemy.exc import SQLAlchemyError
 from models import (Base, User, Profile, Board, user_board_association, Image)
-from image_schemas import ImageDAOResponse, ImageCreate, ImageUpdate
+from image_schemas import ImageCreate, ImageUpdate
 from sqlalchemy import UUID, Table, select, update
 from fastapi import HTTPException, UploadFile
 from typing import Type
@@ -247,7 +247,7 @@ async def update_text(board_id: int, text_id: str, new_text: str, session: Async
     :param session: Асинхронная сессия SQLAlchemy.
     :return: True, если текст успешно обновлен.
     :raises ValueError: Если доска или текст не найдены.
-    :raises RuntimeError: Если произошла ошибка базы данных при обновлении текста.
+    :raises RuntimeError: Если произошл�� ошибка базы данных при обновлении текста.
     """
     try:
         # Получаем доску
@@ -294,7 +294,7 @@ async def update_text(board_id: int, text_id: str, new_text: str, session: Async
 
 async def change_username(user_id: int, new_username: str, session: AsyncSession):
     """
-    Изменяет имя по��ьзователя в базе данных.
+    Изменяет имя пользователя в базе данных.
 
     :param user_id: ID пользователя.
     :param new_username: Новое имя пользователя.

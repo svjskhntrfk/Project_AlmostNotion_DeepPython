@@ -12,9 +12,9 @@ import uuid
 from sqlalchemy.dialects.postgresql import UUID
 from sql_decorator import FilePath
 from sqlalchemy import Boolean
+from uuid import uuid4
 import enum
 from backend.src.conf.s3_client import S3StorageManager
-
 
 
 
@@ -62,6 +62,8 @@ class User(Base):
     )
     profile_id: Mapped[int | None] = mapped_column(ForeignKey('profiles.id'))
 
+    images : Mapped[list["Image"]] = relationship("Image", secondary=user_image_association, back_populates="user", lazy="joined")
+
     profile: Mapped["Profile"] = relationship(
         "Profile",
         back_populates="user",
@@ -98,25 +100,18 @@ class Profile(Base):
     )
 
 class Image(Base):
-    _file_storage = media_storage
+    _file_storage = FilePath(media_storage)
 
     file: Mapped[str] = mapped_column(FilePath(_file_storage), nullable=True)
-    is_main: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
-    users: Mapped[List["User"]] = relationship(
-        "User",
-        secondary=user_image_association,
-        back_populates="image_files",
-        lazy="joined"
-    )
+    is_main : Mapped[bool] = mapped_column(Boolean, default=False)
 
-    def __repr__(self):
-        return f"<Media(id={self.id}, file={self.file}, is_main={self.is_main})>"
-
+    user_id : Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"))
+    user : Mapped["User"] = relationship("User", secondary=user_image_association, back_populates="images", lazy="joined")
+    
     @property
-    def storage(self) -> "S3StorageManager":
-        """Возвращает объект storage, чтобы иcпользовать его методы напрямую."""
-        return self._file_storage
+    def url(self):
+        from config import settings
+        return f"http://{settings.MINIO_DOMAIN}/{settings.MINIO_MEDIA_BUCKET}/{self.file}"
 
 class IssuedJWTToken(Base):
     jti: Mapped[str] = mapped_column(String(36), primary_key=True)

@@ -8,7 +8,7 @@ from sqlalchemy.orm import aliased
 from backend.src.crud.base_crud import GenericCRUD
 from models import Base
 from models import Image
-from image_schemas import ImageCreate, ImageDAOResponse, ImageUpdate
+from image_schemas import ImageCreate, ImageUpdate
 
 class ImageDAO(GenericCRUD[Image, ImageCreate, ImageUpdate]):
     async def _reset_is_main(self, model_name: str, model_instance: Base, association_table_name: str, db_session: AsyncSession):
@@ -49,7 +49,9 @@ class ImageDAO(GenericCRUD[Image, ImageCreate, ImageUpdate]):
         db_obj.file = await db_obj.storage.put_object(file, path)
         db_session.add(db_obj)
         await db_session.flush()
+        await db_session.refresh(db_obj)
 
         return db_obj
+    
 
 image_dao = ImageDAO(Image)
