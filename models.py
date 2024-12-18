@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+﻿from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.orm import DeclarativeBase, declared_attr
 from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
 from sqlalchemy import Integer, func, Table, Column, Boolean, String
@@ -7,7 +7,6 @@ from sqlalchemy import ForeignKey, JSON, DateTime
 from typing import Any
 import enum
 from typing import List, Optional
-
 
 class Base(AsyncAttrs, DeclarativeBase):
     __abstract__ = True  
