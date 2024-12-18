@@ -31,7 +31,6 @@ board_collaborators = Table(
     Column("board_id", Integer, ForeignKey("boards.id"), primary_key=True)
 )
 
-
 class User(Base):
     username: Mapped[str] = mapped_column(String, nullable=False)
     email: Mapped[str] = mapped_column(String, unique=True, nullable=False)
@@ -79,12 +78,50 @@ class Board(Base):
     # Пользователи, имеющие доступ к доске
     collaborators: Mapped[List["User"]] = relationship(
         "User",
+
         secondary=board_collaborators,
         back_populates="boards",
         lazy='joined'
     )
     
-   
+
+    # "To-Do" списки на доске
+    todos: Mapped[List["TodoList"]] = relationship(
+        "TodoList",
+        back_populates="board",
+        cascade="all, delete-orphan",
+        lazy='joined'
+    )
+
+class TodoList(Base):
+    title: Mapped[str] = mapped_column(String, nullable=False)
+    board_id: Mapped[int] = mapped_column(ForeignKey('boards.id'), nullable=False)
+    
+    board: Mapped["Board"] = relationship(
+        "Board",
+        back_populates="todos",
+        lazy='joined'
+    )
+    
+    items: Mapped[List["TodoItem"]] = relationship(
+        "TodoItem",
+        back_populates="todo_list",
+        cascade="all, delete-orphan",
+        lazy='joined'
+    )
+
+class TodoItem(Base):
+    text: Mapped[str] = mapped_column(String, nullable=False)
+    completed: Mapped[bool] = mapped_column(Boolean, default=False)
+    todo_list_id: Mapped[int] = mapped_column(ForeignKey('todolists.id'), nullable=False)
+    due_date: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    
+    todo_list: Mapped["TodoList"] = relationship(
+        "TodoList",
+        back_populates="items",
+        lazy='joined'
+    )
+
 class Profile(Base):
     first_name: Mapped[str | None] = mapped_column(String, nullable=True)
     last_name: Mapped[str | None] = mapped_column(String, nullable=True)
