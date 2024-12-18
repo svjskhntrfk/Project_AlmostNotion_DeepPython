@@ -27,6 +27,16 @@
             <div class="name">
                 <a class="username" href="/profile/main_page/profile/">{{username}}</a>
             </div>
+
+            <div id="modal" class="modal">
+                <div class="content_title">
+                    <form action="/board/main_page/{{board_id}}/add_collaborator" method="post">
+                        <input class="in" type="text" id="email_collaborator" name ="email_collaborator" placeholder="Введите email коллаборатора">
+                        <input class="confirmBtn" type="submit" value="Подтвердить">
+                    </form>
+                </div>
+            </div>
+            <script src="/static/js/js_collab.js"></script>
         </header>
         <main style="width: 100%;">
             <div class="all_texts" id="notesContainer">
@@ -44,6 +54,7 @@
                          data-placeholder="Введите заметку"></pre>
                 </div>
             </div>
+
         </main>
       </body>
   </div>
