@@ -105,7 +105,7 @@ class Image(Base):
     file: Mapped[str] = mapped_column(FilePath(_file_storage), nullable=True)
     is_main : Mapped[bool] = mapped_column(Boolean, default=False)
 
-    user_id : Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"))
+    user_id : Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
     user : Mapped["User"] = relationship("User", secondary=user_image_association, back_populates="images", lazy="joined")
     
     @property
