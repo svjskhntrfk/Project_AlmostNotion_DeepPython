@@ -244,3 +244,317 @@ async def test_change_password_user_not_found(db_session: AsyncSession):
     with pytest.raises(ValueError, match=f"User with ID {invalid_user_id} not found."):
         await change_password(user_id=invalid_user_id, new_password="new_password", session=db_session)
 
+
+
+@pytest.mark.asyncio
+async def test_create_todo_list(db_session: AsyncSession):
+    # Создаём пользователя
+    username = "todo_user"
+    email = "todo_user@example.com"
+    password = "todo_pass"
+    await create_user(username, email, password, db_session)
+
+    # Получаем пользователя
+    result = await db_session.execute(select(User).filter_by(email=email))
+    user = result.scalars().first()
+    assert user is not None
+
+    # Создаём доску
+    board_title = "Todo Board"
+    board_id = await create_board(user_id=user.id, title=board_title, session=db_session)
+
+    # Создаём список задач
+    todo_title = "My Todo List"
+    todo_list_id = await create_todo_list(board_id=board_id, title=todo_title, session=db_session)
+    assert todo_list_id is not None
+
+    # Проверяем, что список задач создан
+    result = await db_session.execute(select(TodoList).filter_by(id=todo_list_id))
+    todo_list = result.scalars().first()
+    assert todo_list is not None
+    assert todo_list.title == todo_title
+    assert todo_list.board_id == board_id
+
+@pytest.mark.asyncio
+async def test_get_todo_lists(db_session: AsyncSession):
+    # Создаём пользователя
+    username = "get_todo_user"
+    email = "get_todo_user@example.com"
+    password = "get_todo_pass"
+    user_id = await create_user(username, email, password, db_session)
+    assert user_id is not None
+
+    # Проверяем, что пользователь создан
+    user = await db_session.execute(select(User).filter_by(id=user_id))
+    user = user.scalars().first()
+    assert user is not None
+
+    # Создаём доску
+    board_title = "Get Todo Board"
+    board_id = await create_board(user_id=user.id, title=board_title, session=db_session)
+    assert board_id is not None
+
+    # Проверяем, что доска создана
+    board = await db_session.execute(select(Board).filter_by(id=board_id))
+    board = board.scalars().first()
+    assert board is not None
+
+    # Создаём несколько списков задач
+    todo_titles = ["List 1", "List 2", "List 3"]
+    for title in todo_titles:
+        todo_list_id = await create_todo_list(board_id=board_id, title=title, session=db_session)
+        assert todo_list_id is not None
+
+    # Проверяем наличие созданных списков в базе
+    created_todo_lists_result = await db_session.execute(select(TodoList).filter_by(board_id=board_id))
+    created_todo_lists = created_todo_lists_result.scalars().unique().all()
+    assert len(created_todo_lists) == len(todo_titles), "Number of created TodoLists does not match expected."
+
+    # Получаем списки задач через функцию
+    todo_lists = await get_todo_lists(board_id=board_id, session=db_session)
+    assert len(todo_lists) == len(todo_titles)
+    returned_titles = [tl["title"] for tl in todo_lists]
+    assert set(returned_titles) == set(todo_titles)
+
+
+
+@pytest.mark.asyncio
+async def test_update_todo_list(db_session: AsyncSession):
+    # Создаём пользователя, доску и список задач
+    username = "update_todo_user"
+    email = "update_todo_user@example.com"
+    password = "update_todo_pass"
+    await create_user(username, email, password, db_session)
+
+    result = await db_session.execute(select(User).filter_by(email=email))
+    user = result.scalars().first()
+    assert user is not None
+
+    board_id = await create_board(user_id=user.id, title="Update Todo Board", session=db_session)
+
+    todo_title = "Original Todo List"
+    todo_list_id = await create_todo_list(board_id=board_id, title=todo_title, session=db_session)
+
+    # Обновляем название списка задач
+    new_title = "Updated Todo List"
+    success = await update_todo_list(todo_list_id=todo_list_id, board_id=board_id, new_title=new_title, session=db_session)
+    assert success is True
+
+    # Проверяем изменения
+    result = await db_session.execute(select(TodoList).filter_by(id=todo_list_id))
+    todo_list = result.scalars().first()
+    assert todo_list.title == new_title
+
+@pytest.mark.asyncio
+async def test_delete_todo_list(db_session: AsyncSession):
+    # Создаём пользователя, доску и список задач
+    username = "delete_todo_user"
+    email = "delete_todo_user@example.com"
+    password = "delete_todo_pass"
+    await create_user(username, email, password, db_session)
+
+    result = await db_session.execute(select(User).filter_by(email=email))
+    user = result.scalars().first()
+    assert user is not None
+
+    board_id = await create_board(user_id=user.id, title="Delete Todo Board", session=db_session)
+
+    todo_title = "Delete Todo List"
+    todo_list_id = await create_todo_list(board_id=board_id, title=todo_title, session=db_session)
+
+    # Удаляем список задач
+    success = await delete_todo_list(todo_list_id=todo_list_id, board_id=board_id, session=db_session)
+    assert success is True
+
+    # Проверяем, что список задач удален
+    result = await db_session.execute(select(TodoList).filter_by(id=todo_list_id))
+    todo_list = result.scalars().first()
+    assert todo_list is None
+
+@pytest.mark.asyncio
+async def test_add_item_to_todo_list(db_session: AsyncSession):
+    # Создаём пользователя, доску и список задач
+    username = "add_item_user"
+    email = "add_item_user@example.com"
+    password = "add_item_pass"
+    await create_user(username, email, password, db_session)
+
+    result = await db_session.execute(select(User).filter_by(email=email))
+    user = result.scalars().first()
+    assert user is not None
+
+    board_id = await create_board(user_id=user.id, title="Add Item Board", session=db_session)
+
+    todo_title = "Add Item Todo List"
+    todo_list_id = await create_todo_list(board_id=board_id, title=todo_title, session=db_session)
+
+    # Добавляем элемент задачи
+    item_text = "Complete unit tests"
+    item_id = await add_item_to_todo_list(todo_list_id=todo_list_id, text=item_text, session=db_session)
+    assert item_id is not None
+
+    # Проверяем, что элемент добавлен
+    result = await db_session.execute(select(TodoItem).filter_by(id=item_id))
+    todo_item = result.scalars().first()
+    assert todo_item is not None
+    assert todo_item.text == item_text
+    assert not todo_item.completed
+
+@pytest.mark.asyncio
+async def test_update_todo_item(db_session: AsyncSession):
+    # Создаём пользователя, доску, список задач и элемент задачи
+    username = "update_item_user"
+    email = "update_item_user@example.com"
+    password = "update_item_pass"
+    await create_user(username, email, password, db_session)
+
+    result = await db_session.execute(select(User).filter_by(email=email))
+    user = result.scalars().first()
+    assert user is not None
+
+    board_id = await create_board(user_id=user.id, title="Update Item Board", session=db_session)
+
+    todo_title = "Update Item Todo List"
+    todo_list_id = await create_todo_list(board_id=board_id, title=todo_title, session=db_session)
+
+    item_text = "Initial Task"
+    item_id = await add_item_to_todo_list(todo_list_id=todo_list_id, text=item_text, session=db_session)
+    assert item_id is not None
+
+    # Обновляем элемент задачи
+    new_text = "Updated Task"
+    completed_status = True
+    updated_item = await update_todo_item(
+        todo_list_id=todo_list_id,
+        item_id=item_id,
+        new_text=new_text,
+        completed=completed_status,
+        session=db_session
+    )
+    assert updated_item.text == new_text
+    assert updated_item.completed == completed_status
+
+    # Проверяем изменения
+    result = await db_session.execute(select(TodoItem).filter_by(id=item_id))
+    todo_item = result.scalars().first()
+    assert todo_item.text == new_text
+    assert todo_item.completed == completed_status
+
+@pytest.mark.asyncio
+async def test_delete_todo_item(db_session: AsyncSession):
+    # Создаём пользователя, доску, список задач и элемент задачи
+    username = "delete_item_user"
+    email = "delete_item_user@example.com"
+    password = "delete_item_pass"
+    await create_user(username, email, password, db_session)
+
+    result = await db_session.execute(select(User).filter_by(email=email))
+    user = result.scalars().first()
+    assert user is not None
+
+    board_id = await create_board(user_id=user.id, title="Delete Item Board", session=db_session)
+
+    todo_title = "Delete Item Todo List"
+    todo_list_id = await create_todo_list(board_id=board_id, title=todo_title, session=db_session)
+
+    item_text = "Task to be deleted"
+    item_id = await add_item_to_todo_list(todo_list_id=todo_list_id, text=item_text, session=db_session)
+    assert item_id is not None
+
+    # Удаляем элемент задачи
+    success = await delete_todo_item(todo_list_id=todo_list_id, item_id=item_id, session=db_session)
+    assert success is True
+
+    # Проверяем, что элемент задачи удален
+    result = await db_session.execute(select(TodoItem).filter_by(id=item_id))
+    todo_item = result.scalars().first()
+    assert todo_item is None
+
+@pytest.mark.asyncio
+async def test_create_todo_list_board_not_found(db_session: AsyncSession):
+    # Попытка создать список задач для несуществующей доски
+    non_existent_board_id = 99999
+    todo_title = "Non-existent Board Todo List"
+
+    with pytest.raises(ValueError, match=f"Board with id {non_existent_board_id} not found."):
+        await create_todo_list(board_id=non_existent_board_id, title=todo_title, session=db_session)
+
+@pytest.mark.asyncio
+async def test_add_item_to_todo_list_todo_list_not_found(db_session: AsyncSession):
+    # Попытка добавить элемент задачи в несуществующий список задач
+    non_existent_todo_list_id = 99999
+    item_text = "Task for non-existent list"
+
+    with pytest.raises(ValueError, match=f"Todo list with id {non_existent_todo_list_id} not found."):
+        await add_item_to_todo_list(todo_list_id=non_existent_todo_list_id, text=item_text, session=db_session)
+
+@pytest.mark.asyncio
+async def test_update_todo_list_not_found(db_session: AsyncSession):
+    # Попытка обновить несуществующий список задач
+    non_existent_todo_list_id = 99999
+    board_id = 1  # Предполагаемый ID доски, убедитесь, что он корректен или настройте соответствующим образом
+    new_title = "Updated Title"
+
+    with pytest.raises(ValueError, match=f"Todo list with id {non_existent_todo_list_id} not found in board {board_id}."):
+        await update_todo_list(todo_list_id=non_existent_todo_list_id, board_id=board_id, new_title=new_title, session=db_session)
+
+@pytest.mark.asyncio
+async def test_update_todo_item_not_found(db_session: AsyncSession):
+    # Попытка обновить несуществующий элемент задачи
+    username = "update_item_fail_user"
+    email = "update_item_fail_user@example.com"
+    password = "update_item_fail_pass"
+    await create_user(username, email, password, db_session)
+
+    result = await db_session.execute(select(User).filter_by(email=email))
+    user = result.scalars().first()
+    assert user is not None
+
+    board_id = await create_board(user_id=user.id, title="Update Item Fail Board", session=db_session)
+
+    todo_title = "Update Item Fail Todo List"
+    todo_list_id = await create_todo_list(board_id=board_id, title=todo_title, session=db_session)
+
+    non_existent_item_id = 99999
+    new_text = "Non-existent Task"
+    completed_status = False
+
+    with pytest.raises(ValueError, match=f"Todo item with id {non_existent_item_id} not found."):
+        await update_todo_item(
+            todo_list_id=todo_list_id,
+            item_id=non_existent_item_id,
+            new_text=new_text,
+            completed=completed_status,
+            session=db_session
+        )
+
+@pytest.mark.asyncio
+async def test_delete_todo_list_not_found(db_session: AsyncSession):
+    # Попытка удалить несуществующий список задач
+    non_existent_todo_list_id = 99999
+    board_id = 1  # Предполагаемый ID доски, убедитесь, что он корректен или настройте соответствующим образом
+
+    with pytest.raises(ValueError, match=f"Todo list with id {non_existent_todo_list_id} not found in board {board_id}."):
+        await delete_todo_list(todo_list_id=non_existent_todo_list_id, board_id=board_id, session=db_session)
+
+@pytest.mark.asyncio
+async def test_delete_todo_item_not_found(db_session: AsyncSession):
+    # Попытка удалить несуществующий элемент задачи
+    username = "delete_item_fail_user"
+    email = "delete_item_fail_user@example.com"
+    password = "delete_item_fail_pass"
+    await create_user(username, email, password, db_session)
+
+    result = await db_session.execute(select(User).filter_by(email=email))
+    user = result.scalars().first()
+    assert user is not None
+
+    board_id = await create_board(user_id=user.id, title="Delete Item Fail Board", session=db_session)
+
+    todo_title = "Delete Item Fail Todo List"
+    todo_list_id = await create_todo_list(board_id=board_id, title=todo_title, session=db_session)
+
+    non_existent_item_id = 99999
+
+    with pytest.raises(ValueError, match=f"Todo item with id {non_existent_item_id} not found."):
+        await delete_todo_item(todo_list_id=todo_list_id, item_id=non_existent_item_id, session=db_session)
