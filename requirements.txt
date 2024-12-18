@@ -52,6 +52,7 @@ mysql-connector==2.2.9
 packaging==24.2
 passlib==1.7.4
 peewee==3.17.7
+
 pillow==11.0.0
 propcache==0.2.1
 pycparser==2.22
