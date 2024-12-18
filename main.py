@@ -11,7 +11,6 @@ from database import *
 from auth.transport.router_reg import router as reg_router
 from router_boards import router as board_router
 from router_profile import router as profile_router
-from router_image import  router as image_router
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
@@ -48,7 +47,6 @@ app = FastAPI(lifespan=lifespan)
 app.include_router(reg_router)
 app.include_router(board_router)
 app.include_router(profile_router)
-app.include_router(image_router)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
