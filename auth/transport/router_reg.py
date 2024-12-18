@@ -94,6 +94,7 @@ async def registration(
                     "username": username
                 }
             )
+
         
         return RedirectResponse(
             url=f"/login",
