@@ -7,10 +7,15 @@ import uuid
 import logging
 from sqlalchemy import cast, Integer
 from sqlalchemy.exc import SQLAlchemyError
+from image_schemas import ImageCreate, ImageUpdate
+from sqlalchemy import UUID, Table, select, update
+from fastapi import HTTPException, UploadFile
+from typing import Type
+from sqlalchemy.orm import aliased
+from backend.src.crud.image_crud import image_dao
 from models import *
 from typing import List, Dict
 from sqlalchemy.orm import selectinload
-
 
 
 logger = logging.getLogger(__name__)
@@ -250,7 +255,7 @@ async def update_text(board_id: int, text_id: str, new_text: str, session: Async
     :param session: Асинхронная сессия SQLAlchemy.
     :return: True, если текст успешно обновлен.
     :raises ValueError: Если доска или текст не найдены.
-    :raises RuntimeError: Если произошла ошибка базы данных при обновлении текста.
+    :raises RuntimeError: Если произошл�� ошибка базы данных при обновлении текста.
     """
     try:
         # Получаем доску
@@ -297,7 +302,7 @@ async def update_text(board_id: int, text_id: str, new_text: str, session: Async
 
 async def change_username(user_id: int, new_username: str, session: AsyncSession):
     """
-    Изменяет имя по��ьзователя в базе данных.
+    Изменяет имя пользователя в базе данных.
 
     :param user_id: ID пользователя.
     :param new_username: Новое имя пользователя.
@@ -363,6 +368,7 @@ async def change_password(user_id: int, new_password: str, session: AsyncSession
     except SQLAlchemyError as e:
         logger.error(f"Error editing password for user_id={user_id}: {e}")
         raise RuntimeError("An error occurred while changing the password.") from e
+
     
 
 async def create_todo_list(board_id: int, title: str, session: AsyncSession) -> int:
@@ -680,33 +686,43 @@ async def get_todo_item_by_id(item_id: int, session: AsyncSession) -> Dict:
 
 
 
+
 async def create_jwt_tokens(
-    tokens: list[dict], 
-    user: User, 
-    device_id: str, 
-    session: AsyncSession
+  tokens: list[dict], 
+  user: User, 
+  device_id: str, 
+  session: AsyncSession
 ) -> None:
-    print('in database')
-    """
-    Create multiple JWT tokens in database
-    
-    Args:
-        tokens: List of token payloads containing 'jti' and 'exp'
-        user: User instance
-        device_id: Device identifier
-        session: AsyncSession instance
-    """
-    issued_tokens = [
-        IssuedJWTToken(
-            subject=user,
-            jti=token['jti'],
-            device_id=device_id,
-            expired_time=token['exp']
-        )
-        for token in tokens
-    ]
-    print(issued_tokens)
-    print('end')
-    session.add_all(issued_tokens)
-    await session.commit()
+  print('in database')
+  """
+  Create multiple JWT tokens in database
+
+  Args:
+      tokens: List of token payloads containing 'jti' and 'exp'
+      user: User instance
+      device_id: Device identifier
+      session: AsyncSession instance
+  """
+  issued_tokens = [
+      IssuedJWTToken(
+          subject=user,
+          jti=token['jti'],
+          device_id=device_id,
+          expired_time=token['exp']
+      )
+      for token in tokens
+  ]
+  print(issued_tokens)
+  print('end')
+  session.add_all(issued_tokens)
+  await session.commit()
+
+
+async def save_user_image(user_id : int, file: UploadFile, is_main: bool, session: AsyncSession) -> Image:
+    user =  await get_user_by_id(user_id, session)
+    image_path = "Users"
+    image = await image_dao.create_with_file(
+        file=file, is_main=is_main, model_instance=user, path=image_path, db_session=session
+    )
+    return image
 
