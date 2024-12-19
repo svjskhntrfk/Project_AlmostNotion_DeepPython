@@ -79,6 +79,7 @@ img {
     margin-top: 10px;
     text-align: center;
     box-sizing: border-box;
+    margin-right: 10px;
 }
 svg {
     width: 50px;
@@ -161,4 +162,9 @@ input {
     background: none;
     border: none;
     cursor: pointer;
+}
+
+a {
+    text-decoration: none;
+    color: #F0E4D8;
 }
