@@ -42,6 +42,13 @@ board_collaborators = Table(
 )
 
 
+user_image_association = Table(
+    "user_image_association",
+    Base.metadata,
+    Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
+    Column("image_id", Integer, ForeignKey("image.id"), primary_key=True)
+)
+
 class User(Base):
     username: Mapped[str] = mapped_column(String, nullable=False)
     email: Mapped[str] = mapped_column(String, unique=True, nullable=False)
