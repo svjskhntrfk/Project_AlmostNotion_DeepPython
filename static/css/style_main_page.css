@@ -136,3 +136,16 @@ input {
     border: none;
     margin: 0px;
 }
+
+.user_photo {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.photo{
+    position: absolute;
+	right: 70px;
+	top: 9px;
+}
