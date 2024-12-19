@@ -124,7 +124,7 @@ input {
 .confirmBtn {
     padding: 10px 20px;
     font-family: "Philosopher", sans-serif;
-    width: 40%;
+    width: 43%;
     margin-bottom: 25px;
     margin-top: 10px;
     background-color: #B14F44;
@@ -149,7 +149,16 @@ input {
 }
 
 .photo{
-   position: absolute;
-   right: 70px;
-   top: 9px;
+    position: absolute;
+	right: 70px;
+	top: 9px;
+}
+
+.closeBtn {
+    position: absolute;
+    top: 5px;
+    left: 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
 }
