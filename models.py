@@ -46,7 +46,7 @@ user_image_association = Table(
     "user_image_association",
     Base.metadata,
     Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
-    Column("image_id", Integer, ForeignKey("image.id"), primary_key=True)
+    Column("image_id", Integer, ForeignKey("images.id"), primary_key=True)
 )
 
 class User(Base):
@@ -154,14 +154,18 @@ class Profile(Base):
     )
 
 class Image(Base):
-    _file_storage = FilePath(media_storage)
+    _file_storage = media_storage
 
     file: Mapped[str] = mapped_column(FilePath(_file_storage), nullable=True)
-    is_main : Mapped[bool] = mapped_column(Boolean, default=False)
+    is_main: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    user_id : Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
-    user : Mapped["User"] = relationship("User", secondary=user_image_association, back_populates="images", lazy="joined")
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
+    user: Mapped["User"] = relationship("User", secondary=user_image_association, back_populates="images", lazy="joined")
     
+    @property
+    def storage(self):
+        return self._file_storage
+
     @property
     def url(self):
         from config import settings

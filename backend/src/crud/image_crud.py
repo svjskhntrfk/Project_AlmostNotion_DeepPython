@@ -18,7 +18,7 @@ class ImageDAO(GenericCRUD[Image, ImageCreate, ImageUpdate]):
         stmt = (
             select(image_alias.id)
             .select_from(association_table)
-            .join(image_alias, association_table.с["image_id"] == image_alias.id)
+            .join(image_alias, association_table.c["image_id"] == image_alias.id)
             .where(association_table.c[f"{model_name}_id"] == model_instance.id)
             .where(image_alias.is_main == True)  # noqa: E712
         )
