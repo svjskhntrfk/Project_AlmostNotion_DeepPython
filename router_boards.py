@@ -194,4 +194,3 @@ async def add_text_on_board(
     to_do_list_id = data.get("to_do_list_id")
     await delete_todo_list(int(to_do_list_id), session)
     return {"status": "success"}
-
