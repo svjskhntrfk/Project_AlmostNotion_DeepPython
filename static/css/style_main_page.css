@@ -139,7 +139,10 @@ input {
 .plus{
     background-color: #DD8E75;
     border: none;
-    margin: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 60px;
 }
 
 .user_photo {
