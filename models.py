@@ -1,12 +1,22 @@
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+﻿from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.orm import DeclarativeBase, declared_attr
 from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
 from sqlalchemy import Integer, func, Table, Column, Boolean, String
 from datetime import datetime
-from sqlalchemy import ForeignKey, JSON, DateTime
-from typing import Any
+
+from sqlalchemy import ForeignKey, JSON, text, DateTime
+
+from typing import Any, List, Optional
+from pydantic import BaseModel
+from backend.src.conf.s3_storages import media_storage
+import uuid
+from sqlalchemy.dialects.postgresql import UUID
+from sql_decorator import FilePath
+from sqlalchemy import Boolean
+from uuid import uuid4
 import enum
-from typing import List, Optional
+from backend.src.conf.s3_client import S3StorageManager
+
 
 
 class Base(AsyncAttrs, DeclarativeBase):
@@ -31,10 +41,19 @@ board_collaborators = Table(
     Column("board_id", Integer, ForeignKey("boards.id"), primary_key=True)
 )
 
+
+user_image_association = Table(
+    "user_image_association",
+    Base.metadata,
+    Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
+    Column("image_id", Integer, ForeignKey("image.id"), primary_key=True)
+)
+
 class User(Base):
     username: Mapped[str] = mapped_column(String, nullable=False)
     email: Mapped[str] = mapped_column(String, unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String, nullable=False)
+
 
     owned_boards: Mapped[List["Board"]] = relationship(
         "Board",
@@ -50,6 +69,8 @@ class User(Base):
         lazy='joined'
     )
     profile_id: Mapped[int | None] = mapped_column(ForeignKey('profiles.id'), nullable=True)
+
+    images : Mapped[list["Image"]] = relationship("Image", secondary=user_image_association, back_populates="user", lazy="joined")
 
     profile: Mapped["Profile"] = relationship(
         "Profile",
@@ -132,6 +153,20 @@ class Profile(Base):
         lazy='joined'
     )
 
+class Image(Base):
+    _file_storage = FilePath(media_storage)
+
+    file: Mapped[str] = mapped_column(FilePath(_file_storage), nullable=True)
+    is_main : Mapped[bool] = mapped_column(Boolean, default=False)
+
+    user_id : Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
+    user : Mapped["User"] = relationship("User", secondary=user_image_association, back_populates="images", lazy="joined")
+    
+    @property
+    def url(self):
+        from config import settings
+        return f"http://{settings.MINIO_DOMAIN}/{settings.MINIO_MEDIA_BUCKET}/{self.file}"
+
 class IssuedJWTToken(Base):
     jti: Mapped[str] = mapped_column(String(36), primary_key=True)
     
@@ -148,3 +183,4 @@ class IssuedJWTToken(Base):
 
     def __str__(self) -> str:
         return f'{self.subject}: {self.jti}'
+
