@@ -172,7 +172,7 @@ async def get_board_by_user_id_and_board_id(user_id: int, board_id: int, session
         print(content)
         if not content:
             raise ValueError(f"No board found for user_id {user_id} and board_id {board_id}.")
-        return result[1]
+        return result
     except SQLAlchemyError as e:
         logger.error(f"Error retrieving board for user_id {user_id} and board_id {board_id}: {e}")
         raise RuntimeError("An error occurred while retrieving the board.")
