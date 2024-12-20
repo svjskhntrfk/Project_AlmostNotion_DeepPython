@@ -7,14 +7,19 @@ import uuid
 import logging
 from sqlalchemy import cast, Integer
 from sqlalchemy.exc import SQLAlchemyError
+from image_schemas import ImageCreate, ImageUpdate
+from sqlalchemy import UUID, Table, select, update
+from fastapi import HTTPException, UploadFile
+from typing import Type
+from sqlalchemy.orm import aliased
+from backend.src.crud.image_crud import image_dao
 from models import *
 from typing import List, Dict
 from sqlalchemy.orm import selectinload
 
 
-
 logger = logging.getLogger(__name__)
-DATABASE_URL = settings.get_db_url()
+DATABASE_URL = f"postgresql+asyncpg://postgres:postgres@postgres:5432/mydatabase"
 
 engine = create_async_engine(DATABASE_URL, echo=False)
 async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
@@ -149,7 +154,7 @@ async def create_board(user_id: int, title: str, session: AsyncSession):
 
 async def get_board_by_user_id_and_board_id(user_id: int, board_id: int, session: AsyncSession):
     """
-    Возвращает данные доски по ID пользователя и ID доски.
+    В��звращает данные доски по ID пользователя и ID доски.
 
     :param user_id: ID пользователя.
     :param board_id: ID доски.
@@ -296,7 +301,7 @@ async def update_text(board_id: int, text_id: str, new_text: str, session: Async
 
 async def change_username(user_id: int, new_username: str, session: AsyncSession):
     """
-    Изменяет имя по��ьзователя в базе данных.
+    Изменяет имя пользователя в базе данных.
 
     :param user_id: ID пользователя.
     :param new_username: Новое имя пользователя.
@@ -334,7 +339,7 @@ async def change_password(user_id: int, new_password: str, session: AsyncSession
     """
     Изменяет пароль пользователя в базе данных.
 
-    :param user_id: ID пользователя.
+    :param user_id: ID ��ользователя.
     :param new_password: Новый пароль пользователя (хэшированный).
     :param session: Асинхронная сессия SQLAlchemy.
     :return: True, если пароль успешно изменен.
@@ -362,35 +367,61 @@ async def change_password(user_id: int, new_password: str, session: AsyncSession
     except SQLAlchemyError as e:
         logger.error(f"Error editing password for user_id={user_id}: {e}")
         raise RuntimeError("An error occurred while changing the password.") from e
-    
 
-async def create_jwt_tokens(
-    tokens: list[dict], 
-    user: User, 
-    device_id: str, 
-    session: AsyncSession
-) -> None:
-    print('in database')
-    """
-    Create multiple JWT tokens in database
     
-    Args:
-        tokens: List of token payloads containing 'jti' and 'exp'
-        user: User instance
-        device_id: Device identifier
-        session: AsyncSession instance
-    """
-    issued_tokens = [
-        IssuedJWTToken(
-            subject=user,
-            jti=token['jti'],
-            device_id=device_id,
-            expired_time=token['exp']
+async def create_jwt_tokens(
+  tokens: list[dict], 
+  user: User, 
+  device_id: str, 
+  session: AsyncSession
+) -> None:
+  print('in database')
+  """
+  Create multiple JWT tokens in database
+
+  Args:
+      tokens: List of token payloads containing 'jti' and 'exp'
+      user: User instance
+      device_id: Device identifier
+      session: AsyncSession instance
+  """
+  issued_tokens = [
+      IssuedJWTToken(
+          subject=user,
+          jti=token['jti'],
+          device_id=device_id,
+          expired_time=token['exp']
+      )
+      for token in tokens
+  ]
+  print(issued_tokens)
+  print('end')
+  session.add_all(issued_tokens)
+  await session.commit()
+
+
+async def save_user_image(user_id: int, file: UploadFile, is_main: bool, session: AsyncSession) -> Image:
+    print(f"Starting save_user_image for user_id: {user_id}")
+    try:
+        # Получаем пользователя
+        user = await session.get(User, user_id)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        print(f"Calling image_dao.create_with_file with path: Users")
+        image = await image_dao.create_with_file(
+            file=file,
+            is_main=is_main,
+            model_instance=user,  # Передаем объект пользователя
+            path="Users",
+            db_session=session
         )
-        for token in tokens
-    ]
-    print(issued_tokens)
-    print('end')
-    session.add_all(issued_tokens)
-    await session.commit()
+        await session.commit()
+        return image
+    except Exception as e:
+        print(f"Error in save_user_image: {str(e)}")
+        print(f"Error type: {type(e)}")
+        import traceback
+        print(f"Traceback: {traceback.format_exc()}")
+        raise
 
