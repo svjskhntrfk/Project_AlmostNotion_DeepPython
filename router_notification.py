@@ -1,46 +1,31 @@
-from typing import List
-from fastapi import APIRouter, Form, Depends, Security
-from fastapi import BackgroundTasks, FastAPI
-from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
-from pydantic import BaseModel, EmailStr
-from starlette.responses import JSONResponse
+import smtplib
+from email.mime.text import MIMEText
 
-router = APIRouter(
-    prefix="/notifications",
-    tags=["Notifications"]
-)
-
-class EmailSchema(BaseModel):
-    email: List[EmailStr]
+def send_email(email, name, height):
+   from_email = "mindspace228@gmail.com"
+   from_password = "Palma1234!"
+   to_email = email
 
 
-conf = ConnectionConfig(
-    MAIL_USERNAME ="MindSpace",
-    MAIL_PASSWORD = "Palma1234!",
-    MAIL_FROM = "mindspace228@gmail.com",
-    MAIL_PORT = 587,
-    MAIL_SERVER = "smtp.gmail.com",
-    MAIL_STARTTLS = True,
-    MAIL_SSL_TLS = False,
-    USE_CREDENTIALS = True,
-    VALIDATE_CERTS = True
-)
+   subject = "Successfully registered"
+   message = "Hey %s, you have successfully registered to the Mindspace app." % (name)
 
 
-html = """
-<p>Thanks for using Fastapi-mail</p> 
-"""
+   msg = MIMEText(message, 'html')
+   msg['Subject'] = subject
+   msg['To'] = to_email
+   msg['From'] = from_email
 
 
-@router.post("/email")
-async def simple_send() -> JSONResponse:
+   # Create SMTP session for sending the mail
+   gmail = smtplib.SMTP('smtp.gmail.com', 587)
+   gmail.ehlo()
+   gmail.starttls()
+   # Login to gmail account
+   gmail.login(from_email, from_password)
+   # Send mail
+   gmail.send_message(msg)
 
-    message = MessageSchema(
-        subject="Fastapi-Mail module",
-        recipients=["begimotik220@gmail.com"],
-        body=html,
-        subtype=MessageType.html)
 
-    fm = FastMail(conf)
-    await fm.send_message(message)
-    return JSONResponse(status_code=200, content={"message": "email has been sent"})     
+if __name__ == '__main__':
+   send_email("hello@gmail.com", "John", "180")  
