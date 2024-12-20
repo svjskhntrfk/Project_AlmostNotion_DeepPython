@@ -62,8 +62,8 @@ img {
     border: 1px solid #C9C9C9;
     background-color: #FFFFFF;
     height: 200px;
-    width: calc(33.33% - 10px);
-    margin-right: 8px;
+    width: calc(33.33% - 20px);
+    margin-right: 10px;
     margin-top: 10px;
     box-sizing: border-box;
     display: flex;
@@ -76,11 +76,11 @@ img {
     border: 1px solid #C9C9C9;
     background-color: #DD8E75;
     height: 200px;
-    width: 33%;
+    width: calc(33.33% - 20px);
     margin-top: 10px;
     text-align: center;
     box-sizing: border-box;
-    margin-right: 8px;
+    margin-right: 10px;
 }
 svg {
     width: 50px;
