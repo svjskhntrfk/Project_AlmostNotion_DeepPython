@@ -49,14 +49,6 @@ class User(Base):
         back_populates="collaborators",
         lazy='joined'
     )
-    profile_id: Mapped[int | None] = mapped_column(ForeignKey('profiles.id'), nullable=True)
-
-    profile: Mapped["Profile"] = relationship(
-        "Profile",
-        back_populates="user",
-        uselist=False,  
-        lazy="joined"  
-    )
 
     tokens: Mapped[list["IssuedJWTToken"]] = relationship(
         "IssuedJWTToken",
