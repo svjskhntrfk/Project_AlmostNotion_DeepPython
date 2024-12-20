@@ -4,8 +4,16 @@ WORKDIR /app
 
 COPY requirements.txt .
 
-# Используем зеркало PyPI
-RUN pip install --no-cache-dir -i https://mirrors.aliyun.com/pypi/simple/ -r requirements.txt
+# Установка пакетов по одному с увеличенным таймаутом
+RUN pip install --no-cache-dir --default-timeout=100 fastapi && \
+    pip install --no-cache-dir --default-timeout=100 uvicorn && \
+    pip install --no-cache-dir --default-timeout=100 sqlalchemy && \
+    pip install --no-cache-dir --default-timeout=100 asyncpg && \
+    pip install --no-cache-dir --default-timeout=100 alembic && \
+    pip install --no-cache-dir --default-timeout=100 python-multipart && \
+    pip install --no-cache-dir --default-timeout=100 passlib && \
+    pip install --no-cache-dir --default-timeout=100 python-dotenv && \
+    pip install --no-cache-dir --default-timeout=100 jinja2
 
 COPY . .
 
