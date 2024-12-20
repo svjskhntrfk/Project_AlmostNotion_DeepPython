@@ -63,7 +63,7 @@ img {
     background-color: #FFFFFF;
     height: 200px;
     width: calc(33.33% - 10px);
-    margin-right: 10px;
+    margin-right: 8px;
     margin-top: 10px;
     box-sizing: border-box;
     display: flex;
@@ -80,7 +80,7 @@ img {
     margin-top: 10px;
     text-align: center;
     box-sizing: border-box;
-    margin-right: 10px;
+    margin-right: 8px;
 }
 svg {
     width: 50px;
