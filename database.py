@@ -19,7 +19,7 @@ from sqlalchemy.orm import selectinload
 
 
 logger = logging.getLogger(__name__)
-DATABASE_URL = settings.get_db_url()
+DATABASE_URL = f"postgresql+asyncpg://postgres:postgres@postgres:5432/mydatabase"
 
 engine = create_async_engine(DATABASE_URL, echo=False)
 async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
@@ -154,7 +154,7 @@ async def create_board(user_id: int, title: str, session: AsyncSession):
 
 async def get_board_by_user_id_and_board_id(user_id: int, board_id: int, session: AsyncSession):
     """
-    Возвращает данные доски по ID пользователя и ID доски.
+    В��звращает данные доски по ID пользователя и ID доски.
 
     :param user_id: ID пользователя.
     :param board_id: ID доски.
@@ -255,7 +255,7 @@ async def update_text(board_id: int, text_id: str, new_text: str, session: Async
     :param session: Асинхронная сессия SQLAlchemy.
     :return: True, если текст успешно обновлен.
     :raises ValueError: Если доска или текст не найдены.
-    :raises RuntimeError: Если произошл�� ошибка базы данных при обновлении текста.
+    :raises RuntimeError: Если произошла ошибка базы данных при обновлении текста.
     """
     try:
         # Получаем доску
@@ -340,7 +340,7 @@ async def change_password(user_id: int, new_password: str, session: AsyncSession
     """
     Изменяет пароль пользователя в базе данных.
 
-    :param user_id: ID пользователя.
+    :param user_id: ID ��ользователя.
     :param new_password: Новый пароль пользователя (хэшированный).
     :param session: Асинхронная сессия SQLAlchemy.
     :return: True, если пароль успешно изменен.
@@ -628,7 +628,7 @@ async def get_todo_list_by_id(todo_list_id: int, session: AsyncSession) -> Dict:
 
     :param todo_list_id: ID "to-do" списка.
     :param session: Асинхронная сессия SQLAlchemy.
-    :return: Словарь с данными "to-do" списка.
+    :return: Словарь данными "to-do" списка.
     :raises ValueError: Если "to-do" список не найден.
     :raises RuntimeError: Если произошла ошибка при получении данных.
     """
@@ -660,7 +660,7 @@ async def get_todo_item_by_id(item_id: int, session: AsyncSession) -> Dict:
 
     :param item_id: ID элемента.
     :param session: Асинхронная сессия SQLAlchemy.
-    :return: Словарь с данными элемента.
+    :return: Словарь с дан��ыми элемента.
     :raises ValueError: Если элемент не найден.
     :raises RuntimeError: Если произошла ошибка при получении данных.
     """
@@ -718,11 +718,28 @@ async def create_jwt_tokens(
   await session.commit()
 
 
-async def save_user_image(user_id : int, file: UploadFile, is_main: bool, session: AsyncSession) -> Image:
-    user =  await get_user_by_id(user_id, session)
-    image_path = "Users"
-    image = await image_dao.create_with_file(
-        file=file, is_main=is_main, model_instance=user, path=image_path, db_session=session
-    )
-    return image
+async def save_user_image(user_id: int, file: UploadFile, is_main: bool, session: AsyncSession) -> Image:
+    print(f"Starting save_user_image for user_id: {user_id}")
+    try:
+        # Получаем пользователя
+        user = await session.get(User, user_id)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        print(f"Calling image_dao.create_with_file with path: Users")
+        image = await image_dao.create_with_file(
+            file=file,
+            is_main=is_main,
+            model_instance=user,  # Передаем объект пользователя
+            path="Users",
+            db_session=session
+        )
+        await session.commit()
+        return image
+    except Exception as e:
+        print(f"Error in save_user_image: {str(e)}")
+        print(f"Error type: {type(e)}")
+        import traceback
+        print(f"Traceback: {traceback.format_exc()}")
+        raise
 

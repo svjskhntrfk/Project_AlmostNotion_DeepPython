@@ -48,30 +48,41 @@ async def upload_user_image(
     - Supported formats: jpg, jpeg, png, gif
     - File will be validated before upload
     """
-    # Validate file size (5MB limit)
-    if file.size > 5 * 1024 * 1024:
-        raise HTTPException(
-            status_code=413,
-            detail="File too large. Maximum size is 5MB"
-        )
-    
-    # Validate file type
-    content_type = file.content_type
-    if content_type not in ["image/jpeg", "image/png", "image/gif"]:
-        raise HTTPException(
-            status_code=415,
-            detail="Unsupported file type. Only JPEG, PNG and GIF are allowed"
-        )
+    try:
+        # Добавляем логирование
+        print(f"Uploading file: {file.filename}, size: {file.size}, content_type: {file.content_type}")
+        
+        # Validate file size (5MB limit)
+        if file.size > 5 * 1024 * 1024:
+            raise HTTPException(
+                status_code=413,
+                detail="File too large. Maximum size is 5MB"
+            )
+        
+        # Validate file type
+        content_type = file.content_type
+        if content_type not in ["image/jpeg", "image/png", "image/gif"]:
+            raise HTTPException(
+                status_code=415,
+                detail="Unsupported file type. Only JPEG, PNG and GIF are allowed"
+            )
 
-    user = request.state.user
-    image = await save_user_image(user_id=user.id, file=file, is_main=is_main, session=session)
-    
-    # Construct the full URL for the image
-    image_url = f"http://{request.base_url.netloc}/media/{image.file}"
-    
-    return ImageUploadResponse(
-        id=image.id,
-        file=image.file,
-        is_main=image.is_main,
-        url=image_url
-    )
+        user = request.state.user
+        print(f"User ID: {user.id}")
+        
+        image = await save_user_image(user_id=user.id, file=file, is_main=is_main, session=session)
+        print(f"Image saved: {image.id}")
+        
+        image_url = f"http://{request.base_url.netloc}/media/{image.file}"
+        return ImageUploadResponse(
+            id=image.id,
+            file=image.file,
+            is_main=image.is_main,
+            url=image_url
+        )
+    except Exception as e:
+        print(f"Error in upload_user_image: {str(e)}")
+        print(f"Error type: {type(e)}")
+        import traceback
+        print(f"Traceback: {traceback.format_exc()}")
+        raise

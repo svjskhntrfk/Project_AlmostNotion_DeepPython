@@ -1,6 +1,7 @@
 import os
 from enum import Enum
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import Field
 
 
 class ModeEnum(str, Enum):
@@ -27,6 +28,7 @@ class Settings(BaseSettings):
     MINIO_STATIC_BUCKET: str
     MINIO_DATABASE_BUCKET: str
     MINIO_USE_SSL: bool
+    MINIO_BUCKET_NAME:str
 
     #SECRET_KEY: str
     #ENCRYPT_KEY: str

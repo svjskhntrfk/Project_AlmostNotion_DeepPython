@@ -9,6 +9,7 @@ from backend.src.crud.base_crud import GenericCRUD
 from models import Base
 from models import Image
 from image_schemas import ImageCreate, ImageUpdate
+import uuid
 
 class ImageDAO(GenericCRUD[Image, ImageCreate, ImageUpdate]):
     async def _reset_is_main(self, model_name: str, model_instance: Base, association_table_name: str, db_session: AsyncSession):
@@ -45,7 +46,11 @@ class ImageDAO(GenericCRUD[Image, ImageCreate, ImageUpdate]):
         if is_main:
             await self._reset_is_main(model_name, model_instance, association_table_name, db_session)
 
-        db_obj = self.model(is_main=is_main)
+        db_obj = self.model(
+            id=uuid.uuid4(),
+            is_main=is_main,
+            user_id=model_instance.id
+        )
         db_obj.file = await db_obj.storage.put_object(file, path)
         db_session.add(db_obj)
         await db_session.flush()

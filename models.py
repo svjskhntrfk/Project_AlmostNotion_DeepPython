@@ -10,12 +10,13 @@ from typing import Any, List, Optional
 from pydantic import BaseModel
 from backend.src.conf.s3_storages import media_storage
 import uuid
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID as pgUUID
 from sql_decorator import FilePath
 from sqlalchemy import Boolean
 from uuid import uuid4
 import enum
 from backend.src.conf.s3_client import S3StorageManager
+from uuid import UUID
 
 
 
@@ -46,7 +47,7 @@ user_image_association = Table(
     "user_image_association",
     Base.metadata,
     Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
-    Column("image_id", Integer, ForeignKey("images.id"), primary_key=True)
+    Column("image_id", pgUUID, ForeignKey("images.id"), primary_key=True)
 )
 
 class User(Base):
@@ -96,7 +97,7 @@ class Board(Base):
         lazy='joined'
     )
     
-    # Пользователи, имеющие доступ к доске
+    # Пользоватеи, имеющие доступ к доске
     collaborators: Mapped[List["User"]] = relationship(
         "User",
         secondary=board_collaborators,
@@ -155,7 +156,8 @@ class Profile(Base):
 
 class Image(Base):
     _file_storage = media_storage
-
+    
+    id: Mapped[UUID] = mapped_column(pgUUID, primary_key=True, default=uuid.uuid4)
     file: Mapped[str] = mapped_column(FilePath(_file_storage), nullable=True)
     is_main: Mapped[bool] = mapped_column(Boolean, default=False)
 
