@@ -182,7 +182,6 @@ async def get_board_by_user_id_and_board_id(user_id: int, board_id: int, session
 async def create_text(board_id: int, text: str, session: AsyncSession):
     """
     Добавляет новый текст в доску.
-
     :param board_id: ID доски.
     :param text: Текст для добавления.
     :param session: Асинхронная сессия SQLAlchemy.
