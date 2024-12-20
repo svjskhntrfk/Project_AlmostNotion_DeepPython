@@ -29,8 +29,9 @@ body {
 .name{
     position: absolute;
     top: 20px;
-	right: 200px;
     font-size: 30px;
+    margin-right: 10px;
+    right: 120px;
 }
 
 .info {
@@ -155,8 +156,8 @@ input {
 
 .photo{
     position: absolute;
-	right: 70px;
-	top: 9px;
+	right: 50px;
+	top: 6px;
 }
 
 .closeBtn {
@@ -178,4 +179,10 @@ a {
     border: 1px solid #C9C9C9;
     width: 100%;
     border-radius: 20px;
+}
+
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
 }
