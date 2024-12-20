@@ -243,4 +243,3 @@ async def test_change_password_user_not_found(db_session: AsyncSession):
     invalid_user_id = 99999
     with pytest.raises(ValueError, match=f"User with ID {invalid_user_id} not found."):
         await change_password(user_id=invalid_user_id, new_password="new_password", session=db_session)
-

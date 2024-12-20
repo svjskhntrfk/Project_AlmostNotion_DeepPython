@@ -31,7 +31,6 @@ board_collaborators = Table(
     Column("board_id", Integer, ForeignKey("boards.id"), primary_key=True)
 )
 
-
 class User(Base):
     username: Mapped[str] = mapped_column(String, nullable=False)
     email: Mapped[str] = mapped_column(String, unique=True, nullable=False)
@@ -49,14 +48,6 @@ class User(Base):
         secondary=board_collaborators,
         back_populates="collaborators",
         lazy='joined'
-    )
-    profile_id: Mapped[int | None] = mapped_column(ForeignKey('profiles.id'), nullable=True)
-
-    profile: Mapped["Profile"] = relationship(
-        "Profile",
-        back_populates="user",
-        uselist=False,  
-        lazy="joined"  
     )
 
     tokens: Mapped[list["IssuedJWTToken"]] = relationship(
@@ -84,18 +75,6 @@ class Board(Base):
         lazy='joined'
     )
     
-   
-class Profile(Base):
-    first_name: Mapped[str | None] = mapped_column(String, nullable=True)
-    last_name: Mapped[str | None] = mapped_column(String, nullable=True)
-    age: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    avatar: Mapped[str | None] = mapped_column(String, nullable=True) 
-    user: Mapped["User"] = relationship(
-        "User",
-        back_populates="profile",
-        uselist=False,
-        lazy='joined'
-    )
 
 class IssuedJWTToken(Base):
     jti: Mapped[str] = mapped_column(String(36), primary_key=True)
