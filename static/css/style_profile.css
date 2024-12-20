@@ -20,6 +20,8 @@ header{
     border-bottom-right-radius: 25px;
     border-bottom-left-radius: 25px;
     margin-bottom: 50px;
+    display: flex;
+    align-items: center;
 }
 
 body {
@@ -97,15 +99,17 @@ p {
 
 .back_to_mp {
     position: absolute;
-    margin-left: 10px;
-    margin-top: 10px;
+    margin: 0px;
     font-size: 30px;
+    display: flex;
+    align-items: center;
 }
 
 h {
     font-size: 27px;
     font-weight: 300px;
     margin-left: 20px;
+    margin-top: 15px;
 }
 
 .in {
@@ -115,6 +119,7 @@ h {
     color: #000000;
     font-family: "Philosopher", sans-serif;
     padding: 10px;
+    margin-top: 10px;
     margin-bottom: 10px;
     display: block;
     width: 50%;
@@ -148,4 +153,39 @@ h {
     font-weight: 300px;
     margin: 0px;
     font-size: 27px;
+}
+
+.photo{
+    position: absolute;
+	right: 70px;
+	top: 9px;
+}
+
+.user_photo {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.reg {
+    width: 53%;
+    height: 35px;
+    border: none;
+    border-radius: 8px;
+    background-color: #B14F44;
+    color: #F0E4D8;
+    font-size: 16px;
+    display: block;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-family: "Philosopher", sans-serif;
+}
+
+.section-title {
+    margin-bottom: 5px;
+}
+
+label {
+    margin-top: 20px;
 }

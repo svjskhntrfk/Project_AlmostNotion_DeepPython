@@ -17,6 +17,9 @@
             <div class="name">
                 <a class="username" >{{username}}</a>
             </div>
+            <div class="photo">
+                <img id="user_photo" class="user_photo" src="https://www.kino-teatr.ru/news/21378/190975.jpg">
+            </div>
         </header>
 
         <main style="width: 100%;">
@@ -35,7 +38,8 @@
                 </div>
                 <div class="info">
                     <div class="form-section">
-                        <h2 class="section-title">Изменить имя</h2>
+                        <h class="section-title">Изменить имя</h>
+                        <p class="section-title"></p>
                         <form action="/profile/main_page/profile/change_name" method="post">
                             <div class="form-group">
                                 <label for="first_name">Имя</label>
@@ -47,7 +51,8 @@
                     </div>
 
                     <div class="form-section">
-                        <h2 class="section-title">Изменить пароль</h2>
+                        <h class="section-title">Изменить пароль</h>
+                        <p class="section-title"></p>
                         <form action="/profile/main_page/profile/change_password" method="post">
                             <div class="form-group">
                                 <label for="old_password">Текущий пароль</label>
