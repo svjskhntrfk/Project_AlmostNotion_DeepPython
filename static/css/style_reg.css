@@ -86,3 +86,10 @@ button {
     margin-bottom: 15px;
     text-align: center;
 }
+
+.img_icon {
+    width: 50px;
+    justify-content: flex-start;
+    margin: 15px 22px;
+    border: none;
+}
