@@ -88,16 +88,4 @@ async def upload_user_image(
         print(f"Traceback: {traceback.format_exc()}")
         raise HTTPException(status_code=500, detail="Internal server error") from e
     
-@router.get("/get-image-url/{image_id}")
-async def get_image_url(image_id: str, session: AsyncSession = Depends(get_session)):
-    url = await get_image_url(image_id, session)
-    return {"url": url}
-
-@router.get("/media/{file_path:path}")
-async def get_media(file_path: str):
-    """
-    Получение медиа-файла из MinIO
-    """
-    url = f"http://{settings.MINIO_DOMAIN}/{settings.MINIO_MEDIA_BUCKET}/{file_path}"
-    return RedirectResponse(url)
 

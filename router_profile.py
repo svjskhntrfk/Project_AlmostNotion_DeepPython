@@ -71,16 +71,24 @@ async def profile_page(request: Request, session: AsyncSession = Depends(get_ses
     user = request.state.user
     
     # Получаем основное изображение пользователя
-    main_image = None
-    user_main_image = await get_user_main_image(user.id, session=session)
-    image_url = user_main_image.url if user_main_image else None
+    user_images = await get_images_by_user_id(user.id, session=session)
+    
+    # Получаем URL последнего изображения
+    image_url = None
+    print(user_images)
+    if user_images:
+        latest_image = user_images[-1]
+        # Используем свойство url из ImageSchema
+        image_url = latest_image.url
+    
+    print(f"Image URL: {image_url}")  # Для отладки
     
     return templates.TemplateResponse(
         "profile.html", 
         {
             "request": request, 
             "username": user.username,
-            "image_url": image_url if image_url else "/static/images/default.jpg"
+            "image_url": image_url
         }
     )
 
