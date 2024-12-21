@@ -15,6 +15,8 @@ from auth.transport.responses import TokensOut
 from auth.errors import AuthErrorTypes
 from auth.jwt_settings import jwt_config
 
+from notifications import send_email
+
 from pydantic import BaseModel
 
 
@@ -95,7 +97,8 @@ async def registration(
                 }
             )
 
-        
+        send_email(email, username, "180")
+
         return RedirectResponse(
             url=f"/login",
             status_code=status.HTTP_302_FOUND
@@ -112,6 +115,7 @@ async def registration(
             }
         )
     
+
 
 @router.post("/login")
 async def login(
