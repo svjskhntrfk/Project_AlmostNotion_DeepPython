@@ -32,7 +32,6 @@ markdown-it-py==3.0.0
 MarkupSafe==3.0.2
 marshmallow==3.23.1
 mdurl==0.1.2
-mysql-connector==2.2.9
 packaging==24.2
 passlib==1.7.4
 peewee==3.17.7
