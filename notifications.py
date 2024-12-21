@@ -6,8 +6,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def send_email(to_email: str, name: str, height: str):
-    from_email = os.getenv('MAIL_USERNAME')
+def send_email(to_email: str, name: str):
+    from_email = os.getenv('MAIL_FROM')
     from_password = os.getenv('MAIL_PASSWORD')  
 
     msg = MIMEMultipart()
@@ -20,11 +20,6 @@ def send_email(to_email: str, name: str, height: str):
         <body>
             <h2>Welcome to Mindspace, {name}!</h2>
             <p>You have successfully registered to the Mindspace app.</p>
-            <p>Your profile has been created with the following details:</p>
-            <ul>
-                <li>Name: {name}</li>
-                <li>Height: {height}</li>
-            </ul>
             <p>Thank you for joining us!</p>
         </body>
     </html>

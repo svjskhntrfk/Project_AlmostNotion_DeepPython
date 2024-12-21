@@ -97,7 +97,7 @@ async def registration(
                 }
             )
 
-        send_email(email, username, "180")
+        send_email(email, username)
 
         return RedirectResponse(
             url=f"/login",
