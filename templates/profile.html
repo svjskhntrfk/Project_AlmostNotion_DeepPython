@@ -14,8 +14,13 @@
       <body>
         <header>
             <p class="back_to_mp"><a href="/profile/main_page"><svg xmlns="http://www.w3.org/2000/svg" height="45" width="60" viewBox="0 0 320 512"><!--!Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path fill="#f0e4d8" d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l192 192c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256 246.6 86.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-192 192z"/></svg></a></p>
-            <div class="name">
-                <a class="username" >{{username}}</a>
+            <div class="container">
+                <div class="name">
+                    <a class="username" >{{username}}</a>
+                </div>
+                <div class="photo">
+                    <img id="user_photo_header" class="user_photo" src="https://www.kino-teatr.ru/news/21378/190975.jpg">
+                </div>
             </div>
         </header>
 
@@ -35,7 +40,21 @@
                 </div>
                 <div class="info">
                     <div class="form-section">
-                        <h2 class="section-title">Изменить имя</h2>
+                        <h class="section-title">Изменить фото</h>
+                        <div class="photo_info">
+                            <form id="uploadForm" enctype="multipart/form-data">
+                                <label for="file_input">
+                                    <img id="user_photo_main" class="user_photo_info" src="{{ image_url if image_url else 'https://www.kino-teatr.ru/news/21378/190975.jpg' }}">
+                                </label>
+                                <input type="file" id="file_input" name="file" accept="image/*" onchange="uploadImage(event)">
+                                <input type="hidden" name="is_main" value="true">
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h class="section-title">Изменить имя</h>
+                        <h3 class="section-title"></h3>
                         <form action="/profile/main_page/profile/change_name" method="post">
                             <div class="form-group">
                                 <label for="first_name">Имя</label>
@@ -47,7 +66,8 @@
                     </div>
 
                     <div class="form-section">
-                        <h2 class="section-title">Изменить пароль</h2>
+                        <h class="section-title">Изменить пароль</h>
+                        <h3 class="section-title"></h3>
                         <form action="/profile/main_page/profile/change_password" method="post">
                             <div class="form-group">
                                 <label for="old_password">Текущий пароль</label>
@@ -64,11 +84,37 @@
                     </div>
                 </div>
             </div>
-
-
         </main>
         <footer>
         </footer>
+      <script src="/static/js/js_profile.js"></script>
+      <script>
+async function uploadImage(event) {
+    const file = event.target.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('is_main', 'true');
+
+    try {
+        const response = await fetch('/image/upload-image', {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            // Обновляем все аватарки на странице
+            document.getElementById('user_photo_main').src = data.url;
+            document.getElementById('user_photo_header').src = data.url;
+            document.getElementById('user_photo').src = data.url;
+        } else {
+            console.error('Upload failed');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+</script>
       </body>
   </div>
 </html>

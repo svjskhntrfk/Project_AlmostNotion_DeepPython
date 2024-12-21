@@ -76,6 +76,13 @@ class User(Base):
         lazy="joined"
     )
 
+    images: Mapped[List["Image"]] = relationship(
+        "Image",
+        secondary=user_image_association,
+        back_populates="user",
+        lazy="joined"
+    )
+
 class Board(Base):
     title: Mapped[str] = mapped_column(String, nullable=False)
     content: Mapped[dict | None] = mapped_column(JSON, nullable=True)

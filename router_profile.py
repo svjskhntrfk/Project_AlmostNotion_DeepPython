@@ -68,15 +68,21 @@ async def profile_page(request: Request, old_password = Form(), new_password = F
 
 @router.get("/main_page/profile", response_class=HTMLResponse)
 async def profile_page(request: Request, session: AsyncSession = Depends(get_session)):
-    """
-    Get-запрос, переходим на HTML страничку профиля
-
-    Параметры:
-        user_id (str): ID пользователя
-        request (Request): Запрос на переход
-    """
     user = request.state.user
-    return templates.TemplateResponse("profile.html", {"request": request, "user_id" : user.id, "username": user.username })
+    
+    # Получаем основное изображение пользователя
+    main_image = None
+    user_main_image = await get_user_main_image(user.id, session=session)
+    image_url = user_main_image.url if user_main_image else None
+    
+    return templates.TemplateResponse(
+        "profile.html", 
+        {
+            "request": request, 
+            "username": user.username,
+            "image_url": image_url if image_url else "/static/images/default.jpg"
+        }
+    )
 
 @router.get("/logout")
 async def logout(request: Request, session: AsyncSession = Depends(get_session),auth_service: AuthService = Depends(get_auth_service)   ):
