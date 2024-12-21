@@ -23,3 +23,7 @@ window.addEventListener('click', (e) => {
     modal.style.display = 'none';
   }
 });
+
+function closeModal() {
+    document.getElementById('modal').style.display = 'none';
+}
