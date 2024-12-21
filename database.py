@@ -425,3 +425,6 @@ async def save_user_image(user_id: int, file: UploadFile, is_main: bool, session
         print(f"Traceback: {traceback.format_exc()}")
         raise
 
+async def get_image_url(image_id: str, session: AsyncSession) -> str:
+    image = await image_dao.get(id=image_id, db_session=session)
+    return image.url

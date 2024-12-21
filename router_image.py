@@ -85,4 +85,9 @@ async def upload_user_image(
         print(f"Error type: {type(e)}")
         import traceback
         print(f"Traceback: {traceback.format_exc()}")
-        raise
+        raise HTTPException(status_code=500, detail="Internal server error") from e
+    
+@router.get("/get-image-url/{image_id}")
+async def get_image_url(image_id: str, session: AsyncSession = Depends(get_session)):
+    url = await get_image_url(image_id, session)
+    return {"url": url}

@@ -43,7 +43,9 @@
                         <h class="section-title">Изменить фото</h>
                         <div class="photo_info">
                             <label for="file_input">
-                                <img id="user_photo_main" class="user_photo_info" src="https://www.kino-teatr.ru/news/21378/190975.jpg">
+                                <!-- <img id="user_photo_main" class="user_photo_info" src="https://www.kino-teatr.ru/news/21378/190975.jpg"> -->
+                                <form action="/image/upload-image" method="post">
+                                    <img id="user_photo_main" class="user_photo_info" src=<form action="/image/get-image-url/{image_id}" method="get">
                             </label>
                             <input type="file" id="file_input" accept="image/*">
                         </div>
