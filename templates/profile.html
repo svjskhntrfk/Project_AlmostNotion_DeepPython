@@ -42,12 +42,13 @@
                     <div class="form-section">
                         <h class="section-title">Изменить фото</h>
                         <div class="photo_info">
-                            <label for="file_input">
-                                <!-- <img id="user_photo_main" class="user_photo_info" src="https://www.kino-teatr.ru/news/21378/190975.jpg"> -->
-                                <form action="/image/upload-image" method="post">
-                                    <img id="user_photo_main" class="user_photo_info" src=<form action="/image/get-image-url/{image_id}" method="get">
-                            </label>
-                            <input type="file" id="file_input" accept="image/*">
+                            <form id="uploadForm" enctype="multipart/form-data">
+                                <label for="file_input">
+                                    <img id="user_photo_main" class="user_photo_info" src="{{ image_url if image_url else 'https://www.kino-teatr.ru/news/21378/190975.jpg' }}">
+                                </label>
+                                <input type="file" id="file_input" name="file" accept="image/*" onchange="uploadImage(event)">
+                                <input type="hidden" name="is_main" value="true">
+                            </form>
                         </div>
                     </div>
 
@@ -87,6 +88,33 @@
         <footer>
         </footer>
       <script src="/static/js/js_profile.js"></script>
+      <script>
+async function uploadImage(event) {
+    const file = event.target.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('is_main', 'true');
+
+    try {
+        const response = await fetch('/image/upload-image', {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            // Обновляем все аватарки на странице
+            document.getElementById('user_photo_main').src = data.url;
+            document.getElementById('user_photo_header').src = data.url;
+            document.getElementById('user_photo').src = data.url;
+        } else {
+            console.error('Upload failed');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+</script>
       </body>
   </div>
 </html>

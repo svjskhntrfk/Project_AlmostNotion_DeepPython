@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, File, Form, UploadFile, HTTPException, Security
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from typing import Annotated
 from database import get_session, save_user_image
 from image_schemas import ImageUploadResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from auth.middlewares.jwt.service import check_access_token
 from starlette.requests import Request
+from config import settings
 
 router = APIRouter(
     prefix="/image",
@@ -73,11 +74,11 @@ async def upload_user_image(
         image = await save_user_image(user_id=user.id, file=file, is_main=is_main, session=session)
         print(f"Image saved: {image.id}")
         
-        image_url = f"http://{request.base_url.netloc}/media/{image.file}"
+        image_url = image.url
         return ImageUploadResponse(
             id=image.id,
             file=image.file,
-            is_main=image.is_main,
+            is_main=True,
             url=image_url
         )
     except Exception as e:
@@ -91,3 +92,12 @@ async def upload_user_image(
 async def get_image_url(image_id: str, session: AsyncSession = Depends(get_session)):
     url = await get_image_url(image_id, session)
     return {"url": url}
+
+@router.get("/media/{file_path:path}")
+async def get_media(file_path: str):
+    """
+    Получение медиа-файла из MinIO
+    """
+    url = f"http://{settings.MINIO_DOMAIN}/{settings.MINIO_MEDIA_BUCKET}/{file_path}"
+    return RedirectResponse(url)
+

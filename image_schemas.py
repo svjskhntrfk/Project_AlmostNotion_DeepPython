@@ -29,3 +29,9 @@ class ImageUploadResponse(BaseModel):
 
 class ImageUpdate(ImageCreate):
     id: uuid.UUID
+
+class ImageDAOResponse(BaseModel):
+    id: str
+    filename: str
+    content_type: str
+    # Add any other fields that you need for the response
