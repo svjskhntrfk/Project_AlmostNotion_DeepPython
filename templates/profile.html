@@ -19,7 +19,7 @@
                     <a class="username" >{{username}}</a>
                 </div>
                 <div class="photo">
-                    <img id="user_photo" class="user_photo" src="https://www.kino-teatr.ru/news/21378/190975.jpg">
+                    <img id="user_photo_header" class="user_photo" src="https://www.kino-teatr.ru/news/21378/190975.jpg">
                 </div>
             </div>
         </header>
@@ -40,8 +40,18 @@
                 </div>
                 <div class="info">
                     <div class="form-section">
+                        <h class="section-title">Изменить фото</h>
+                        <div class="photo_info">
+                            <label for="file_input">
+                                <img id="user_photo_main" class="user_photo_info" src="https://www.kino-teatr.ru/news/21378/190975.jpg">
+                            </label>
+                            <input type="file" id="file_input" accept="image/*">
+                        </div>
+                    </div>
+
+                    <div class="form-section">
                         <h class="section-title">Изменить имя</h>
-                        <p class="section-title"></p>
+                        <h3 class="section-title"></h3>
                         <form action="/profile/main_page/profile/change_name" method="post">
                             <div class="form-group">
                                 <label for="first_name">Имя</label>
@@ -54,7 +64,7 @@
 
                     <div class="form-section">
                         <h class="section-title">Изменить пароль</h>
-                        <p class="section-title"></p>
+                        <h3 class="section-title"></h3>
                         <form action="/profile/main_page/profile/change_password" method="post">
                             <div class="form-group">
                                 <label for="old_password">Текущий пароль</label>
@@ -74,6 +84,7 @@
         </main>
         <footer>
         </footer>
+      <script src="/static/js/js_profile.js"></script>
       </body>
   </div>
 </html>
