@@ -461,7 +461,7 @@ async def get_images_by_user_id(user_id: int, session: AsyncSession) -> List[Ima
         print(f"Traceback: {traceback_str}")
         logger.error(f"Traceback: {traceback_str}")
         raise RuntimeError("An unexpected error occurred while retrieving images.") from e
-    
+
 async def get_image_url(image_id: str, session: AsyncSession) -> str:
     image = await image_dao.get(id=image_id, db_session=session)
     return image.url
