@@ -243,3 +243,24 @@ async def test_change_password_user_not_found(db_session: AsyncSession):
     invalid_user_id = 99999
     with pytest.raises(ValueError, match=f"User with ID {invalid_user_id} not found."):
         await change_password(user_id=invalid_user_id, new_password="new_password", session=db_session)
+
+@pytest.mark.asyncio
+async def test_get_images_by_user_id(session: AsyncSession):
+    # Создаем тестового пользователя
+    user = User(username="testuser", email="test@example.com", password="hashedpassword")
+    session.add(user)
+    await session.commit()
+    await session.refresh(user)
+
+    # Добавляем изображения
+    image1 = Image(file="path/to/image1.png", is_main=True, user_id=user.id)
+    image2 = Image(file="path/to/image2.png", is_main=False, user_id=user.id)
+    session.add_all([image1, image2])
+    await session.commit()
+
+    # Вызываем функцию
+    images = await get_images_by_user_id(user.id, session)
+
+    assert len(images) == 2
+    assert images[0].file == "path/to/image1.png"
+    assert images[1].file == "path/to/image2.png"
