@@ -8,7 +8,7 @@ import logging
 from sqlalchemy import cast, Integer
 from sqlalchemy.exc import SQLAlchemyError
 from image_schemas import ImageCreate, ImageUpdate
-from sqlalchemy import UUID, Table, select, update
+from sqlalchemy import UUID, Table, select, update, or_
 from fastapi import HTTPException, UploadFile
 from typing import Type
 from sqlalchemy.orm import aliased
@@ -16,6 +16,8 @@ from backend.src.crud.image_crud import image_dao
 from models import *
 from typing import List, Dict
 from sqlalchemy.orm import selectinload
+from image_schemas import ImageSchema
+import traceback
 
 
 logger = logging.getLogger(__name__)
@@ -424,6 +426,41 @@ async def save_user_image(user_id: int, file: UploadFile, is_main: bool, session
         import traceback
         print(f"Traceback: {traceback.format_exc()}")
         raise
+
+async def get_images_by_user_id(user_id: int, session: AsyncSession) -> List[Image]:
+    print(f"Starting get_images_by_user_id for user_id: {user_id}")
+    try:
+        user = await session.get(User, user_id)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        query = (
+            select(Image)
+            .outerjoin(user_image_association, Image.id == user_image_association.c.image_id)
+            .where(or_(Image.user_id == user_id, user_image_association.c.user_id == user_id))
+            .options(selectinload(Image.user))  # Опционально: загрузка связанных пользователей
+        )
+
+        result = await session.execute(query)
+        images = result.scalars().all()
+
+        print(f"Retrieved {len(images)} images for user_id: {user_id}")
+        logger.info(f"Retrieved {len(images)} images for user_id: {user_id}")
+
+        return [ImageSchema.from_orm(image) for image in images]
+
+    except HTTPException as e:
+        print(f"HTTPException in get_images_by_user_id: {e.detail}")
+        logger.error(f"HTTPException in get_images_by_user_id: {e.detail}")
+        raise e
+    except Exception as e:
+        print(f"Error in get_images_by_user_id: {str(e)}")
+        print(f"Error type: {type(e)}")
+        logger.error(f"Error in get_images_by_user_id: {str(e)}")
+        traceback_str = traceback.format_exc()
+        print(f"Traceback: {traceback_str}")
+        logger.error(f"Traceback: {traceback_str}")
+        raise RuntimeError("An unexpected error occurred while retrieving images.") from e
 
 async def get_image_url(image_id: str, session: AsyncSession) -> str:
     image = await image_dao.get(id=image_id, db_session=session)
