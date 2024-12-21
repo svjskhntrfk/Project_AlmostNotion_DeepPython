@@ -12,8 +12,10 @@ class Settings(BaseSettings):
     HASH_SALT: str
     JWT_SECRET: str 
     ACCESS_TOKEN_TTL: int
-    REFRESH_TOKEN_TTL: int  
-    
+    REFRESH_TOKEN_TTL: int
+    MAIL_USERNAME: str
+    MAIL_FROM: str
+    MAIL_PASSWORD: str
     model_config = SettingsConfigDict(
         env_file=os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
     )
