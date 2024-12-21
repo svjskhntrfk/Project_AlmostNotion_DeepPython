@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+﻿from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.orm import DeclarativeBase, declared_attr
 from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
 from sqlalchemy import Integer, func, Table, Column, Boolean, String
@@ -66,15 +66,20 @@ class Board(Base):
         back_populates="owned_boards",
         lazy='joined'
     )
-    
-    # Пользователи, имеющие доступ к доске
+
     collaborators: Mapped[List["User"]] = relationship(
         "User",
         secondary=board_collaborators,
         back_populates="boards",
         lazy='joined'
     )
-    
+
+    todo_lists: Mapped[List["ToDoList"]] = relationship(
+        "ToDoList",
+        back_populates="board",
+        cascade="all, delete-orphan",
+        lazy="joined"
+    )
 
 class IssuedJWTToken(Base):
     jti: Mapped[str] = mapped_column(String(36), primary_key=True)
@@ -92,3 +97,25 @@ class IssuedJWTToken(Base):
 
     def __str__(self) -> str:
         return f'{self.subject}: {self.jti}'
+
+class ToDoList(Base):
+    title: Mapped[str] = mapped_column(String, nullable=False)
+    deadline: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+    board_id: Mapped[int] = mapped_column(ForeignKey('boards.id'), nullable=False)
+    board: Mapped["Board"] = relationship("Board", back_populates="todo_lists", lazy="joined")
+
+    tasks: Mapped[List["Task"]] = relationship(
+        "Task",
+        back_populates="todo_list",
+        cascade="all, delete-orphan",
+        lazy="joined"
+    )
+
+class Task(Base):
+    title: Mapped[str] = mapped_column(String, nullable=False)
+    completed: Mapped[bool] = mapped_column(Boolean, default=False)
+    deadline: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+    todo_list_id: Mapped[int] = mapped_column(ForeignKey('todolists.id'), nullable=False)
+    todo_list: Mapped["ToDoList"] = relationship("ToDoList", back_populates="tasks", lazy="joined")
