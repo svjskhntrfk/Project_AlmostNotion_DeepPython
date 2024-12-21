@@ -125,3 +125,9 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+.env
+.DS_Store
+.idea/
+static/.DS_Store
+mvenv/

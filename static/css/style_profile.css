@@ -20,6 +20,8 @@ header{
     border-bottom-right-radius: 25px;
     border-bottom-left-radius: 25px;
     margin-bottom: 50px;
+    display: flex;
+    align-items: center;
 }
 
 body {
@@ -29,8 +31,9 @@ body {
 .name{
     position: absolute;
     top: 20px;
-	right: 200px;
     font-size: 30px;
+    margin-right: 10px;
+    right: 120px;
 }
 
 .blocks {
@@ -97,89 +100,100 @@ p {
 
 .back_to_mp {
     position: absolute;
-    margin-left: 10px;
-    margin-top: 10px;
+    margin: 0px;
     font-size: 30px;
+    display: flex;
+    align-items: center;
 }
 
-.form-section {
-    margin-bottom: 20px;
-    padding: 15px;
-    background-color: #fff;
-    border-radius: 15px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-}
-
-.section-title {
-    color: #B14F44;
-    font-size: 20px;
-    margin-bottom: 12px;
-    padding-bottom: 8px;
-    border-bottom: 2px solid #DD8E75;
-}
-
-.form-group {
-    margin-bottom: 12px;
-    padding: 0 15px;
-}
-
-.form-group label {
-    display: block;
-    color: #B14F44;
-    font-size: 16px;
-    margin-bottom: 8px;
+h {
+    font-size: 27px;
+    font-weight: 300px;
+    margin-left: 20px;
+    margin-top: 15px;
 }
 
 .in {
-    width: calc(100% - 30px);
-    height: 40px;
-    padding: 0 15px;
-    border: 2px solid #DD8E75;
-    border-radius: 8px;
-    font-size: 16px;
-    color: #B14F44;
-    background-color: #F0E4D8;
-    transition: all 0.3s ease;
+    border: 1px solid #C9C9C9;
+    border-radius: 10px;
+    height: 25px;
+    color: #000000;
+    font-family: "Philosopher", sans-serif;
+    padding: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
     display: block;
-    margin: 0 auto;
-    font-family: "Philosopher", sans-serif;
+    width: 50%;
 }
 
-.in:focus {
-    outline: none;
-    border-color: #B14F44;
-    box-shadow: 0 0 5px rgba(177, 79, 68, 0.2);
+.form{
+    font-size: 25px;
 }
 
-.in::placeholder {
+.change {
+    padding: 10px 20px;
     font-family: "Philosopher", sans-serif;
-    color: #DD8E75;
+    width: 53%;
+    margin-bottom: 25px;
+    margin-top: 10px;
+    background-color: #B14F44;
+    color: #F0E4D8;
+    font-size: 20px;
+    border: 1px solid #C9C9C9;
+    border-radius: 10px;
+}
+
+.txt{
+    font-size:20px;
+    padding: 8px 0px 0px 0px;
+
+}
+
+.section-title {
+    font-family: "Philosopher", sans-serif;
+    font-weight: 300px;
+    margin: 0px;
+    font-size: 27px;
+}
+
+.user_photo {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: none;
+}
+
+.photo{
+    position: absolute;
+	right: 50px;
+	top: 6px;
 }
 
 .reg {
-    width: auto;
+    width: 53%;
     height: 35px;
-    padding: 0 20px;
-    margin: 15px 15px;
     border: none;
     border-radius: 8px;
-    background-color: #DD8E75;
+    background-color: #B14F44;
     color: #F0E4D8;
     font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
     display: block;
+    margin-top: 20px;
+    margin-bottom: 20px;
     font-family: "Philosopher", sans-serif;
 }
 
-.reg:hover {
-    background-color: #B14F44;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 5px rgba(177, 79, 68, 0.2);
+.section-title {
+    margin-bottom: 5px;
 }
 
-.reg:active {
-    transform: translateY(0);
-    box-shadow: none;
+label {
+    margin-top: 20px;
+}
+
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
 }
