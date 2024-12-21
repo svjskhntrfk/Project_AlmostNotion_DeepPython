@@ -717,3 +717,21 @@ async def get_tasks_by_deadline(
         logger.error(f"Error filtering tasks for board_id={board_id}: {e}")
         raise RuntimeError("An error occurred while filtering tasks.")
 
+async def get_board_with_todo_lists(board_id: int, session: AsyncSession) -> Board:
+    """
+    Возвращает объект Board, загружая связанные ToDoList и Task.
+    """
+    from sqlalchemy.orm import selectinload
+
+    query = (
+        select(Board)
+        .options(
+            selectinload(Board.todo_lists).selectinload(ToDoList.tasks)
+        )
+        .filter(Board.id == board_id)
+    )
+    result = await session.execute(query)
+    board = result.scalars().first()
+    if not board:
+        raise ValueError(f"Board with id={board_id} not found.")
+    return board

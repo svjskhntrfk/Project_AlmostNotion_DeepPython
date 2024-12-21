@@ -99,7 +99,7 @@ class IssuedJWTToken(Base):
         return f'{self.subject}: {self.jti}'
 
 class ToDoList(Base):
-    title: Mapped[str] = mapped_column(String, nullable=False)
+    title: Mapped[str] = mapped_column(String, nullable=True)
     deadline: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
     board_id: Mapped[int] = mapped_column(ForeignKey('boards.id'), nullable=False)
