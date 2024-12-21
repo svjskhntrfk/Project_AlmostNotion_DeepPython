@@ -732,6 +732,7 @@ async def get_board_with_todo_lists(board_id: int, session: AsyncSession) -> Boa
     )
     result = await session.execute(query)
     board = result.scalars().first()
+    print("board", board)
     if not board:
         raise ValueError(f"Board with id={board_id} not found.")
     return board
