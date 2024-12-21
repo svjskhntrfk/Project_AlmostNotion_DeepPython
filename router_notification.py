@@ -1,15 +1,10 @@
 import smtplib
 from email.mime.text import MIMEText
 
-def send_email(email, name, height):
+def send_email(email,subject, message):
    from_email = "mindspace228@gmail.com"
    from_password = "Palma1234!"
    to_email = email
-
-
-   subject = "Successfully registered"
-   message = "Hey %s, you have successfully registered to the Mindspace app." % (name)
-
 
    msg = MIMEText(message, 'html')
    msg['Subject'] = subject
@@ -26,6 +21,4 @@ def send_email(email, name, height):
    # Send mail
    gmail.send_message(msg)
 
-
-if __name__ == '__main__':
-   send_email("hello@gmail.com", "John", "180")  
+de

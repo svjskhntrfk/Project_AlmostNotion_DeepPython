@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database import create_board, get_board_by_user_id_and_board_id, create_text, get_session
 from fastapi import APIRouter, Depends, Request, Security
 from fastapi.responses import JSONResponse
+from router_notification import send_email
 
 from auth.middlewares.jwt.service import check_access_token
 from auth.service import AuthService
@@ -94,8 +95,11 @@ async def registration(
                     "username": username
                 }
             )
-
         
+        subject = "Successfully registered"
+        message = "Hey %s, you have successfully registered in the MindSpace." % (username)
+        send_email(email, subject, message)
+
         return RedirectResponse(
             url=f"/login",
             status_code=status.HTTP_302_FOUND
@@ -161,6 +165,10 @@ async def login(
             httponly=True
         )
         
+        subject = "Successfully logged in"
+        message = "Hey %s, you have successfully logged in to the MindSpace." % (request.state.user.username)
+        send_email(email, subject, message)
+
         return response
 
     except Exception as e:
