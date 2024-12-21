@@ -48,7 +48,7 @@ async def main_page(request: Request, session: AsyncSession = Depends(get_sessio
     return templates.TemplateResponse("main_page.html", {"request": request, "username": user.username, "links" : context})
 
 @router.post("/main_page/profile/change_name")
-async def profile_page(request: Request, first_name = Form(), session: AsyncSession = Depends(get_session)) :
+async def profile_page_change_name(request: Request, first_name = Form(), session: AsyncSession = Depends(get_session)) :
     user = request.state.user
     user_id = user.id
     await change_username(int(user_id), first_name, session=session)
@@ -56,7 +56,7 @@ async def profile_page(request: Request, first_name = Form(), session: AsyncSess
                             status_code=status.HTTP_302_FOUND)
 
 @router.post("/main_page/profile/change_password")
-async def profile_page(request: Request, old_password = Form(), new_password = Form(), session: AsyncSession = Depends(get_session)) :
+async def profile_page_change_password(request: Request, old_password = Form(), new_password = Form(), session: AsyncSession = Depends(get_session)) :
     user = request.state.user
     user_id = user.id
     if user.password == get_sha256_hash(old_password):
