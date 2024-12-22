@@ -45,10 +45,19 @@ async def main_page(request: Request, session: AsyncSession = Depends(get_sessio
     context = []
     for board in boards_id_and_names:
         context.append({"url":"/board/main_page/" + str(board["id"]), "name": board["title"]})
-    return templates.TemplateResponse("main_page.html", {"request": request, "username": user.username, "links" : context})
+    user_images = await get_images_by_user_id(user.id, session=session)
+    
+    # Получаем URL последнего изображения
+    image_url = None
+    print(user_images)
+    if user_images:
+        latest_image = user_images[-1]
+        # Используем свойство url из ImageSchema
+        image_url = latest_image.url
+    return templates.TemplateResponse("main_page.html", {"request": request, "username": user.username, "links" : context, "image_url": image_url})
 
 @router.post("/main_page/profile/change_name")
-async def profile_page(request: Request, first_name = Form(), session: AsyncSession = Depends(get_session)) :
+async def profile_page_change_name(request: Request, first_name = Form(), session: AsyncSession = Depends(get_session)) :
     user = request.state.user
     user_id = user.id
     await change_username(int(user_id), first_name, session=session)
@@ -56,7 +65,7 @@ async def profile_page(request: Request, first_name = Form(), session: AsyncSess
                             status_code=status.HTTP_302_FOUND)
 
 @router.post("/main_page/profile/change_password")
-async def profile_page(request: Request, old_password = Form(), new_password = Form(), session: AsyncSession = Depends(get_session)) :
+async def profile_page_change_password(request: Request, old_password = Form(), new_password = Form(), session: AsyncSession = Depends(get_session)) :
     user = request.state.user
     user_id = user.id
     if user.password == get_sha256_hash(old_password):
@@ -68,15 +77,29 @@ async def profile_page(request: Request, old_password = Form(), new_password = F
 
 @router.get("/main_page/profile", response_class=HTMLResponse)
 async def profile_page(request: Request, session: AsyncSession = Depends(get_session)):
-    """
-    Get-запрос, переходим на HTML страничку профиля
-
-    Параметры:
-        user_id (str): ID пользователя
-        request (Request): Запрос на переход
-    """
     user = request.state.user
-    return templates.TemplateResponse("profile.html", {"request": request, "user_id" : user.id, "username": user.username })
+    
+    # Получаем основное изображение пользователя
+    user_images = await get_images_by_user_id(user.id, session=session)
+    
+    # Получаем URL последнего изображения
+    image_url = None
+    print(user_images)
+    if user_images:
+        latest_image = user_images[-1]
+        # Используем свойство url из ImageSchema
+        image_url = latest_image.url
+    
+    print(f"Image URL: {image_url}")  # Для отладки
+    
+    return templates.TemplateResponse(
+        "profile.html", 
+        {
+            "request": request, 
+            "username": user.username,
+            "image_url": image_url
+        }
+    )
 
 @router.get("/logout")
 async def logout(request: Request, session: AsyncSession = Depends(get_session),auth_service: AuthService = Depends(get_auth_service)   ):

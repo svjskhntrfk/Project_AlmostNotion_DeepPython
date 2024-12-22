@@ -20,7 +20,9 @@
                     <a href="/profile/main_page/profile">{{username}}</a>
                 </div>
                 <div class="photo">
-                    <a href="/profile/main_page/profile"><img id="user_photo" class="user_photo" src="https://www.kino-teatr.ru/news/21378/190975.jpg"></a>
+                    <a href="/profile/main_page/profile">
+                        <img id="user_photo" class="user_photo" src="{{ image_url if image_url else 'https://www.kino-teatr.ru/news/21378/190975.jpg' }}">
+                    </a>
                 </div>
             </div>
         </header>
