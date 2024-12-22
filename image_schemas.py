@@ -11,7 +11,7 @@ class ImageSchema(BaseModel):
     @property
     def url(self) -> str:
         from config import settings
-        return f"http://127.0.0.1:9000/{settings.MINIO_MEDIA_BUCKET}/{self.file}"
+        return f"http://31.31.207.109:9000/{settings.MINIO_MEDIA_BUCKET}/{self.file}"
     
     class Config:
         from_attributes = True
