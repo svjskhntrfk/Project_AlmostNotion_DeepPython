@@ -101,7 +101,13 @@ class Board(Base):
         back_populates="boards",
         lazy='joined'
     )
-    
+
+    images: Mapped[List["ImageBoard"]] = relationship(
+        "ImageBoard",
+        back_populates="board",
+        cascade="all, delete-orphan",
+        lazy="joined"
+    )
 
 class Image(Base):
     _file_storage = media_storage
@@ -139,3 +145,20 @@ class IssuedJWTToken(Base):
     def __str__(self) -> str:
         return f'{self.subject}: {self.jti}'
 
+class ImageBoard(Base):
+    _file_storage = media_storage
+    
+    id: Mapped[UUID] = mapped_column(pgUUID, primary_key=True, default=uuid.uuid4)
+    file: Mapped[str] = mapped_column(FilePath(_file_storage), nullable=True)
+
+    board_id: Mapped[int] = mapped_column(Integer, ForeignKey("boards.id"))
+    board: Mapped["Board"] = relationship("Board", back_populates="images", lazy="joined")
+
+    @property
+    def storage(self):
+        return self._file_storage
+
+    @property
+    def url(self):
+        from config import settings
+        return f"http://{settings.MINIO_DOMAIN}/{settings.MINIO_MEDIA_BUCKET}/{self.file}"

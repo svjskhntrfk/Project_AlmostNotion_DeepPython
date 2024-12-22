@@ -76,5 +76,10 @@
                 </div>
             </div>
         </main>
+        <div class="images">
+            {% for image in board_images %}
+                <img src="{{ image.url }}" alt="Image">
+            {% endfor %}
+        </div>
       </body>
 </html>
