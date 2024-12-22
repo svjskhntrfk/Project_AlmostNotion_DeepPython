@@ -105,6 +105,10 @@ async def profile_page(request: Request, session: AsyncSession = Depends(get_ses
 async def logout(request: Request, session: AsyncSession = Depends(get_session),auth_service: AuthService = Depends(get_auth_service)   ):
     user = request.state.user
     device_id = request.state.device_id
-    await auth_service.logout(user, device_id, session=session)
-    return RedirectResponse("/",
+    try:
+        await auth_service.logout(user, device_id, session=session)
+    except Exception as e:
+        print(e)
+    finally:
+        return RedirectResponse("/",
                             status_code=status.HTTP_302_FOUND)
