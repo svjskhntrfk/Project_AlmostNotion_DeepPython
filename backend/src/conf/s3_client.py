@@ -15,7 +15,7 @@ class S3AsyncClient:
     _cached_session = None
 
     def __init__(self):
-        self.endpoint_domain = settings.S3_ENDPOINT
+        self.endpoint_domain = "s3.regru.cloud"
         self.use_ssl = False
         if S3AsyncClient._cached_session is None:
             S3AsyncClient._cached_session = aioboto3.Session(
