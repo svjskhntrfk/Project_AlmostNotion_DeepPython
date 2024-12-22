@@ -601,3 +601,77 @@ async def save_image_on_board(board_id: int, file: UploadFile, session: AsyncSes
         import traceback
         print(f"Traceback: {traceback.format_exc()}")
         raise
+
+async def get_images_by_board_id(board_id: int, session: AsyncSession) -> List[ImageSchema]:
+    """
+    Получает список изображений, связанных с доской по её ID.
+
+    Args:
+        board_id (int): ID доски.
+        session (AsyncSession): Асинхронная сессия SQLAlchemy.
+
+    Returns:
+        List[ImageSchema]: Список Pydantic моделей изображений.
+
+    Raises:
+        HTTPException: Если доска не найдена.
+        RuntimeError: В случае непредвиденных ошибок.
+    """
+    print(f"Starting get_images_by_board_id for board_id: {board_id}")
+    logger.info(f"Starting get_images_by_board_id for board_id: {board_id}")
+    
+    try:
+        # Проверяем существование доски
+        board = await session.get(Board, board_id)
+        if not board:
+            logger.error(f"Board with id {board_id} not found.")
+            raise HTTPException(status_code=404, detail="Board not found")
+        
+        # Получаем всех пользователей, связанных с данной доской
+        query_users = (
+            select(User)
+            .join(board_user_association, User.id == board_user_association.c.user_id)
+            .where(board_user_association.c.board_id == board_id)
+        )
+        result_users = await session.execute(query_users)
+        users = result_users.scalars().all()
+        
+        if not users:
+            logger.info(f"No users found for board_id: {board_id}")
+            return []
+        
+        user_ids = [user.id for user in users]
+        logger.info(f"Found {len(user_ids)} users for board_id {board_id}: {user_ids}")
+        
+        # Получаем изображения, связанные с этими пользователями через user_id или ассоциационную таблицу
+        query_images = (
+            select(Image)
+            .outerjoin(user_image_association, Image.id == user_image_association.c.image_id)
+            .where(
+                or_(
+                    Image.user_id.in_(user_ids),
+                    user_image_association.c.user_id.in_(user_ids)
+                )
+            )
+            .options(selectinload(Image.user))  # Опционально: загрузка связанных пользователей
+        )
+        result_images = await session.execute(query_images)
+        images = result_images.scalars().all()
+        
+        print(f"Retrieved {len(images)} images for board_id: {board_id}")
+        logger.info(f"Retrieved {len(images)} images for board_id: {board_id}")
+        
+        return [ImageSchema.from_orm(image) for image in images]
+    
+    except HTTPException as e:
+        print(f"HTTPException in get_images_by_board_id: {e.detail}")
+        logger.error(f"HTTPException in get_images_by_board_id: {e.detail}")
+        raise e
+    except Exception as e:
+        print(f"Error in get_images_by_board_id: {str(e)}")
+        print(f"Error type: {type(e)}")
+        logger.error(f"Error in get_images_by_board_id: {str(e)}")
+        traceback_str = traceback.format_exc()
+        print(f"Traceback: {traceback_str}")
+        logger.error(f"Traceback: {traceback_str}")
+        raise RuntimeError("An unexpected error occurred while retrieving images.") from e
