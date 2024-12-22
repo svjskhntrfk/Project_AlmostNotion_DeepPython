@@ -171,3 +171,8 @@ document.addEventListener('DOMContentLoaded', function() {
         return taskElement;
     }
 });
+
+function submitDeadline() {
+    const deadline = document.getElementById('deadline').value;
+    // Здесь можно отправить данные на сервер или выполнить другие действия
+}
