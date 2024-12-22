@@ -2,6 +2,7 @@ from pydantic import BaseModel, HttpUrl
 from uuid import UUID
 from fastapi import UploadFile
 import uuid
+from src.core.config import settings
 
 class ImageSchema(BaseModel):
     id: UUID
@@ -10,7 +11,6 @@ class ImageSchema(BaseModel):
     
     @property
     def url(self) -> str:
-        from config import settings
         return f"http://127.0.0.1:9000/{settings.MINIO_MEDIA_BUCKET}/{self.file}"
     
     class Config:

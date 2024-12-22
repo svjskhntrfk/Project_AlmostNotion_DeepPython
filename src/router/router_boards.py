@@ -12,7 +12,7 @@ from src.auth.middlewares.jwt.service import check_access_token
 
 from src.core.database import *
 
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="src/front/templates")
 
 router = APIRouter(
     prefix="/board",
