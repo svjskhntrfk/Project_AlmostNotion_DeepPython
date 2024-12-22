@@ -164,7 +164,7 @@ async def registration(
 
         logger.info(f"Successfully registered user with email: {email}")
         return RedirectResponse(
-            url=f"/login",
+            url="/users/login",
             status_code=status.HTTP_302_FOUND
         )
 
