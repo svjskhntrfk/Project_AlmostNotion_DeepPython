@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Закрытие модального окна при нажатии "Отмена"
     cancelBtn.addEventListener('click', function() {
-        modal.style.display = 'none'; // Скрыть модальное окно
+        modal.style.display = 'none'; // Скрыть модал��ное окно
     });
 
     // Add todo list button click handler
@@ -170,6 +170,66 @@ document.addEventListener('DOMContentLoaded', function() {
 
         return taskElement;
     }
+
+    // Добавляем инициализацию существующих задач
+    const existingTasks = document.querySelectorAll('.todo-task');
+    existingTasks.forEach(taskElement => {
+        const checkbox = taskElement.querySelector('input[type="checkbox"]');
+        const textSpan = taskElement.querySelector('span');
+        const taskId = taskElement.getAttribute('data-task-id');
+        const todoListId = taskElement.closest('.todo-list').getAttribute('data-todo-list-id');
+
+        // Добавляем обработчик для checkbox
+        checkbox.addEventListener('change', async function() {
+            try {
+                const response = await fetch(`/board/main_page/${boardId}/update_to_do_list_item`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        to_do_list_id: todoListId,
+                        to_do_list_item_id: taskId,
+                        text: textSpan.textContent,
+                        completed: this.checked
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to update task');
+                }
+            } catch (error) {
+                console.error('Error updating task:', error);
+                this.checked = !this.checked;
+            }
+        });
+
+        // Добавляем возможность редактирования
+        textSpan.contentEditable = true;
+        textSpan.addEventListener('blur', async function() {
+            const newText = this.textContent.trim();
+            try {
+                const response = await fetch(`/board/main_page/${boardId}/update_to_do_list_item`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        to_do_list_id: todoListId,
+                        to_do_list_item_id: taskId,
+                        text: newText,
+                        completed: checkbox.checked
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to update task');
+                }
+            } catch (error) {
+                console.error('Error updating task text:', error);
+            }
+        });
+    });
 });
 
 function submitDeadline() {
