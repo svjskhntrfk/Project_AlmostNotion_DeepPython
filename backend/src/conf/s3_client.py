@@ -15,13 +15,13 @@ class S3AsyncClient:
     _cached_session = None
 
     def __init__(self):
-        self.endpoint_domain = "https://s3.regru.cloud"
+        self.endpoint_domain = settings.S3_ENDPOINT
         self.use_ssl = False
         if S3AsyncClient._cached_session is None:
             S3AsyncClient._cached_session = aioboto3.Session(
-                aws_access_key_id="YVF1ZNVVLWJQSJ73U0KP",
-                aws_secret_access_key="p1rTUNH65GyRagIngARAZ1S91Vf2vEY8tU3xMruT",
-                region_name="us-east-1"
+                aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+                aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+                region_name=settings.S3_REGION
             )
         self.endpoint_url = self._get_endpoint_url()
 
