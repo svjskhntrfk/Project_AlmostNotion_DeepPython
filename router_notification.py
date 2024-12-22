@@ -3,12 +3,20 @@ from email.mime.text import MIMEText
 from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import select
-from models import Notification
+import config 
 
 def send_email_after_register(email,subject, message):
-   from_email = "mindspace228@gmail.com"
-   from_password = "Palma1234!"
+   from_email = config.GMAIL_FROM
+   from_password = config.GMAIL_PASSWORD
    to_email = email
+
+   message = f"""
+   <h1>Привет, {email}!</h1>
+   <p>Ты успешно зарегистрировался в MindSpace.</p>
+   <p>Теперь ты можешь начать использовать нашу платформу для управления задачами и проектами.</p>
+   <p>Если у тебя возникнут вопросы или нужна помощь, обращайся к нам.</p>
+   <p>Спасибо, что выбрал MindSpace!</p>
+   """
 
    msg = MIMEText(message, 'html')
    msg['Subject'] = subject
