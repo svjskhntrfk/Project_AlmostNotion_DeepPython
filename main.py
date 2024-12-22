@@ -6,6 +6,8 @@ from fastapi.templating import Jinja2Templates
 from passlib.context import CryptContext
 from starlette.requests import Request
 from starlette.responses import HTMLResponse
+import logging
+from logging.handlers import RotatingFileHandler
 
 from database import *
 from auth.transport.router_reg import router as reg_router
@@ -14,6 +16,17 @@ from router_profile import router as profile_router
 from router_image import  router as image_router
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+# Настройка логирования
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        RotatingFileHandler('app.log', maxBytes=10000000, backupCount=5),  # Файловый handler
+        logging.StreamHandler()  # Консольный handler
+    ]
+)
+
+logger = logging.getLogger(__name__)
 
 def get_password_hash(password: str) -> str:
     """
