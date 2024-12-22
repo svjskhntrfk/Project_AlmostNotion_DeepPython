@@ -11,6 +11,7 @@ from database import *
 from auth.transport.router_reg import router as reg_router
 from router_boards import router as board_router
 from router_profile import router as profile_router
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
