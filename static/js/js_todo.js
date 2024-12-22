@@ -1,8 +1,3 @@
-document.getElementById('addTodoBtn').addEventListener('click', function() {
-    document.getElementById('todoInputContainer').style.display = 'block';
-    document.getElementById('todoInput').focus();
-});
-
 document.addEventListener('DOMContentLoaded', function() {
     const todoList = document.getElementById('todoList');
     const todoInputContainer = document.getElementById('todoInputContainer');
@@ -12,10 +7,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let currentTodoListId = null;
 
+    const modal = document.getElementById('modal_todo');
+    const todoTitleInput = document.getElementById('todo-title-input');
+    const cancelBtn = document.getElementById('cancel-btn');
+    const submitBtn = document.getElementById('submit-btn');
+
+    // Открытие модального окна
+    addTodoBtn.addEventListener('click', function() {
+        modal.style.display = 'flex'; // Показываем модальное окно
+        todoTitleInput.focus(); // Фокус на поле ввода
+    });
+
+    // Закрытие модального окна при нажатии "Отмена"
+    cancelBtn.addEventListener('click', function() {
+        modal.style.display = 'none'; // Скрыть модальное окно
+    });
+
     // Add todo list button click handler
-    addTodoBtn.addEventListener('click', async function() {
-        const title = prompt("Введите название списка задач:");
-        if (!title) return;
+    submitBtn.addEventListener('click', async function() {
+        const title = todoTitleInput.value.trim();
+        if (!title) return; // Если поле ввода пустое, не выполняем действие
 
         try {
             const response = await fetch(`/board/main_page/${boardId}/add_to_do_list`, {
@@ -30,24 +41,27 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             if (!response.ok) throw new Error('Failed to create todo list');
-            
+
             const data = await response.json();
             currentTodoListId = data.to_do_list_id;
-            
+
             // Create and append new todo list
             const todoListElement = document.createElement('div');
             todoListElement.className = 'todo-list';
             todoListElement.setAttribute('data-todo-list-id', currentTodoListId);
-            
+
             const titleElement = document.createElement('h3');
             titleElement.textContent = title;
             todoListElement.appendChild(titleElement);
-            
-            const taskElement = createTaskElement("Новая задача", data.to_do_list_new_item);
+
+            const taskElement = createTaskElement("Новая задача", data.to_do_list_new_item, false);  // Состояние false для нового чекбокса
             todoListElement.appendChild(taskElement);
-            
+
             todoList.appendChild(todoListElement);
-            
+
+            // Hide the modal after submission
+            modal.style.display = 'none';
+
             // Show input for additional tasks
             todoInputContainer.style.display = 'block';
             todoInput.focus();
@@ -77,12 +91,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
                 if (!response.ok) throw new Error('Failed to add task');
-                
+
                 const data = await response.json();
                 const currentList = document.querySelector(`.todo-list[data-todo-list-id="${currentTodoListId}"]`);
-                const taskElement = createTaskElement(text, data.to_do_list_new_item);
+                const taskElement = createTaskElement(text, data.to_do_list_new_item, false);  // Новая задача с состоянием unchecked
                 currentList.appendChild(taskElement);
-                
+
                 this.value = '';
             } catch (error) {
                 console.error('Error:', error);
@@ -92,13 +106,15 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Create task element helper function
-    function createTaskElement(text, taskId) {
+    function createTaskElement(text, taskId, isChecked) {
         const taskElement = document.createElement('div');
         taskElement.className = 'todo-task';
         taskElement.setAttribute('data-task-id', taskId);
-        
+
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
+        checkbox.checked = isChecked; // Устанавливаем состояние чекбокса при создании задачи
+
         checkbox.addEventListener('change', async function() {
             const todoListId = this.closest('.todo-list').getAttribute('data-todo-list-id');
             try {
@@ -120,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             } catch (error) {
                 console.error('Error updating task:', error);
-                this.checked = !this.checked;
+                this.checked = !this.checked;  // В случае ошибки восстанавливаем состояние
             }
         });
 
@@ -148,10 +164,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.textContent = text;
             }
         });
-        
+
         taskElement.appendChild(checkbox);
         taskElement.appendChild(textSpan);
-        
+
         return taskElement;
     }
 });
