@@ -343,7 +343,7 @@ async def change_password(user_id: int, new_password: str, session: AsyncSession
     """
     Изменяет пароль пользователя в базе данных.
 
-    :param user_id: ID ��ользователя.
+    :param user_id: ID пользователя.
     :param new_password: Новый пароль пользователя (хэшированный).
     :param session: Асинхронная сессия SQLAlchemy.
     :return: True, если пароль успешно изменен.
@@ -389,19 +389,27 @@ async def create_jwt_tokens(
       device_id: Device identifier
       session: AsyncSession instance
   """
-  issued_tokens = [
-      IssuedJWTToken(
-          subject=user,
-          jti=token['jti'],
-          device_id=device_id,
-          expired_time=token['exp']
+
+  try:
+    issued_tokens = [
+        IssuedJWTToken(
+            subject=user,
+            jti=token['jti'],
+            device_id=device_id,
+            expired_time=token['exp']
       )
       for token in tokens
   ]
-  print(issued_tokens)
-  print('end')
-  session.add_all(issued_tokens)
-  await session.commit()
+    print(issued_tokens)
+    print('end')
+    session.add_all(issued_tokens)
+    await session.commit()
+
+  except SQLAlchemyError as e:
+        logger.error(f"Database error while creating JWT tokens for user_id {user.id}: {str(e)}")
+        await session.rollback()
+        raise RuntimeError("Failed to create JWT tokens") from e
+
 
 
 async def save_user_image(user_id: int, file: UploadFile, is_main: bool, session: AsyncSession) -> Image:
