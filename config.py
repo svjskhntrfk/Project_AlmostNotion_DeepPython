@@ -16,22 +16,12 @@ class Settings(BaseSettings):
     DB_PORT: int
     DB_NAME: str
 
-    #MODE : str
-    MINIO_ROOT_USER : str
-    MINIO_ROOT_PASSWORD : str
+    AWS_ACCESS_KEY_ID: str
+    AWS_SECRET_ACCESS_KEY: str
+    S3_ENDPOINT: str
+    S3_REGION: str
+    S3_BUCKET: str
 
-    MINIO_ACCESS_KEY: str
-    MINIO_SECRET_KEY: str
-    MINIO_DOMAIN: str
-    MINIO_REGION_NAME: str
-    MINIO_MEDIA_BUCKET: str
-    MINIO_STATIC_BUCKET: str
-    MINIO_DATABASE_BUCKET: str
-    MINIO_USE_SSL: bool
-    MINIO_BUCKET_NAME:str
-
-    #SECRET_KEY: str
-    #ENCRYPT_KEY: str
     API_SECRET: str
     HASH_SALT: str
     JWT_SECRET: str 
