@@ -4,27 +4,22 @@ async function uploadImage(event) {
 
     if (!file) return;
 
-    // Keep track of current images in case we need to revert
     const currentMainSrc = document.getElementById('user_photo_main').src;
     const currentHeaderSrc = document.getElementById('user_photo_header').src;
 
     try {
-        // Show preview and confirmation button
         const reader = new FileReader();
         reader.onload = function(e) {
-            // Set preview
             document.getElementById('user_photo_main').src = e.target.result;
             document.getElementById('user_photo_header').src = e.target.result;
 
-            // Show confirmation button
             const confirmButton = document.createElement('button');
             confirmButton.textContent = 'Сохранить фото';
             confirmButton.className = 'confirm-photo-btn';
             confirmButton.onclick = () => confirmUpload(file, currentMainSrc, currentHeaderSrc);
 
-            // Find the photo_info div and append the button
             const photoInfo = document.querySelector('.photo_info');
-            // Remove existing button if any
+
             const existingBtn = photoInfo.querySelector('.confirm-photo-btn');
             if (existingBtn) {
                 existingBtn.remove();
@@ -35,7 +30,7 @@ async function uploadImage(event) {
         reader.readAsDataURL(file);
     } catch (error) {
         console.error('Error:', error);
-        alert('An error occurred while processing the image.');
+        displayError("An error occurred while processing the image.");
     }
 }
 
@@ -63,13 +58,11 @@ async function confirmUpload(file, currentMainSrc, currentHeaderSrc) {
             document.getElementById('user_photo_main').src = finalUrl;
             document.getElementById('user_photo_header').src = finalUrl;
 
-            // Remove confirmation button after successful upload
             const confirmButton = document.querySelector('.confirm-photo-btn');
             if (confirmButton) {
                 confirmButton.remove();
             }
 
-            // Refresh the page after a short delay to ensure the upload is complete
             setTimeout(() => {
                 window.location.reload();
             }, 500);
@@ -77,7 +70,6 @@ async function confirmUpload(file, currentMainSrc, currentHeaderSrc) {
             throw new Error('No URL in response');
         }
     } catch (error) {
-        // Revert to previous images if upload fails
         document.getElementById('user_photo_main').src = currentMainSrc;
         document.getElementById('user_photo_header').src = currentHeaderSrc;
         console.error('Upload error:', error);
@@ -86,7 +78,44 @@ async function confirmUpload(file, currentMainSrc, currentHeaderSrc) {
 }
 
 function displayError(message) {
-    const errorMessageDiv = document.getElementById("error-message");
+    const errorMessageDiv = document.getElementById("error-message-upload");
+    errorMessageDiv.textContent = message;
+    errorMessageDiv.style.display = "block";
+}
+
+document.getElementById("changePasswordForm").addEventListener("submit", async function(event) {
+    event.preventDefault();  
+
+    const oldPassword = document.getElementById("old_password").value;
+    const newPassword = document.getElementById("new_password").value;
+
+    document.getElementById("error-message-password").style.display = "none";
+
+    const formData = new FormData();
+    formData.append("old_password", oldPassword);
+    formData.append("new_password", newPassword);
+
+    try {
+        const response = await fetch("/profile/main_page/profile/change_password", {
+            method: "POST",
+            body: formData
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            window.location.href = "/login";  
+        } else {
+            const errorData = await response.json();
+            displayErrorPassword(errorData.detail || "Неизвестная ошибка. Попробуйте ещё раз.");
+        }
+    } catch (error) {
+        console.error("Ошибка при изменении пароля:", error);
+    }
+});
+
+
+function displayErrorPassword(message) {
+    const errorMessageDiv = document.getElementById("error-message-password");
     errorMessageDiv.textContent = message;
     errorMessageDiv.style.display = "block";
 }
