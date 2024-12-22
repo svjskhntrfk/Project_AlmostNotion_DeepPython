@@ -32,7 +32,6 @@ body {
     margin: 15px 0px;
 }
 a {
-    text-decoration: none;
     color: #F0E4D8;
     font-size: 15px;
 }
@@ -90,6 +89,10 @@ button {
 .img_icon {
     width: 50px;
     justify-content: flex-start;
-    margin: 15px 22px;
+    margin: 8px 15px;
     border: none;
+}
+
+.lg {
+    color: black;
 }
