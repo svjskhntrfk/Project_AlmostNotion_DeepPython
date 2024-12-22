@@ -164,9 +164,6 @@ async def login(
             value=f"Bearer {tokens.access_token}",
             httponly=True
         )
-        
-        subject = "Successfully logged in"
-        message = "Hey %s, you have successfully logged in to the MindSpace." % (request.state.user.username)
 
         return response
 
