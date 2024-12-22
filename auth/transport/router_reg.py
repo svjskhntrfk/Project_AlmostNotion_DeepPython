@@ -16,6 +16,9 @@ from auth.errors import AuthErrorTypes
 from auth.jwt_settings import jwt_config
 
 from pydantic import BaseModel
+from email_validator import validate_email, EmailNotValidError
+import dns.resolver
+import asyncio
 
 
 class SuccessOut(BaseModel):
@@ -40,6 +43,45 @@ router = APIRouter(
     tags=["Users"]
 )
 
+async def is_valid_email_domain(email: str) -> bool:
+    """Check if email domain exists and can accept emails."""
+    try:
+        # Get domain from email
+        domain = email.split('@')[1]
+        
+        # Try to get MX records for the domain
+        try:
+            mx_records = dns.resolver.resolve(domain, 'MX')
+            return len(mx_records) > 0
+        except (dns.resolver.NXDOMAIN, dns.resolver.NoAnswer):
+            return False
+            
+    except Exception as e:
+        logger.error(f"Error checking email domain: {str(e)}")
+        return False
+
+async def validate_email_address(email: str) -> tuple[bool, str]:
+    """
+    Validate email address format and domain.
+    Returns (is_valid, error_message)
+    """
+    try:
+        # Check email format
+        validation = validate_email(email, check_deliverability=False)
+        email = validation.normalized
+        
+        # Check if domain can accept emails
+        if not await is_valid_email_domain(email):
+            return False, "Email domain cannot receive emails"
+            
+        return True, ""
+        
+    except EmailNotValidError as e:
+        return False, str(e)
+    except Exception as e:
+        logger.error(f"Error validating email: {str(e)}")
+        return False, "Invalid email address"
+
 @router.post(
     path='/registration',
     responses={
@@ -59,7 +101,11 @@ async def registration(
     Post-запрос, забиваем данные пользователя с регистрации.
     """
     try:
+        logger.info(f"Starting registration for email: {email}")
+        
+        # Validate passwords match
         if password != password2:
+            logger.warning("Password mismatch during registration")
             return templates.TemplateResponse(
                 "reg.html",
                 {
@@ -70,13 +116,28 @@ async def registration(
                 }
             )
 
+        # Validate email
+        is_valid, error_message = await validate_email_address(email)
+        if not is_valid:
+            logger.warning(f"Invalid email during registration: {error_message}")
+            return templates.TemplateResponse(
+                "reg.html",
+                {
+                    "request": request,
+                    "email_error": f"Неверный email: {error_message}",
+                    "username": username
+                }
+            )
+
         user_credentials = UserCredentialsDTO(
             email=email,
             password=password
         )
+        
         tokens, error = await auth_service.register(user_credentials, username, session)
         if error:
             if error.type == AuthErrorTypes.EMAIL_OCCUPIED:
+                logger.warning(f"Email already registered: {email}")
                 return templates.TemplateResponse(
                     "reg.html",
                     {
@@ -85,6 +146,7 @@ async def registration(
                         "username": username
                     }
                 )
+            logger.error(f"Registration error: {error.message}")
             return templates.TemplateResponse(
                 "reg.html",
                 {
@@ -95,13 +157,14 @@ async def registration(
                 }
             )
 
-        
+        logger.info(f"Successfully registered user with email: {email}")
         return RedirectResponse(
             url=f"/login",
             status_code=status.HTTP_302_FOUND
         )
 
     except Exception as e:
+        logger.error(f"Unexpected error during registration: {str(e)}")
         return templates.TemplateResponse(
             "reg.html",
             {
