@@ -52,7 +52,6 @@ async def upload_user_image(
     try:
         # Добавляем логирование
         print(f"Uploading file: {file.filename}, size: {file.size}, content_type: {file.content_type}")
-        
         # Validate file size (5MB limit)
         if file.size > 5 * 1024 * 1024:
             raise HTTPException(
