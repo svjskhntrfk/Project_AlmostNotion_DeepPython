@@ -13,11 +13,8 @@ from database import *
 from auth.transport.router_reg import router as reg_router
 from router_boards import router as board_router
 from router_profile import router as profile_router
-<<<<<<< HEAD
 from router_image import  router as image_router
-=======
 
->>>>>>> b17fe021c9093d1a561956f694da193d56de139e
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
