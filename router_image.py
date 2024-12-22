@@ -101,9 +101,9 @@ async def get_image_url(image_id: str, session: AsyncSession = Depends(get_sessi
 @router.get("/media/{file_path:path}")
 async def get_media(file_path: str):
     """
-    Получение медиа-файла из MinIO
+    Получение медиа-файла из S3
     """
-    url = f"http://{settings.MINIO_DOMAIN}/{settings.MINIO_MEDIA_BUCKET}/{file_path}"
+    url = f"{settings.S3_ENDPOINT}/{settings.S3_BUCKET}/{file_path}"
     return RedirectResponse(url)
 
 

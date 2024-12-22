@@ -120,7 +120,7 @@ class Image(Base):
     @property
     def url(self):
         from config import settings
-        return f"http://{settings.MINIO_DOMAIN}/{settings.MINIO_MEDIA_BUCKET}/{self.file}"
+        return f"{settings.S3_ENDPOINT}/{settings.S3_BUCKET}/{self.file}"
 
 class IssuedJWTToken(Base):
     jti: Mapped[str] = mapped_column(String(36), primary_key=True)
