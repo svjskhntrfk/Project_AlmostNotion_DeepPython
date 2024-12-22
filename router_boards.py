@@ -50,6 +50,15 @@ async def board_page(board_id: str, request: Request, session: AsyncSession = De
     """
     user = request.state.user
     board = await get_board_by_user_id_and_board_id(int(user.id), int(board_id), session)
+    user_images = await get_images_by_user_id(user.id, session=session)
+    
+    # Получаем URL последнего изображения
+    image_url = None
+    print(user_images)
+    if user_images:
+        latest_image = user_images[-1]
+        # Используем свойство url из ImageSchema
+        image_url = latest_image.url
     return templates.TemplateResponse(
         "article.html",
         {
@@ -58,7 +67,8 @@ async def board_page(board_id: str, request: Request, session: AsyncSession = De
             "board_id": board_id,
             "texts": board[1]["texts"],
             "username" : user.username,
-            "title" : board[0]
+            "title" : board[0],
+            "image_url" : image_url
         }
     )
 
