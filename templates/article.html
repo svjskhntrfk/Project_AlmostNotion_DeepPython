@@ -67,6 +67,7 @@
                     </div>
                 {% endfor %}
             </div>
+
             <div class="new-note-area">
                 <div class="text">
                     <pre class="note-content" 
@@ -75,7 +76,35 @@
                          data-placeholder="Введите заметку"></pre>
                 </div>
             </div>
+
+            <div class="new-todo-area">
+                <div id="todoList" class="todo-lists-container">
+                    {% for todo_list in todo_lists %}
+                        <div class="todo-list" data-todo-list-id="{{ todo_list.id }}">
+                            <h3>{{ todo_list.title }}</h3>
+                            {% for task in todo_list.tasks %}
+                                <div class="todo-task" data-task-id="{{ task.id }}">
+                                    <input type="checkbox" {% if task.completed %}checked{% endif %}>
+                                    <span>{{ task.title }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+                <div id="todoInputContainer" style="display: none;">
+                    <input class="input_todo" type="text" id="todoInput" placeholder="Введите задачу">
+                </div>
+                <button id="addTodoBtn" class="add_btn">
+                    <div class="plus">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                            <path fill="#B14F44" d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/>
+                        </svg>
+                    </div>
+                </button>
+            </div>
+
         </main>
+      <script src="/static/js/js_todo.js"></script>
       </body>
   </div>
 </html>

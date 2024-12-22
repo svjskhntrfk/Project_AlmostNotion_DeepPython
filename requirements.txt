@@ -43,7 +43,10 @@ httpx==0.27.2
 idna==3.10
 itsdangerous==2.2.0
 Jinja2==3.1.4
+<<<<<<< HEAD
 jmespath==1.0.1
+=======
+>>>>>>> b17fe021c9093d1a561956f694da193d56de139e
 Mako==1.3.6
 markdown-it-py==3.0.0
 MarkupSafe==3.0.2

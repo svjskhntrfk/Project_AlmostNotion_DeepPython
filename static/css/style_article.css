@@ -78,15 +78,11 @@ main {
 }
 
 .note-content {
-    width: 100%;
-    padding: 5px;
-    outline: none;
-    font-family: inherit;
-    border: none;
-    color: #B14F44;
-    font-size: 25px;
-    white-space: pre-wrap;
-    word-wrap: break-word;
+  font-size: 18px; /* Уменьшите размер шрифта */
+  padding: 5px;
+  color: #B14F44;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
 .note-content:focus {
@@ -145,7 +141,6 @@ input {
     color: #000000;
     font-family: "Philosopher", sans-serif;
     padding: 10px;
-    margin-top: 50px;
     margin-bottom: 10px;
     width: 75%;
     text-align: center;
@@ -206,4 +201,25 @@ a {
     background: none;
     border: none;
     cursor: pointer;
+}
+
+
+.input_todo{
+    width: 70%;
+    padding: 10px;
+    border: 1px solid #C9C9C9;
+    border-radius: 10px;
+    font-family: "Philosopher", sans-serif;
+}
+
+.add_btn{
+    background-color: #F0E4D8;
+    width: 30px;
+    height: 30px;
+    border: none;
+}
+
+#todoList input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
 }
