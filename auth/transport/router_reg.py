@@ -17,6 +17,7 @@ from auth.jwt_settings import jwt_config
 
 from pydantic import BaseModel
 
+from fastapi.responses import HTMLResponse
 
 class SuccessOut(BaseModel):
     success: bool = True
@@ -96,7 +97,7 @@ async def registration(
             )
         
         return RedirectResponse(
-            url=f"/login",
+            url=f"/users/login",
             status_code=status.HTTP_302_FOUND
         )
 
@@ -174,3 +175,23 @@ async def login(
 async def check_email(email: str, session: AsyncSession = Depends(get_session)):
     user = await is_email_registered(email, session)
     return {"exists": user is not None}
+
+@router.get("/login", response_class=HTMLResponse)
+async def login_page(request: Request):
+    """
+    Отображает страницу входа
+
+    Параметры:
+        request (Request): Объект HTTP-запроса.
+    """
+    return templates.TemplateResponse("entry.html", {"request": request})
+
+@router.get("/registration", response_class=HTMLResponse)
+async def registration_page(request: Request):
+    """
+    Get-запрос, отображает страницу регистрации
+
+    Параметры:
+        request (Request): Объект HTTP-запроса
+    """
+    return templates.TemplateResponse("reg.html", {"request": request})

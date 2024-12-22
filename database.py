@@ -62,6 +62,7 @@ async def create_user(username: str, email: str, password: str, session: AsyncSe
     :param session: Асинхронная сессия SQLAlchemy.
     :raises RuntimeError: Если произошла ошибка при создании пользователя.
     """
+    email = email.lower()
     user = User(username=username, email=email, password=password)
     session.add(user)
     try:
@@ -86,6 +87,7 @@ async def is_email_registered(email: str, session: AsyncSession):
     :raises RuntimeError: Если произошла ошибка при проверке электронной почты.
     """
     try:
+        email = email.lower()
         query = select(User).filter_by(email=email)
         result = await session.execute(query)
         user = result.scalars().first()

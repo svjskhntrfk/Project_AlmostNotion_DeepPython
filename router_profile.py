@@ -121,5 +121,5 @@ async def logout(request: Request, session: AsyncSession = Depends(get_session),
     except Exception as e:
         print(e)
     finally:
-        return RedirectResponse("/",
-                            status_code=status.HTTP_302_FOUND)
+        return RedirectResponse("/", status_code=status.HTTP_302_FOUND)
+
