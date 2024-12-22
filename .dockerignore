@@ -15,6 +15,5 @@ coverage.xml
 *.cover
 *.log
 .pytest_cache
-.env
 .venv
 .DS_Store
