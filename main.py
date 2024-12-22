@@ -1,4 +1,4 @@
-# from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager
 from fastapi import Depends
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
@@ -6,6 +6,8 @@ from fastapi.templating import Jinja2Templates
 from passlib.context import CryptContext
 from starlette.requests import Request
 from starlette.responses import HTMLResponse
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from router_notification import check_and_send_notifications
 
 from database import *
 from auth.transport.router_reg import router as reg_router
@@ -52,6 +54,16 @@ app.include_router(profile_router)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
+
+# Set up scheduler
+scheduler = AsyncIOScheduler()
+scheduler.add_job(
+    check_and_send_notifications,
+    'interval',
+    minutes=15,  # Check every 15 minutes
+    kwargs={'session': async_session_maker()}
+)
+scheduler.start()
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):

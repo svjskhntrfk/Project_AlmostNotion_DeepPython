@@ -119,3 +119,13 @@ class Task(Base):
 
     todo_list_id: Mapped[int] = mapped_column(ForeignKey('todolists.id'), nullable=False)
     todo_list: Mapped["ToDoList"] = relationship("ToDoList", back_populates="tasks", lazy="joined")
+
+class Notification(Base):
+
+    id : Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id : Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
+    email : Mapped[str] = mapped_column(String)
+    subject : Mapped[str] = mapped_column(String)
+    message : Mapped[str] = mapped_column(String)
+    scheduled_time : Mapped[datetime] = mapped_column(DateTime)
+    sent : Mapped[bool] = mapped_column(Boolean, default=False)
