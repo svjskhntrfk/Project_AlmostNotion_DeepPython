@@ -34,11 +34,11 @@ services:
         condition: service_started
 
   postgres:
-    image: postgres:latest
+    image: postgres:15
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=mydatabase
+      - POSTGRES_DB=postgres
     ports:
       - "5432:5432"
     volumes:
