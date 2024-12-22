@@ -19,7 +19,7 @@
                     <a class="username" >{{username}}</a>
                 </div>
                 <div class="photo">
-                    <img id="user_photo_header" class="user_photo" src="{{ image_url }}">
+                    <img id="user_photo_header" class="user_photo" src="{{ image_url if image_url else 'https://www.kino-teatr.ru/news/21378/190975.jpg' }}">
                 </div>
             </div>
         </header>
@@ -44,7 +44,7 @@
                         <div class="photo_info">
                             <form id="uploadForm" enctype="multipart/form-data">
                                 <label for="file_input">
-                                    <img id="user_photo_main" class="user_photo_info" src="{{ image_url }}">
+                                    <img id="user_photo_main" class="user_photo_info" src="{{ image_url if image_url else 'https://www.kino-teatr.ru/news/21378/190975.jpg' }}">
                                 </label>
                                 <input type="file" id="file_input" name="file" accept="image/*" onchange="uploadImage(event)">
                                 <input type="hidden" name="is_main" value="true">

@@ -526,3 +526,27 @@ async def delete_image(image_id: UUID, session: AsyncSession) -> None:
         logger.error(f"Traceback: {traceback_str}")
         print(f"Traceback: {traceback_str}")
         raise RuntimeError("An unexpected error occurred while deleting the image.") from e
+
+async def add_collaborator(user_id: int, board_id: int, session: AsyncSession):
+    try:
+        # Get the board
+        board_query = select(Board).filter(Board.id == board_id)
+        board_result = await session.execute(board_query)
+        board = board_result.scalars().first()
+        
+        if not board:
+            raise ValueError(f"Board with ID {board_id} not found")
+
+        user = await get_user_by_id(user_id, session)
+        print('in add_collaborator', user   )
+        
+        if not user:
+            raise ValueError(f"User with ID {user_id} not found")
+
+        # Add the user to collaborators
+        board.collaborators.append(user)
+        await session.commit()
+        
+    except SQLAlchemyError as e:
+        logger.error(f"Error adding collaborator to board_id={board_id}: {e}")
+        raise RuntimeError("An error occurred while adding a collaborator to the board.") from e
