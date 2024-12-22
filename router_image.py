@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, File, Form, UploadFile, HTTPException, Security
 from fastapi.responses import JSONResponse, RedirectResponse
 from typing import Annotated
-from database import get_session, save_user_image
+from database import get_session, save_user_image, get_images_by_user_id, delete_image
 from image_schemas import ImageUploadResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from auth.middlewares.jwt.service import check_access_token
@@ -70,6 +70,11 @@ async def upload_user_image(
 
         user = request.state.user
         print(f"User ID: {user.id}")
+
+        list_images = await get_images_by_user_id(user_id=user.id, session=session)
+        if len(list_images) > 0:
+            for image in list_images:
+                await delete_image(image_id=image.id, session=session)
         
         image = await save_user_image(user_id=user.id, file=file, is_main=is_main, session=session)
         print(f"Image saved: {image.id}")
