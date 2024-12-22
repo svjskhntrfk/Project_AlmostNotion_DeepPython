@@ -7,11 +7,11 @@ from passlib.context import CryptContext
 from starlette.requests import Request
 from starlette.responses import HTMLResponse
 
-from database import *
-from auth.transport.router_reg import router as reg_router
-from router_boards import router as board_router
-from router_profile import router as profile_router
-from router_image import  router as image_router
+from src.core.database import *
+from src.auth.transport.router_reg import router as reg_router
+from src.router.router_boards import router as board_router
+from src.router.router_profile import router as profile_router
+from src.router.router_image import  router as image_router
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
@@ -50,9 +50,9 @@ app.include_router(board_router)
 app.include_router(profile_router)
 app.include_router(image_router)
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory="src/front/static"), name="static")
 
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="src/front/templates")
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
