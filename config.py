@@ -28,6 +28,10 @@ class Settings(BaseSettings):
     JWT_SECRET: str 
     ACCESS_TOKEN_TTL: int
     REFRESH_TOKEN_TTL: int  
+
+    GMAIL_USERNAME: str
+    GMAIL_FROM: str
+    GMAIL_PASSWORD: str
     
     model_config = SettingsConfigDict(
         env_file=os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
