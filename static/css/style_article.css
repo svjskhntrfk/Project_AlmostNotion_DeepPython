@@ -217,17 +217,20 @@ a {
     width: 30px;
     height: 30px;
     border: none;
+    margin-left: 20px;
 }
 
 #todoList input[type="checkbox"] {
   width: 15px;
   height: 15px;
+  margin-left: 20px;
 }
 
 .todo_title {
     padding: 10px 0px;
     font-size: 23px;
     color: #B14F44;
+    margin-left: 20px;
 }
 
 .modal_todo {
@@ -289,3 +292,34 @@ a {
     margin-top: 10px;
     margin-bottom: 20px;
     font-family: "Philosopher", sans-serif;
+
+.images {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.images img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.save_img {
+    width: 7%;
+    height: 13px;
+    border: none;
+    border-radius: 8px;
+    background-color: #B14F44;
+    color: #F0E4D8;
+    font-size: 10px;
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    font-family: "Philosopher", sans-serif;
+}
