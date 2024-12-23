@@ -1,7 +1,7 @@
 from ..models import *
 from ..database import *
 
-async def save_user_image(user_id: int, file: UploadFile, is_main: bool, session: AsyncSession) -> Image:
+async def save_user_image(user_id: int, file: UploadFile, session: AsyncSession) -> Image:
     print(f"Starting save_user_image for user_id: {user_id}")
     try:
         # Получаем пользователя
@@ -12,7 +12,6 @@ async def save_user_image(user_id: int, file: UploadFile, is_main: bool, session
         print(f"Calling image_dao.create_with_file with path: Users")
         image = await image_dao.create_with_file(
             file=file,
-            is_main=is_main,
             model_instance=user,  # Передаем объект пользователя
             path="Users",
             db_session=session
@@ -64,3 +63,65 @@ async def get_images_by_user_id(user_id: int, session: AsyncSession) -> List[Ima
 async def get_image_url(image_id: str, session: AsyncSession) -> str:
     image = await image_dao.get(id=image_id, db_session=session)
     return image.url
+
+
+
+async def delete_image(image_id: UUID, session: AsyncSession) -> None:
+    """
+    Удаляет изображение по его ID, удаляет файл из хранилища и удаляет все связи с пользователями.
+
+    Args:
+        image_id (UUID): ID изображения, которое нужно удалить.
+        session (AsyncSession): Асинхронная сессия SQLAlchemy.
+
+    Raises:
+        HTTPException: Если изображение не найдено.
+        RuntimeError: Если произошла ошибка при удалении изображения.
+    """
+    print(f"Starting delete_image for image_id: {image_id}")
+    logger.info(f"Starting delete_image for image_id: {image_id}")
+    try:
+        image = await session.get(Image, image_id)
+        if not image:
+            logger.error(f"Image with id {image_id} not found.")
+            raise HTTPException(status_code=404, detail="Image not found")
+
+        if image.file:
+            try:
+                print(f"Deleting file from storage: {image.file}")
+                logger.info(f"Deleting file from storage: {image.file}")
+                await image.storage.delete_object(image.file)
+            except Exception as file_error:
+                logger.error(f"Failed to delete file {image.file} from storage: {file_error}")
+                raise RuntimeError(f"Failed to delete file from storage: {file_error}") from file_error
+
+        try:
+            stmt = user_image_association.delete().where(user_image_association.c.image_id == image_id)
+            await session.execute(stmt)
+            logger.info(f"Deleted associations for image_id: {image_id}")
+        except Exception as assoc_error:
+            logger.error(f"Failed to delete associations for image_id {image_id}: {assoc_error}")
+            raise RuntimeError(f"Failed to delete associations: {assoc_error}") from assoc_error
+
+        try:
+            await session.delete(image)
+            await session.commit()
+            logger.info(f"Successfully deleted image with ID: {image_id}")
+            print(f"Successfully deleted image with ID: {image_id}")
+        except Exception as db_error:
+            await session.rollback()
+            logger.error(f"Failed to delete image with id {image_id}: {db_error}")
+            print(f"Failed to delete image with id {image_id}: {db_error}")
+            raise RuntimeError(f"Failed to delete image: {db_error}") from db_error
+
+    except HTTPException as e:
+        logger.error(f"HTTPException in delete_image: {e.detail}")
+        print(f"HTTPException in delete_image: {e.detail}")
+        raise e
+    except Exception as e:
+        logger.error(f"Unexpected error in delete_image: {str(e)}")
+        print(f"Error in delete_image: {str(e)}")
+        traceback_str = traceback.format_exc()
+        logger.error(f"Traceback: {traceback_str}")
+        print(f"Traceback: {traceback_str}")
+        raise RuntimeError("An unexpected error occurred while deleting the image.") from e

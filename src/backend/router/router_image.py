@@ -6,7 +6,7 @@ from src.schemas.image_schemas import ImageUploadResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from ..auth import check_access_token
 from starlette.requests import Request
-from src.db import settings
+from src.db.cfg import settings
 
 router = APIRouter(
     prefix="/image",
@@ -27,7 +27,6 @@ router = APIRouter(
                     "example": {
                         "id": "123e4567-e89b-12d3-a456-426614174000",
                         "file": "path/to/image.jpg",
-                        "is_main": True,
                         "url": "http://minio.domain/media/path/to/image.jpg"
                     }
                 }
@@ -40,7 +39,6 @@ router = APIRouter(
 async def upload_user_image(
     request: Request,
     file: Annotated[UploadFile, File(description="Image file to upload")],
-    is_main: Annotated[bool, Form(description="Flag indicating if this is the main image")],
     session: AsyncSession = Depends(get_session)
 ) -> ImageUploadResponse:
     """
@@ -70,15 +68,19 @@ async def upload_user_image(
 
         user = request.state.user
         print(f"User ID: {user.id}")
+
+        list_images = await get_images_by_user_id(user_id=user.id, session=session)
+        if len(list_images) > 0:
+            for image in list_images:
+                await delete_image(image_id=image.id, session=session)
         
-        image = await save_user_image(user_id=user.id, file=file, is_main=is_main, session=session)
+        image = await save_user_image(user_id=user.id, file=file, session=session)
         print(f"Image saved: {image.id}")
         
         image_url = image.url
         return ImageUploadResponse(
             id=image.id,
             file=image.file,
-            is_main=True,
             url=image_url
         )
     except Exception as e:
@@ -101,5 +103,4 @@ async def get_media(file_path: str):
     """
     url = f"http://{settings.MINIO_DOMAIN}/{settings.MINIO_MEDIA_BUCKET}/{file_path}"
     return RedirectResponse(url)
-
 

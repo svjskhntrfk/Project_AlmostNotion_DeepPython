@@ -47,7 +47,6 @@
                                     <img id="user_photo_main" class="user_photo_info" src="{{ image_url }}">
                                 </label>
                                 <input type="file" id="file_input" name="file" accept="image/*" onchange="uploadImage(event)">
-                                <input type="hidden" name="is_main" value="true">
                             </form>
                         </div>
                     </div>
@@ -93,7 +92,6 @@ async function uploadImage(event) {
     const file = event.target.files[0];
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('is_main', 'true');
 
     try {
         const response = await fetch('/image/upload-image', {
