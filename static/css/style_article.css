@@ -219,36 +219,6 @@ a {
     border: none;
 }
 
-.images {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    padding: 20px;
-    width: 100%;
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.images img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-}
-
-.save_img {
-    width: 7%;
-    height: 13px;
-    border: none;
-    border-radius: 8px;
-    background-color: #B14F44;
-    color: #F0E4D8;
-    font-size: 10px;
-    display: block;
-    margin-top: 10px;
-    margin-bottom: 20px;
-    font-family: "Philosopher", sans-serif;
-
 #todoList input[type="checkbox"] {
   width: 15px;
   height: 15px;
@@ -289,3 +259,33 @@ a {
 .todo_input {
     font-size: 15px;
 }
+
+.images {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.images img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.save_img {
+    width: 7%;
+    height: 13px;
+    border: none;
+    border-radius: 8px;
+    background-color: #B14F44;
+    color: #F0E4D8;
+    font-size: 10px;
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    font-family: "Philosopher", sans-serif;
