@@ -402,7 +402,7 @@ async def create_jwt_tokens(
   await session.commit()
 
 
-async def save_user_image(user_id: int, file: UploadFile, is_main: bool, session: AsyncSession) -> Image:
+async def save_user_image(user_id: int, file: UploadFile, session: AsyncSession) -> Image:
     print(f"Starting save_user_image for user_id: {user_id}")
     try:
         # Получаем пользователя
@@ -413,7 +413,6 @@ async def save_user_image(user_id: int, file: UploadFile, is_main: bool, session
         print(f"Calling image_dao.create_with_file with path: Users")
         image = await image_dao.create_with_file(
             file=file,
-            is_main=is_main,
             model_instance=user,  # Передаем объект пользователя
             path="Users",
             db_session=session

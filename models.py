@@ -154,7 +154,6 @@ class Image(Base):
     id: Mapped[UUID] = mapped_column(pgUUID(as_uuid=True), primary_key=True, default=uuid4)
 
     file: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    is_main: Mapped[bool] = mapped_column(Boolean, default=False)
 
     users: Mapped[List["User"]] = relationship(
         "User",
