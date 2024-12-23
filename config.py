@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     DB_HOST: str
     DB_PORT: int
     DB_NAME: str
+    
 
     #MODE : str
     MINIO_ROOT_USER : str
@@ -29,6 +30,9 @@ class Settings(BaseSettings):
     MINIO_DATABASE_BUCKET: str
     MINIO_USE_SSL: bool
     MINIO_BUCKET_NAME:str
+    GMAIL_USERNAME:str
+    GMAIL_FROM:str
+    GMAIL_PASSWORD:str
 
     #SECRET_KEY: str
     #ENCRYPT_KEY: str

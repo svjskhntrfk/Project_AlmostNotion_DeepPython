@@ -18,6 +18,7 @@ class ImageSchema(BaseModel):
 class ImageCreate(BaseModel):
     file: str
 
+
 class ImageUploadResponse(BaseModel):
     id: UUID
     file: str

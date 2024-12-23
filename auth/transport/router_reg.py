@@ -14,6 +14,7 @@ from auth.middlewares.jwt.base.auth import JWTAuth
 from auth.transport.responses import TokensOut
 from auth.errors import AuthErrorTypes
 from auth.jwt_settings import jwt_config
+from router_notification import send_email_after_register
 
 from pydantic import BaseModel
 
@@ -161,6 +162,10 @@ async def registration(
                     "username": username
                 }
             )
+        
+        subject = "Successfully registered"
+        message = "Hey %s, you have successfully registered in the MindSpace." % (username)
+        send_email_after_register(email, subject, message)
 
         logger.info(f"Successfully registered user with email: {email}")
         return RedirectResponse(
@@ -228,7 +233,7 @@ async def login(
             value=f"Bearer {tokens.access_token}",
             httponly=True
         )
-        
+
         return response
 
     except Exception as e:
