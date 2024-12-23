@@ -107,7 +107,6 @@ class Board(Base):
         cascade="all, delete-orphan",
         lazy="joined"
     )
-    
     todo_lists: Mapped[List["ToDoList"]] = relationship(
         "ToDoList",
         back_populates="board",
