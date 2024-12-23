@@ -112,6 +112,31 @@ document.getElementById("changePasswordForm").addEventListener("submit", async f
     }
 });
 
+document.addEventListener('DOMContentLoaded', function() {
+    const profileLink = document.querySelector('#profile-link');  // Updated selector
+    const notificationsLink = document.querySelector('#notifications-link');  // Updated selector
+
+    const infoBlock = document.querySelector('.info');
+    const notifBlock = document.querySelector('.notif');
+
+    // Set initial state
+    infoBlock.style.display = 'block';
+    notifBlock.style.display = 'none';
+
+    // Add click handler for notifications link
+    notificationsLink.addEventListener('click', function(e) {
+        e.preventDefault();  // Prevent default link behavior
+        infoBlock.style.display = 'none';
+        notifBlock.style.display = 'block';
+    });
+
+    // Add click handler for profile link
+    profileLink.addEventListener('click', function(e) {
+        e.preventDefault();  // Prevent default link behavior
+        infoBlock.style.display = 'block';
+        notifBlock.style.display = 'none';
+    });
+});
 
 function displayErrorPassword(message) {
     const errorMessageDiv = document.getElementById("error-message-password");
