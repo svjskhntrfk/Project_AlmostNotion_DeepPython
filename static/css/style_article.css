@@ -207,3 +207,27 @@ a {
     border: none;
     cursor: pointer;
 }
+
+.add_btn{
+    background-color: #F0E4D8;
+    width: 30px;
+    height: 30px;
+    border: none;
+}
+
+.images {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.images img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
