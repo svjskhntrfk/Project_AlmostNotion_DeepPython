@@ -103,6 +103,11 @@ class Board(Base):
 
     images: Mapped[List["ImageBoard"]] = relationship(
         "ImageBoard",
+        back_populates="board",
+        cascade="all, delete-orphan",
+        lazy="joined"
+    )
+    
     todo_lists: Mapped[List["ToDoList"]] = relationship(
         "ToDoList",
         back_populates="board",

@@ -65,14 +65,14 @@ async def board_page(board_id: str, request: Request, session: AsyncSession = De
     print(images_url)
     return templates.TemplateResponse(
         "article.html",
-        {
+        {   
             "request": request,
             "user_id": user.id,
             "board_id": board_id,
             "texts": board.content["texts"],
             "todo_lists": board.todo_lists,
             "username" : user.username,
-            "board_images" : images_url
+            "board_images" : images_url,
             "title" : board.title,
             "image_url" : image_url
         }
