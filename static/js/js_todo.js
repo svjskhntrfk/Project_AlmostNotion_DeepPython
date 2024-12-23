@@ -20,15 +20,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Закрытие модального окна при нажатии "Отмена"
     cancelBtn.addEventListener('click', function() {
-        modal.style.display = 'none'; // Скрыть модал��ное окно
+        modal.style.display = 'none'; // Скрыть модальное окно
     });
 
     // Add todo list button click handler
+    
     submitBtn.addEventListener('click', async function() {
         const title = todoTitleInput.value.trim();
-        if (!title) return; // Если поле ввода пустое, не выполняем действие
+        const deadlineInput = document.getElementById('deadline');
+        if (!title) return;
 
         try {
+            // Format the deadline to match the expected format "YYYY-MM-DD HH:MM"
+
             const response = await fetch(`/board/main_page/${boardId}/add_to_do_list`, {
                 method: 'POST',
                 headers: {
@@ -36,11 +40,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: JSON.stringify({
                     title: title,
-                    text: "Новая задача"  // Default first task
+                    text: "Новая задача",
+                    deadline: deadlineInput
                 })
             });
 
-            if (!response.ok) throw new Error('Failed to create todo list');
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'Failed to create todo list');
+            }
 
             const data = await response.json();
             currentTodoListId = data.to_do_list_id;
@@ -79,6 +87,13 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!text) return;
 
             try {
+                const deadlineInput = document.querySelector('.deadline-input');
+                let formattedDeadline = null;
+                if (deadlineInput && deadlineInput.value) {
+                    const deadlineDate = new Date(deadlineInput.value);
+                    formattedDeadline = `${deadlineDate.getFullYear()}-${String(deadlineDate.getMonth() + 1).padStart(2, '0')}-${String(deadlineDate.getDate()).padStart(2, '0')} ${String(deadlineDate.getHours()).padStart(2, '0')}:${String(deadlineDate.getMinutes()).padStart(2, '0')}`;
+                }
+
                 const response = await fetch(`/board/main_page/${boardId}/add_to_do_list_item`, {
                     method: 'POST',
                     headers: {
@@ -86,6 +101,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     },
                     body: JSON.stringify({
                         to_do_list_id: currentTodoListId,
+                        text: text,
+                        deadline: formattedDeadline
                         text: text
                     })
                 });
@@ -94,10 +111,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const data = await response.json();
                 const currentList = document.querySelector(`.todo-list[data-todo-list-id="${currentTodoListId}"]`);
-                const taskElement = createTaskElement(text, data.to_do_list_new_item, false);  // Новая задача с состоянием unchecked
+                const taskElement = createTaskElement(text, data.to_do_list_new_item, false);
                 currentList.appendChild(taskElement);
 
                 this.value = '';
+                if (deadlineInput) deadlineInput.value = ''; // Clear deadline input after adding task
             } catch (error) {
                 console.error('Error:', error);
                 alert('Произошла ошибка при добавлении задачи');
@@ -170,6 +188,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         return taskElement;
     }
+});
+
 
     // Добавляем инициализацию существующих задач
     const existingTasks = document.querySelectorAll('.todo-task');

@@ -253,8 +253,8 @@ async def test_get_images_by_user_id(session: AsyncSession):
     await session.refresh(user)
 
     # Добавляем изображения
-    image1 = Image(file="path/to/image1.png", is_main=True, user_id=user.id)
-    image2 = Image(file="path/to/image2.png", is_main=False, user_id=user.id)
+    image1 = Image(file="path/to/image1.png", user_id=user.id)
+    image2 = Image(file="path/to/image2.png", user_id=user.id)
     session.add_all([image1, image2])
     await session.commit()
 

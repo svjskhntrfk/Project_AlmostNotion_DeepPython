@@ -101,6 +101,8 @@ class Board(Base):
         lazy='joined'
     )
 
+    images: Mapped[List["ImageBoard"]] = relationship(
+        "ImageBoard",
     todo_lists: Mapped[List["ToDoList"]] = relationship(
         "ToDoList",
         back_populates="board",
@@ -113,7 +115,6 @@ class Image(Base):
     
     id: Mapped[UUID] = mapped_column(pgUUID, primary_key=True, default=uuid.uuid4)
     file: Mapped[str] = mapped_column(FilePath(_file_storage), nullable=True)
-    is_main: Mapped[bool] = mapped_column(Boolean, default=False)
 
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
     user: Mapped["User"] = relationship("User", secondary=user_image_association, back_populates="images", lazy="joined")
@@ -144,6 +145,24 @@ class IssuedJWTToken(Base):
     def __str__(self) -> str:
         return f'{self.subject}: {self.jti}'
 
+class ImageBoard(Base):
+    _file_storage = media_storage
+    
+    id: Mapped[UUID] = mapped_column(pgUUID, primary_key=True, default=uuid.uuid4)
+    file: Mapped[str] = mapped_column(FilePath(_file_storage), nullable=True)
+
+    board_id: Mapped[int] = mapped_column(Integer, ForeignKey("boards.id"))
+    board: Mapped["Board"] = relationship("Board", back_populates="images", lazy="joined")
+
+    @property
+    def storage(self):
+        return self._file_storage
+
+    @property
+    def url(self):
+        from config import settings
+        return f"http://{settings.MINIO_DOMAIN}/{settings.MINIO_MEDIA_BUCKET}/{self.file}"
+      
 class ToDoList(Base):
     title: Mapped[str] = mapped_column(String, nullable=True)
     deadline: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
@@ -165,3 +184,4 @@ class Task(Base):
 
     todo_list_id: Mapped[int] = mapped_column(ForeignKey('todolists.id'), nullable=False)
     todo_list: Mapped["ToDoList"] = relationship("ToDoList", back_populates="tasks", lazy="joined")
+
