@@ -1,76 +1,41 @@
-async function uploadImage(event) {
-    event.preventDefault();
-    const file = event.target.files[0];
+document.getElementById('file_input').addEventListener('change', function(event) {
+    // Show the submit button when a file is selected
+    document.getElementById('submitImage').style.display = 'inline-block';
 
-    if (!file) return;
-
-    const currentMainSrc = document.getElementById('user_photo_main').src;
-    const currentHeaderSrc = document.getElementById('user_photo_header').src;
-
-    try {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const confirmButton = document.createElement('button');
-            confirmButton.textContent = 'Сохранить фото';
-            confirmButton.className = 'confirm-photo-btn';
-            confirmButton.onclick = () => confirmUpload(file);
-
-            const photoInfo = document.querySelector('.photo_info');
-
-            const existingBtn = photoInfo.querySelector('.confirm-photo-btn');
-            if (existingBtn) {
-                existingBtn.remove();
-            }
-            photoInfo.appendChild(confirmButton);
-        };
-
-        reader.readAsDataURL(file);
-    } catch (error) {
-        console.error('Error:', error);
-        displayError("An error occurred while processing the image.");
+    // Optional: Show selected file name
+    const fileName = event.target.files[0]?.name;
+    if (fileName) {
+        console.log('Selected file:', fileName);
     }
-}
+});
 
-async function confirmUpload(file, currentMainSrc, currentHeaderSrc) {
-    const formData = new FormData();
-    formData.append('file', file);
+document.getElementById('uploadForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    const boardId = window.location.pathname.split('/')[3];
 
+    const formData = new FormData(this);
     try {
-        const response = await fetch('/board/upload-image', {
+        const response = await fetch(`/board/main_page/${boardId}/add_image`, {
             method: 'POST',
-            body: formData,
-            headers: {
-                'Accept': 'application/json'
-            }
+            body: formData
         });
 
-        if (!response.ok) {
-            throw new Error('Upload failed');
-        }
+        if (!response.ok) throw new Error('Upload failed');
 
-        const data = await response.json();
-        if (data.url) {
-            const finalUrl = data.url;
+        // Handle successful upload
+        const result = await response.json();
+        console.log('Upload successful:', result);
 
-            const confirmButton = document.querySelector('.confirm-photo-btn');
-            if (confirmButton) {
-                confirmButton.remove();
-            }
+        // Reset form and hide submit button
+        this.reset();
+        document.getElementById('submitImage').style.display = 'none';
 
-            setTimeout(() => {
-                window.location.reload();
-            }, 500);
-        } else {
-            throw new Error('No URL in response');
-        }
+        setTimeout(() => {
+           window.location.reload();
+        }, 100);
+
     } catch (error) {
         console.error('Upload error:', error);
-        displayError("Произошла ошибка при загрузке изображения. Maximum file size: 5MB");
+        alert('Ошибка при загрузке файла');
     }
-}
-
-function displayError(message) {
-    const errorMessageDiv = document.getElementById("error-message-upload");
-    errorMessageDiv.textContent = message;
-    errorMessageDiv.style.display = "block";
-}
+});
