@@ -1,40 +1,10 @@
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-html, body {
-    width: 100%;
-    overflow-x: hidden;
-}
-
 body {
     background-color: #F0E4D8;
     font-family: "Philosopher", sans-serif;
     font-weight: 400;
     font-style: normal;
-}
-
-header {
-    width: 100%;
-    background: #DD8E75;
-    height: 82px;
-    border: 1px solid #C9C9C9;
-    border-bottom-right-radius: 25px;
-    border-bottom-left-radius: 25px;
-    margin-bottom: 50px;
-    display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    padding: 0 20px;
-}
-
-main {
-    width: 100%;
-    max-width: 1200px;
-    margin-left: 20px;
-    padding: 0;
 }
 
 .username {
@@ -42,26 +12,20 @@ main {
     color: #F0E4D8;
 }
 
-.title {
-    text-decoration: none;
-    color: #F0E4D8;
-}
-
-.back_to_mp {
-    flex: 0 0 auto;
-    margin-right: 20px;
-}
-
-.back_to_mp a {
+header{
+    width: 100%;
+    background: #DD8E75;
+    height: 80px;
+    border: 1px solid #C9C9C9;
+    border-bottom-right-radius: 25px;
+    border-bottom-left-radius: 25px;
+    margin-bottom: 30px;
     display: flex;
     align-items: center;
 }
 
-.title {
-    flex: 1;
-    text-align: center;
-    font-size: 30px;
-    color: #F0E4D8;
+body {
+  margin: 0px;
 }
 
 .name{
@@ -72,94 +36,124 @@ main {
     right: 120px;
 }
 
-.username {
+.blocks {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.settings {
+    width: 27%;
+    background-color: #DD8E75;
+    height: 680px;
+    border: 1px solid #C9C9C9;
+    border-radius: 25px;
+    margin-left: 150px;
+    display: flex;
+    flex-direction: column;
+}
+
+.info {
+    width: 50%;
+    background-color: #FFFFFF;
+    height: 640px;
+    border: 1px solid #C9C9C9;
+    border-radius: 25px;
+    margin-left: 20px;
+    padding: 20px;
+}
+
+a {
     text-decoration: none;
     color: #F0E4D8;
 }
 
-.note-content {
-  font-size: 18px; /* Уменьшите размер шрифта */
-  padding: 5px;
-  color: #B14F44;
-  white-space: pre-wrap;
-  word-wrap: break-word;
+p {
+    font-size: 27px;
+    padding: 10px 20px;
+    margin-top: 5px;
 }
 
-.note-content:focus {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.note-content:empty:before {
-    content: attr(data-placeholder);
-    color: #888;
-}
-
-.text {
-    margin: 5px 0;
-    color: #B14F44;
-    font-size: 25px;
-    width: calc(100% - 20px)
-    word-wrap: break-word;
-    text-align: left;
-}
-
-.all_texts {
-    position: relative;
-    width: calc(100% - 20px);
-}
-
-.new-note-area {
-    width: 100%;
-}
-
-.share{
+.s1 {
     background-color: #DD8E75;
-    border: none;
-    margin: 0px;
+    transition: background-color 0.2s ease;
 }
 
+.s1:hover {
+    background-color: #B14F44;
+}
 
-.confirmBtn {
+.top, .bottom {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.top {
+    flex-grow: 1;
+}
+
+.bottom {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.back_to_mp {
+    position: absolute;
+    margin: 0px;
+    font-size: 30px;
+    display: flex;
+    align-items: center;
+}
+
+h {
+    font-size: 27px;
+    font-weight: 300px;
+    margin-left: 20px;
+    margin-top: 15px;
+}
+
+.in {
+    border: 1px solid #C9C9C9;
+    border-radius: 10px;
+    height: 25px;
+    color: #000000;
+    font-family: "Philosopher", sans-serif;
+    padding: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    display: block;
+    width: 50%;
+}
+
+.form{
+    font-size: 25px;
+}
+
+.change {
     padding: 10px 20px;
     font-family: "Philosopher", sans-serif;
-    width: 43%;
+    width: 53%;
     margin-bottom: 25px;
     margin-top: 10px;
     background-color: #B14F44;
     color: #F0E4D8;
-    font-size: 15px;
+    font-size: 20px;
     border: 1px solid #C9C9C9;
     border-radius: 10px;
-    height: 40px;
 }
 
+.txt{
+    font-size:20px;
+    padding: 8px 0px 0px 0px;
 
-input {
-    border: 1px solid #C9C9C9;
-    border-radius: 10px;
-    height: 46px;
-    color: #000000;
+}
+
+.section-title {
     font-family: "Philosopher", sans-serif;
-    padding: 10px;
-    margin-bottom: 10px;
-    width: 75%;
-    text-align: center;
-}
-
-.modal {
-    display: none;
-    border-radius: 20px;
-    border: 1px solid #C9C9C9;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    text-align: center;
-    position: fixed;
-    background-color: rgba(0, 0, 0, 0.5);
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+    font-weight: 300px;
+    margin: 0px;
+    font-size: 27px;
 }
 
 .user_photo {
@@ -176,150 +170,127 @@ input {
 	top: 6px;
 }
 
+.reg {
+    width: 53%;
+    height: 35px;
+    border: none;
+    border-radius: 8px;
+    background-color: #B14F44;
+    color: #F0E4D8;
+    font-size: 16px;
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    font-family: "Philosopher", sans-serif;
+}
+
+.section-title {
+    margin-bottom: 5px;
+}
+
+label {
+    margin-top: 20px;
+}
+
 .container {
     display: flex;
     align-items: center;
     justify-content: flex-end;
 }
 
-a {
-    text-decoration: none;
-    color: #F0E4D8;
+.photo_info {
+    margin: 5px;
 }
 
-.back{
-    background-color: #FFFFFF;
-    border: 1px solid #C9C9C9;
-    width: 100%;
-    border-radius: 20px;
-}
-
-.closeBtn {
-    position: absolute;
-    top: 75px;
-    left: 20px;
-    background: none;
+.user_photo_info {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
     border: none;
-    cursor: pointer;
 }
 
-
-.input_todo{
-    width: 50%;
-    padding: 10px;
-    border: 1px solid #C9C9C9;
-    border-radius: 10px;
-    font-family: "Philosopher", sans-serif;
-}
-
-.add_btn{
-    background-color: #F0E4D8;
-    width: 30px;
-    height: 30px;
-    border: none;
-    margin-left: 20px;
-}
-
-#todoList input[type="checkbox"] {
-  width: 15px;
-  height: 15px;
-  margin-left: 20px;
-}
-
-.todo_title {
-    padding: 10px 0px;
-    font-size: 23px;
-    color: #B14F44;
-    margin-left: 20px;
-}
-
-.modal_todo {
+input[type="file"] {
     display: none;
-    border-radius: 20px;
+}
+
+.confirm-photo-btn {
+    width: 53%;
+    height: 35px;
+    border: none;
+    border-radius: 8px;
+    background-color: #B14F44;
+    color: #F0E4D8;
+    font-size: 16px;
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    font-family: "Philosopher", sans-serif;
+}
+
+.notif {
+    width: 50%;
+    background-color: #FFFFFF;
+    height: 640px;
     border: 1px solid #C9C9C9;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    text-align: center;
-    position: fixed;
-    background-color: rgba(0, 0, 0, 0.5);
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.content_todo {
-    width: 30%;
-    justify-content: center;
-    align-items: center;
-}
-
-.in {
-    margin-top: 20px;
-}
-
-.todo_input {
-    font-size: 15px;
-}
-
-.images {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
+    border-radius: 25px;
+    margin-left: 20px;
     padding: 20px;
-    width: 100%;
-    max-width: 800px;
-    margin: 0 auto;
 }
 
-.images img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
 }
 
-.save_img {
-    width: 7%;
-    height: 13px;
-    border: none;
-    border-radius: 8px;
-    background-color: #B14F44;
-    color: #F0E4D8;
-    font-size: 10px;
-    display: block;
-    margin-top: 10px;
-    margin-bottom: 20px;
-    font-family: "Philosopher", sans-serif;
-
-.images {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    padding: 20px;
-    width: 100%;
-    max-width: 800px;
-    margin: 0 auto;
+.switch input {
+    display:none;
 }
 
-.images img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
 }
 
-.save_img {
-    width: 7%;
-    height: 13px;
-    border: none;
-    border-radius: 8px;
-    background-color: #B14F44;
-    color: #F0E4D8;
-    font-size: 10px;
-    display: block;
-    margin-top: 10px;
-    margin-bottom: 20px;
-    font-family: "Philosopher", sans-serif;
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #B14F44;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
 }
