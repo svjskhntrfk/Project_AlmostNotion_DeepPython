@@ -141,6 +141,14 @@ class Board(Base):
         lazy="joined"
     )
 
+
+    images: Mapped[List["ImageBoard"]] = relationship(
+        "ImageBoard",
+        back_populates="board",
+        cascade="all, delete-orphan",
+        lazy="joined"
+    )
+
     todo_lists: Mapped[List["ToDoList"]] = relationship(
         "ToDoList",
         back_populates="board",
@@ -150,6 +158,23 @@ class Board(Base):
 
 
 class Image(Base):
+    _file_storage = media_storage
+    
+    id: Mapped[UUID] = mapped_column(pgUUID, primary_key=True, default=uuid.uuid4)
+    file: Mapped[str] = mapped_column(FilePath(_file_storage), nullable=True)
+
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
+    user: Mapped["User"] = relationship("User", secondary=user_image_association, back_populates="images", lazy="joined")
+    
+    @property
+    def storage(self):
+        return self._file_storage
+
+    @property
+    def url(self):
+        from config import settings
+        return f"http://{settings.MINIO_DOMAIN}/{settings.MINIO_MEDIA_BUCKET}/{self.file}"
+
 
     id: Mapped[UUID] = mapped_column(pgUUID(as_uuid=True), primary_key=True, default=uuid4)
 
@@ -173,11 +198,31 @@ class IssuedJWTToken(Base):
     expired_time: Mapped[int] = mapped_column(Integer, nullable=False)
 
 
+
 class ToDoList(Base):
     title: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     deadline: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
     board_id: Mapped[int] = mapped_column(ForeignKey("boards.id"), nullable=False)
+
+class ImageBoard(Base):
+    _file_storage = media_storage
+    
+    id: Mapped[UUID] = mapped_column(pgUUID, primary_key=True, default=uuid.uuid4)
+    file: Mapped[str] = mapped_column(FilePath(_file_storage), nullable=True)
+
+    board_id: Mapped[int] = mapped_column(Integer, ForeignKey("boards.id"))
+    board: Mapped["Board"] = relationship("Board", back_populates="images", lazy="joined")
+
+    @property
+    def storage(self):
+        return self._file_storage
+
+    @property
+    def url(self):
+        from config import settings
+        return f"http://{settings.MINIO_DOMAIN}/{settings.MINIO_MEDIA_BUCKET}/{self.file}"
+      
     board: Mapped["Board"] = relationship("Board", back_populates="todo_lists", lazy="joined")
 
     tasks: Mapped[List["Task"]] = relationship(
@@ -187,12 +232,10 @@ class ToDoList(Base):
         lazy="joined"
     )
 
-
 class Task(Base):
     title: Mapped[str] = mapped_column(String, nullable=False)
     completed: Mapped[bool] = mapped_column(Boolean, default=False)
     deadline: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
-
     todo_list_id: Mapped[int] = mapped_column(ForeignKey("todolists.id"), nullable=False)
     todo_list: Mapped["ToDoList"] = relationship("ToDoList", back_populates="tasks", lazy="joined")
 
@@ -223,3 +266,4 @@ class Notification(Base):
         back_populates="notifications",
         lazy="joined"
     )
+

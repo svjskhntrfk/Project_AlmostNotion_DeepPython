@@ -186,3 +186,10 @@ a {
     align-items: center;
     justify-content: flex-end;
 }
+
+.img_icon {
+    width: 50px;
+    justify-content: flex-start;
+    margin: 15px 22px;
+    border: none;
+}

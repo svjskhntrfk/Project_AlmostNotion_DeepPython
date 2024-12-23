@@ -59,16 +59,31 @@ async def board_page(board_id: str, request: Request, session: AsyncSession = De
         print("todo_list", todo_list)
         print("todo_list.tasks", todo_list.tasks)
     print("board", board.todo_lists)
+    user_images = await get_images_by_user_id(user.id, session=session)
+    
+    # Получаем URL последнего изображения
+    image_url = None
+    print(user_images)
+    if user_images:
+        latest_image = user_images[-1]
+        # Используем свойство url из ImageSchema
+        image_url = latest_image.url
+    
+    board_images = await get_images_by_board_id(int(board_id), session=session)
+    images_url = [image.url for image in board_images]
+    print(images_url)
     return templates.TemplateResponse(
         "article.html",
-        {
+        {   
             "request": request,
             "user_id": user.id,
             "board_id": board_id,
             "texts": board.content["texts"],
             "todo_lists": board.todo_lists,
             "username" : user.username,
-            "title" : board.title
+            "board_images" : images_url,
+            "title" : board.title,
+            "image_url" : image_url
         }
     )
 
@@ -330,4 +345,17 @@ async def update_todo_list(
         new_deadline=None,
         session=session
     )
+
     return {"status": "success"}
+
+@router.post("/main_page/{board_id}/add_collaborator")
+async def add_board_collaborator( board_id: str, email_collaborator = Form(), session: AsyncSession = Depends(get_session)):
+    new_collaborator = await is_email_registered(str(email_collaborator), session)
+    await add_collaborator(int(new_collaborator.id), int(board_id), session)
+    return {'status': 'success'}
+
+@router.post("/main_page/{board_id}/add_image")
+async def add_image_on_board(board_id: str, file: UploadFile, session: AsyncSession = Depends(get_session)):
+    await save_image_on_board(int(board_id), file, session)
+    return {'status': 'success'}    
+

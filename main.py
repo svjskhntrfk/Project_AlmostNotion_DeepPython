@@ -78,24 +78,7 @@ async def read_root(request: Request):
     """
     return templates.TemplateResponse("landing.html", {"request": request})
 
-@app.get("/registration", response_class=HTMLResponse)
-async def registration_page(request: Request):
-    """
-    Get-запрос, отображает страницу регистрации
 
-    Параметры:
-        request (Request): Объект HTTP-запроса
-    """
-    return templates.TemplateResponse("reg.html", {"request": request})
 
-@app.get("/login", response_class=HTMLResponse)
-async def login_page(request: Request):
-    """
-    Отображает страницу входа
-
-    Параметры:
-        request (Request): Объект HTTP-запроса.
-    """
-    return templates.TemplateResponse("entry.html", {"request": request})
 
 
