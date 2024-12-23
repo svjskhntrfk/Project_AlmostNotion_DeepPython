@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     DB_HOST: str
     DB_PORT: int
     DB_NAME: str
+    
 
     #MODE : str
     MINIO_ROOT_USER : str

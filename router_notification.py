@@ -1,34 +1,51 @@
 import smtplib
 from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import select
-import config 
+from config import settings
+from models import Notification
 
-def send_email_after_register(email,subject, message):
-   from_email = config.GMAIL_FROM
-   from_password = config.GMAIL_PASSWORD
-   to_email = email
+def send_email_after_register(email, subject, message):
+    try:
+        # Создаем объект MIMEMultipart
+        msg = MIMEMultipart()
+        msg['From'] = settings.GMAIL_FROM
+        msg['To'] = email
+        msg['Subject'] = subject
 
-   message = f"""
-   <h1>Привет, {email}!</h1>
-   <p>Ты успешно зарегистрировался в MindSpace.</p>
-   <p>Теперь ты можешь начать использовать нашу платформу для управления задачами и проектами.</p>
-   <p>Если у тебя возникнут вопросы или нужна помощь, обращайся к нам.</p>
-   <p>Спасибо, что выбрал MindSpace!</p>
-   """
+        # Добавляем HTML-контент
+        html_message = f"""
+        <html>
+            <body>
+                <h1>Привет!</h1>
+                <p>Ты успешно зарегистрировался в MindSpace.</p>
+                <p>Теперь ты можешь начать использовать нашу платформу для управления задачами и проектами.</p>
+                <p>Если у тебя возникнут вопросы или нужна помощь, обращайся к нам.</p>
+                <p>Спасибо, что выбрал MindSpace!</p>
+            </body>
+        </html>
+        """
+        msg.attach(MIMEText(html_message, 'html'))
 
-   msg = MIMEText(message, 'html')
-   msg['Subject'] = subject
-   msg['To'] = to_email
-   msg['From'] = from_email
-
-
-   gmail = smtplib.SMTP('smtp.gmail.com', 587)
-   gmail.ehlo()
-   gmail.starttls()
-   gmail.login(from_email, from_password)
-   gmail.send_message(msg)
+        # Создаем SMTP-соединение
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        
+        # Логинимся
+        server.login(settings.GMAIL_FROM, settings.GMAIL_PASSWORD)
+        
+        # Отправляем письмо
+        server.send_message(msg)
+        
+        # Закрываем соединение
+        server.quit()
+        
+        return True
+    except Exception as e:
+        print(f"Ошибка при отправке email: {str(e)}")
+        return False
 
 
 def send_email_before_deadline(email,subject, message):
