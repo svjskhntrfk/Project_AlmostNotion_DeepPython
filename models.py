@@ -93,15 +93,20 @@ class Board(Base):
         back_populates="owned_boards",
         lazy='joined'
     )
-    
-    # Пользоватеи, имеющие доступ к доске
+
     collaborators: Mapped[List["User"]] = relationship(
         "User",
         secondary=board_collaborators,
         back_populates="boards",
         lazy='joined'
     )
-    
+
+    todo_lists: Mapped[List["ToDoList"]] = relationship(
+        "ToDoList",
+        back_populates="board",
+        cascade="all, delete-orphan",
+        lazy="joined"
+    )
 
 class Image(Base):
     _file_storage = media_storage
@@ -139,3 +144,24 @@ class IssuedJWTToken(Base):
     def __str__(self) -> str:
         return f'{self.subject}: {self.jti}'
 
+class ToDoList(Base):
+    title: Mapped[str] = mapped_column(String, nullable=True)
+    deadline: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+    board_id: Mapped[int] = mapped_column(ForeignKey('boards.id'), nullable=False)
+    board: Mapped["Board"] = relationship("Board", back_populates="todo_lists", lazy="joined")
+
+    tasks: Mapped[List["Task"]] = relationship(
+        "Task",
+        back_populates="todo_list",
+        cascade="all, delete-orphan",
+        lazy="joined"
+    )
+
+class Task(Base):
+    title: Mapped[str] = mapped_column(String, nullable=False)
+    completed: Mapped[bool] = mapped_column(Boolean, default=False)
+    deadline: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+    todo_list_id: Mapped[int] = mapped_column(ForeignKey('todolists.id'), nullable=False)
+    todo_list: Mapped["ToDoList"] = relationship("ToDoList", back_populates="tasks", lazy="joined")
