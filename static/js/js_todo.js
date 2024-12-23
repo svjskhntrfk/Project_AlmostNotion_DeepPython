@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: JSON.stringify({
                     title: title,
-                    text: "Новая задача"  // Default first task
+                    text: "Новая задача, нажмите, чтобы изменить"  
                 })
             });
 
@@ -45,7 +45,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
             currentTodoListId = data.to_do_list_id;
 
-            // Create and append new todo list
             const todoListElement = document.createElement('div');
             todoListElement.className = 'todo-list';
             todoListElement.setAttribute('data-todo-list-id', currentTodoListId);
@@ -59,10 +58,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
             todoList.appendChild(todoListElement);
 
-            // Hide the modal after submission
             modal.style.display = 'none';
 
-            // Show input for additional tasks
             todoInputContainer.style.display = 'block';
             todoInput.focus();
 
@@ -72,7 +69,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Input for new tasks
     todoInput.addEventListener('keydown', async function(event) {
         if (event.key === 'Enter') {
             const text = this.value.trim();
@@ -105,7 +101,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Create task element helper function
     function createTaskElement(text, taskId, isChecked) {
         const taskElement = document.createElement('div');
         taskElement.className = 'todo-task';
