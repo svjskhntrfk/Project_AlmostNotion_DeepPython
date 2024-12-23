@@ -114,7 +114,6 @@ class Image(Base):
     
     id: Mapped[UUID] = mapped_column(pgUUID, primary_key=True, default=uuid.uuid4)
     file: Mapped[str] = mapped_column(FilePath(_file_storage), nullable=True)
-    is_main: Mapped[bool] = mapped_column(Boolean, default=False)
 
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
     user: Mapped["User"] = relationship("User", secondary=user_image_association, back_populates="images", lazy="joined")
