@@ -50,7 +50,6 @@ async def upload_user_image(
     try:
         # Добавляем логирование
         print(f"Uploading file: {file.filename}, size: {file.size}, content_type: {file.content_type}")
-        
         # Validate file size (5MB limit)
         if file.size > 5 * 1024 * 1024:
             raise HTTPException(
@@ -99,9 +98,9 @@ async def get_image_url(image_id: str, session: AsyncSession = Depends(get_sessi
 @router.get("/media/{file_path:path}")
 async def get_media(file_path: str):
     """
-    Получение медиа-файла из MinIO
+    Получение медиа-файла из S3
     """
-    url = f"http://{settings.MINIO_DOMAIN}/{settings.MINIO_MEDIA_BUCKET}/{file_path}"
+    url = f"{settings.S3_ENDPOINT}/{settings.S3_BUCKET}/{file_path}"
     return RedirectResponse(url)
 
 

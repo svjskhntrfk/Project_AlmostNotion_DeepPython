@@ -176,7 +176,7 @@ class Image(Base):
     @property
     def url(self):
         from config import settings
-        return f"http://{settings.MINIO_DOMAIN}/{settings.MINIO_MEDIA_BUCKET}/{self.file}"
+        return f"{settings.S3_ENDPOINT}/{settings.S3_BUCKET}/{self.file}"
 
 
     

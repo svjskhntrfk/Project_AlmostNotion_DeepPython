@@ -15,13 +15,13 @@ class S3AsyncClient:
     _cached_session = None
 
     def __init__(self):
-        self.endpoint_domain = settings.MINIO_DOMAIN
-        self.use_ssl = settings.MINIO_USE_SSL
+        self.endpoint_domain = "s3.regru.cloud"
+        self.use_ssl = False
         if S3AsyncClient._cached_session is None:
             S3AsyncClient._cached_session = aioboto3.Session(
-                aws_access_key_id=settings.MINIO_ACCESS_KEY,
-                aws_secret_access_key=settings.MINIO_SECRET_KEY,
-                region_name=settings.MINIO_REGION_NAME
+                aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+                aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+                region_name=settings.S3_REGION
             )
         self.endpoint_url = self._get_endpoint_url()
 

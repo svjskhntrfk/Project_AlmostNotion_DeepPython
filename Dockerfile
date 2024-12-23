@@ -2,26 +2,25 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install system dependencies
+# Установка только необходимых системных пакетов
 RUN apt-get update && apt-get install -y \
     curl \
     gcc \
     python3-dev \
-    postgresql-client \
-    libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first to leverage Docker cache
+# Копируем только requirements.txt сначала
 COPY requirements.txt .
-RUN pip install --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
 
-# Copy project files
+# Устанавливаем зависимости с оптимизациями
+RUN pip install --no-cache-dir -r requirements.txt \
+    --compile \
+    --no-deps \
+    --disable-pip-version-check
+
 COPY . .
-
-# Create directory for static files
 RUN mkdir -p static
 
-# Command to run the application
+EXPOSE 8000
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
