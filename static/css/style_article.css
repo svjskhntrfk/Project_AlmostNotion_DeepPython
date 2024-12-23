@@ -231,3 +231,17 @@ a {
     height: auto;
     border-radius: 8px;
 }
+
+.save_img {
+    width: 7%;
+    height: 13px;
+    border: none;
+    border-radius: 8px;
+    background-color: #B14F44;
+    color: #F0E4D8;
+    font-size: 10px;
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    font-family: "Philosopher", sans-serif;
+}
