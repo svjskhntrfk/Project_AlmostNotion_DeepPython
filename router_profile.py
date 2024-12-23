@@ -99,7 +99,7 @@ async def profile_page(request: Request, session: AsyncSession = Depends(get_ses
         # Используем свойство url из ImageSchema
         image_url = latest_image.url
 
-    print(f"Image URL: {image_url}")  # Для отладки
+    print(f"Image URL: {image_url}")
 
     return templates.TemplateResponse(
         "profile.html",

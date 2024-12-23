@@ -62,7 +62,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Handle line breaks and preserve them
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -70,10 +69,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Handle existing notes editing with debounce
     const debouncedSave = debounce((textId, newText) => {
         saveNoteChanges(textId, newText);
-    }, 500); // Reduced debounce time for better responsiveness
+    }, 500);
 
     notesContainer.addEventListener('input', (e) => {
         const noteContent = e.target.closest('.note-content');
@@ -84,7 +82,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Handle new note creation
     let isCreatingNote = false;
     newNote.addEventListener('input', debounce(async (e) => {
         if (isCreatingNote) return;

@@ -48,16 +48,13 @@ async def upload_user_image(
     - File will be validated before upload
     """
     try:
-        # Добавляем логирование
         print(f"Uploading file: {file.filename}, size: {file.size}, content_type: {file.content_type}")
-        # Validate file size (5MB limit)
         if file.size > 5 * 1024 * 1024:
             raise HTTPException(
                 status_code=413,
                 detail="File too large. Maximum size is 5MB"
             )
         
-        # Validate file type
         content_type = file.content_type
         if content_type not in ["image/jpeg", "image/png", "image/gif"]:
             raise HTTPException(

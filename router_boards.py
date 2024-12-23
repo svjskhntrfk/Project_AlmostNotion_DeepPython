@@ -146,15 +146,13 @@ async def add_todo_list_on_board(
     print('title', title)
     text = data.get("text")
     print('text', text)
-    deadline_str = data.get("deadline")  # Expected format: "YYYY-MM-DD HH:MM"
+    deadline_str = data.get("deadline") 
     print('deadline_str', deadline_str)
-    # Convert deadline string to datetime if provided
     deadline = None
     if deadline_str:
         try:
             deadline = datetime.strptime(deadline_str, "%Y-%m-%d %H:%M")
             
-            # Get the board owner and collaborators for notifications
             board = await get_board_with_todo_lists(int(board_id), session)
             query = (
                 select(User)
@@ -164,14 +162,12 @@ async def add_todo_list_on_board(
             result = await session.execute(query)
             users = result.scalars().all()
             
-            # Schedule notifications for 24 hours before deadline
             notification_time = deadline - timedelta(hours=24)
             print('notification_time', notification_time)
             print("notification_time", notification_time)
             print("deadline", deadline) 
             if notification_time > datetime.now():
                 for user in users:
-                    # Prepare notification message
                     subject = f"Deadline Reminder: {text}"
                     message = f"""
                     <html>
@@ -211,15 +207,13 @@ async def add_todo_list_item_on_board(
     """
     text = data.get("text")
     to_do_list_id = data.get("to_do_list_id")
-    deadline_str = data.get("deadline")  # Expected format: "YYYY-MM-DD HH:MM"
+    deadline_str = data.get("deadline") 
     
-    # Convert deadline string to datetime if provided
     deadline = None
     if deadline_str:
         try:
             deadline = datetime.strptime(deadline_str, "%Y-%m-%d %H:%M")
             
-            # Get the board owner and collaborators for notifications
             board = await get_board_with_todo_lists(int(board_id), session)
             query = (
                 select(User)
@@ -229,13 +223,11 @@ async def add_todo_list_item_on_board(
             result = await session.execute(query)
             users = result.scalars().all()
             
-            # Schedule notifications for 24 hours before deadline
             notification_time = deadline - timedelta(hours=24)
             print("notification_time", notification_time)
             print("deadline", deadline) 
             if notification_time > datetime.now():
                 for user in users:
-                    # Prepare notification message
                     subject = f"Deadline Reminder: {text}"
                     message = f"""
                     <html>
@@ -260,7 +252,6 @@ async def add_todo_list_item_on_board(
         except ValueError as e:
             raise HTTPException(status_code=400, detail="Invalid deadline format")
     
-    # Create the task with deadline
     to_do_list_new_item = await create_task(
         int(to_do_list_id), 
         text, 
