@@ -122,18 +122,7 @@ async def registration(
                 }
             )
 
-        # Validate email
-        is_valid, error_message = await validate_email_address(email)
-        if not is_valid:
-            logger.warning(f"Invalid email during registration: {error_message}")
-            return templates.TemplateResponse(
-                "reg.html",
-                {
-                    "request": request,
-                    "email_error": f"Неверный email: {error_message}",
-                    "username": username
-                }
-            )
+        
 
         user_credentials = UserCredentialsDTO(
             email=email,
@@ -165,7 +154,7 @@ async def registration(
         
         subject = "Successfully registered"
         message = "Hey %s, you have successfully registered in the MindSpace." % (username)
-        send_email_after_register(email, subject, message)
+        
 
         logger.info(f"Successfully registered user with email: {email}")
         return RedirectResponse(
