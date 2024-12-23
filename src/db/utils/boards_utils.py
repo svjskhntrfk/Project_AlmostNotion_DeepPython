@@ -1,6 +1,7 @@
 from ..models import *
 from ..database import *
-
+from src.backend.crud.image_crud import *
+from .user_utils import get_user_by_id
 
 async def create_board(user_id: int, title: str, session: AsyncSession):
     """

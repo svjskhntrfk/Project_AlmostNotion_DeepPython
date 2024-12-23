@@ -17,7 +17,7 @@ def get_auth_service() -> AuthService:
     return AuthService(jwt_auth=JWTAuth(config=jwt_config))
 
 
-templates = Jinja2Templates(directory="src/front/templates")
+templates = Jinja2Templates(directory="templates")
 
 router = APIRouter(
     prefix="/profile",
@@ -98,7 +98,7 @@ async def profile_page(request: Request, session: AsyncSession = Depends(get_ses
         # Используем свойство url из ImageSchema
         image_url = latest_image.url
 
-    print(f"Image URL: {image_url}")  # Для отладки
+    print(f"Image URL: {image_url}")
 
     return templates.TemplateResponse(
         "profile.html",

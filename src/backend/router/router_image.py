@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..auth import check_access_token
 from starlette.requests import Request
 from src.db.cfg import settings
+from src.db.utils.image_utils import get_images_by_user_id, delete_image
 
 router = APIRouter(
     prefix="/image",
@@ -48,17 +49,13 @@ async def upload_user_image(
     - File will be validated before upload
     """
     try:
-        # Добавляем логирование
         print(f"Uploading file: {file.filename}, size: {file.size}, content_type: {file.content_type}")
-        
-        # Validate file size (5MB limit)
         if file.size > 5 * 1024 * 1024:
             raise HTTPException(
                 status_code=413,
                 detail="File too large. Maximum size is 5MB"
             )
         
-        # Validate file type
         content_type = file.content_type
         if content_type not in ["image/jpeg", "image/png", "image/gif"]:
             raise HTTPException(
@@ -99,8 +96,7 @@ async def get_image_url(image_id: str, session: AsyncSession = Depends(get_sessi
 @router.get("/media/{file_path:path}")
 async def get_media(file_path: str):
     """
-    Получение медиа-файла из MinIO
+    Получение медиа-файла из S3
     """
-    url = f"http://{settings.MINIO_DOMAIN}/{settings.MINIO_MEDIA_BUCKET}/{file_path}"
+    url = f"{settings.S3_ENDPOINT}/{settings.S3_BUCKET}/{file_path}"
     return RedirectResponse(url)
-
