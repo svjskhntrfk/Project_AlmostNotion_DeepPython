@@ -68,7 +68,7 @@ async def board_page(board_id: str, request: Request, session: AsyncSession = De
             "texts": board.content["texts"],
             "todo_lists": board.todo_lists,
             "username" : user.username,
-            "title" : board[0],
+            "title" : board.title,
             "image_url" : image_url
         }
     )
