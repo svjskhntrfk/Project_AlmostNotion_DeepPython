@@ -16,7 +16,6 @@ from ..auth import jwt_config
 def get_auth_service() -> AuthService:
     return AuthService(jwt_auth=JWTAuth(config=jwt_config))
 
-
 templates = Jinja2Templates(directory="src/front/templates")
 
 router = APIRouter(
