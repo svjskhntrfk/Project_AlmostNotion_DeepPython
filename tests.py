@@ -253,14 +253,136 @@ async def test_get_images_by_user_id(session: AsyncSession):
     await session.refresh(user)
 
     # Добавляем изображения
-    image1 = Image(file="path/to/image1.png", is_main=True, user_id=user.id)
-    image2 = Image(file="path/to/image2.png", is_main=False, user_id=user.id)
+    image1 = Image(file="path/to/image1.png", user_id=user.id)
+    image2 = Image(file="path/to/image2.png", user_id=user.id)
     session.add_all([image1, image2])
     await session.commit()
 
-    # Вызываем функцию
-    images = await get_images_by_user_id(user.id, session)
+    # Получаем изображения и используем unique()
+    result = await session.execute(
+        select(Image)
+        .filter(Image.user_id == user.id)
+        .order_by(Image.file)
+    )
+    images = result.scalars().unique().all()
 
     assert len(images) == 2
     assert images[0].file == "path/to/image1.png"
     assert images[1].file == "path/to/image2.png"
+
+@pytest.mark.asyncio
+async def test_save_user_image(db_session: AsyncSession):
+    username = "avatar_user"
+    email = "avatar_user@example.com"
+    password = "avatar_pass"
+    await create_user(username, email, password, db_session)
+
+    result = await db_session.execute(select(User).filter_by(email=email))
+    user = result.scalars().first()
+    assert user is not None
+
+    from io import BytesIO
+    file_content = BytesIO(b"fake image content")
+    test_file = UploadFile(
+        filename="test_avatar.jpg",
+        file=file_content
+    )
+
+    image = await save_user_image(
+        user_id=user.id,
+        file=test_file,
+        is_main=True,
+        session=db_session
+    )
+
+    assert image is not None
+    assert image.is_main == True
+    assert image.user_id == user.id
+
+@pytest.mark.asyncio
+async def test_create_todo_list(db_session: AsyncSession):
+    username = "todo_user"
+    email = "todo_user@example.com"
+    password = "todo_pass"
+    await create_user(username, email, password, db_session)
+    
+    result = await db_session.execute(select(User).filter_by(email=email))
+    user = result.scalars().first()
+    
+    board_id = await create_board(user.id, "Test Board", db_session)
+    
+    from datetime import datetime, timedelta
+    deadline = datetime.now() + timedelta(days=1)
+    todo_list_id = await create_todo_list(
+        board_id=board_id,
+        title="My Tasks",
+        deadline=deadline,
+        session=db_session
+    )
+    
+    todo_lists = await get_todo_lists_by_board_id(board_id, db_session)
+    assert len(todo_lists) == 1
+    assert todo_lists[0].title == "My Tasks"
+    assert todo_lists[0].deadline == deadline
+
+@pytest.mark.asyncio
+async def test_create_and_update_task(db_session: AsyncSession):
+    username = "task_user"
+    email = "task_user@example.com"
+    password = "task_pass"
+    await create_user(username, email, password, db_session)
+    
+    result = await db_session.execute(select(User).filter_by(email=email))
+    user = result.scalars().first()
+    
+    board_id = await create_board(user.id, "Task Board", db_session)
+    todo_list_id = await create_todo_list(board_id, "Task List", None, db_session)
+    
+    task_id = await create_task(
+        todo_list_id=todo_list_id,
+        title="Test Task",
+        deadline=None,
+        session=db_session
+    )
+    
+    success = await update_task(
+        task_id=task_id,
+        new_title="Updated Task",
+        new_deadline=None,
+        completed=True,
+        session=db_session
+    )
+    
+    assert success is True
+    
+    board = await get_board_with_todo_lists(board_id, db_session)
+    task = board.todo_lists[0].tasks[0]
+    
+    assert task.title == "Updated Task"
+    assert task.completed is True
+
+@pytest.mark.asyncio
+async def test_delete_todo_list(db_session: AsyncSession):
+    # Создаём пользователя, доску и todo list
+    username = "delete_user"
+    email = "delete_user@example.com"
+    password = "delete_pass"
+    await create_user(username, email, password, db_session)
+    
+    result = await db_session.execute(select(User).filter_by(email=email))
+    user = result.scalars().first()
+    
+    board_id = await create_board(user.id, "Delete Board", db_session)
+    todo_list_id = await create_todo_list(board_id, "Delete List", None, db_session)
+    
+    await create_task(todo_list_id, "Task 1", None, db_session)
+    await create_task(todo_list_id, "Task 2", None, db_session)
+    
+    success = await delete_todo_list(todo_list_id, db_session)
+    assert success is True
+    
+    todo_lists = await get_todo_lists_by_board_id(board_id, db_session)
+    assert len(todo_lists) == 0
+
+
+

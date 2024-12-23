@@ -6,12 +6,16 @@ from fastapi.templating import Jinja2Templates
 from passlib.context import CryptContext
 from starlette.requests import Request
 from starlette.responses import HTMLResponse
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from router_notification import check_and_send_notifications
+from datetime import datetime, timedelta
 
 from database import *
 from auth.transport.router_reg import router as reg_router
 from router_boards import router as board_router
 from router_profile import router as profile_router
 from router_image import  router as image_router
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
@@ -54,6 +58,16 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
 
+# Настраиваем планировщик для проверки дедлайнов TodoList
+scheduler = AsyncIOScheduler()
+scheduler.add_job(
+    check_and_send_notifications,
+    'interval',
+    seconds=30,  # проверяем каждые 30 секунд
+    kwargs={'session': async_session_maker()}
+)
+scheduler.start()
+
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     """
@@ -64,24 +78,7 @@ async def read_root(request: Request):
     """
     return templates.TemplateResponse("landing.html", {"request": request})
 
-@app.get("/registration", response_class=HTMLResponse)
-async def registration_page(request: Request):
-    """
-    Get-запрос, отображает страницу регистрации
 
-    Параметры:
-        request (Request): Объект HTTP-запроса
-    """
-    return templates.TemplateResponse("reg.html", {"request": request})
 
-@app.get("/login", response_class=HTMLResponse)
-async def login_page(request: Request):
-    """
-    Отображает страницу входа
-
-    Параметры:
-        request (Request): Объект HTTP-запроса.
-    """
-    return templates.TemplateResponse("entry.html", {"request": request})
 
 
