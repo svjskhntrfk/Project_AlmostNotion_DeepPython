@@ -8,6 +8,7 @@ from starlette.requests import Request
 from starlette.responses import HTMLResponse
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from router_notification import check_and_send_notifications
+from datetime import datetime, timedelta
 
 from database import *
 from auth.transport.router_reg import router as reg_router
@@ -57,12 +58,12 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
 
-# Set up scheduler
+# Настраиваем планировщик для проверки дедлайнов TodoList
 scheduler = AsyncIOScheduler()
 scheduler.add_job(
     check_and_send_notifications,
     'interval',
-    minutes=15,  # Check every 15 minutes
+    seconds=30,  # проверяем каждые 30 секунд
     kwargs={'session': async_session_maker()}
 )
 scheduler.start()
