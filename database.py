@@ -427,43 +427,45 @@ async def save_user_image(user_id: int, file: UploadFile, session: AsyncSession)
         print(f"Traceback: {traceback.format_exc()}")
         raise
 
-async def get_images_by_user_id(user_id: int, session: AsyncSession) -> List[ImageDAOResponse]:
-    """
-    Get all images associated with a user through the many-to-many relationship.
-    """
-    logger.info(f"Getting images for user_id: {user_id}")
+async def get_images_by_user_id(user_id: int, session: AsyncSession) -> List[Image]:
+    print(f"Starting get_images_by_user_id for user_id: {user_id}")
     try:
-        # Query using the association table
-        stmt = (
+        user = await session.get(User, user_id)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        query = (
             select(Image)
-            .join(user_image_association)
-            .where(user_image_association.c.user_id == user_id)
-            .order_by(Image.created_at.desc())
+            .outerjoin(user_image_association, Image.id == user_image_association.c.image_id)
+            .where(or_(Image.user_id == user_id, user_image_association.c.user_id == user_id))
+            .options(selectinload(Image.user))  # Опционально: загрузка связанных пользователей
         )
-        
-        result = await session.execute(stmt)
-        images = result.scalars().all()
-        
-        # Get URLs for each image
-        image_responses = []
-        for image in images:
-            url = await image.storage.generate_url(image.file)
-            image_responses.append(ImageDAOResponse(image=image, url=url))
-            
-        logger.info(f"Successfully retrieved {len(image_responses)} images for user_id: {user_id}")
-        return image_responses
 
+        result = await session.execute(query)
+        images = result.scalars().all()
+
+        print(f"Retrieved {len(images)} images for user_id: {user_id}")
+        logger.info(f"Retrieved {len(images)} images for user_id: {user_id}")
+
+        return [ImageSchema.from_orm(image) for image in images]
+
+    except HTTPException as e:
+        print(f"HTTPException in get_images_by_user_id: {e.detail}")
+        logger.error(f"HTTPException in get_images_by_user_id: {e.detail}")
+        raise e
     except Exception as e:
-        logger.error(f"Error getting images for user_id {user_id}: {str(e)}")
-        logger.error(f"Traceback: {traceback.format_exc()}")
-        raise HTTPException(
-            status_code=500,
-            detail="Failed to retrieve user images"
-        )
+        print(f"Error in get_images_by_user_id: {str(e)}")
+        print(f"Error type: {type(e)}")
+        logger.error(f"Error in get_images_by_user_id: {str(e)}")
+        traceback_str = traceback.format_exc()
+        print(f"Traceback: {traceback_str}")
+        logger.error(f"Traceback: {traceback_str}")
+        raise RuntimeError("An unexpected error occurred while retrieving images.") from e
 
 async def get_image_url(image_id: str, session: AsyncSession) -> str:
     image = await image_dao.get(id=image_id, db_session=session)
     return image.url
+
 
 
 async def delete_image(image_id: UUID, session: AsyncSession) -> None:

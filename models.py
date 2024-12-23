@@ -19,9 +19,12 @@ from sqlalchemy.orm import (
 from sqlalchemy.ext.asyncio import AsyncAttrs, create_async_engine, async_sessionmaker
 from datetime import datetime
 from typing import List, Optional
+from sqlalchemy.dialects.postgresql import UUID as pgUUID
+from backend.src.conf.s3_storages import media_storage
+import uuid
 from uuid import uuid4, UUID
 from sqlalchemy.dialects.postgresql import UUID as pgUUID
-
+from sql_decorator import FilePath
 
 class Base(AsyncAttrs, DeclarativeBase):
     __abstract__ = True
@@ -71,7 +74,7 @@ user_image_association = Table(
     "user_image_association",
     Base.metadata,
     Column("user_id", Integer, ForeignKey("users.id"), primary_key=True),
-    Column("image_id", pgUUID(as_uuid=True), ForeignKey("images.id"), primary_key=True),
+    Column("image_id", pgUUID, ForeignKey("images.id"), primary_key=True)
 )
 
 
@@ -118,7 +121,7 @@ class User(Base):
     images: Mapped[List["Image"]] = relationship(
         "Image",
         secondary=user_image_association,
-        back_populates="users",
+        back_populates="user",
         lazy="joined"
     )
 
@@ -160,9 +163,9 @@ class Board(Base):
 class Image(Base):
     _file_storage = media_storage
     
-    id: Mapped[UUID] = mapped_column(pgUUID, primary_key=True, default=uuid.uuid4)
-    file: Mapped[str] = mapped_column(FilePath(_file_storage), nullable=True)
+    id: Mapped[UUID] = mapped_column(pgUUID(as_uuid=True), primary_key=True, default=uuid4)
 
+    file: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
     user: Mapped["User"] = relationship("User", secondary=user_image_association, back_populates="images", lazy="joined")
     
@@ -176,16 +179,7 @@ class Image(Base):
         return f"http://{settings.MINIO_DOMAIN}/{settings.MINIO_MEDIA_BUCKET}/{self.file}"
 
 
-    id: Mapped[UUID] = mapped_column(pgUUID(as_uuid=True), primary_key=True, default=uuid4)
-
-    file: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-
-    users: Mapped[List["User"]] = relationship(
-        "User",
-        secondary=user_image_association,
-        back_populates="images",
-        lazy="joined"
-    )
+    
 
 
 class IssuedJWTToken(Base):
@@ -200,10 +194,18 @@ class IssuedJWTToken(Base):
 
 
 class ToDoList(Base):
-    title: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    title: Mapped[str] = mapped_column(String, nullable=True)
     deadline: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
-    board_id: Mapped[int] = mapped_column(ForeignKey("boards.id"), nullable=False)
+    board_id: Mapped[int] = mapped_column(ForeignKey('boards.id'), nullable=False)
+    board: Mapped["Board"] = relationship("Board", back_populates="todo_lists", lazy="joined")
+
+    tasks: Mapped[List["Task"]] = relationship(
+        "Task",
+        back_populates="todo_list",
+        cascade="all, delete-orphan",
+        lazy="joined"
+    )
 
 class ImageBoard(Base):
     _file_storage = media_storage
@@ -222,15 +224,6 @@ class ImageBoard(Base):
     def url(self):
         from config import settings
         return f"http://{settings.MINIO_DOMAIN}/{settings.MINIO_MEDIA_BUCKET}/{self.file}"
-      
-    board: Mapped["Board"] = relationship("Board", back_populates="todo_lists", lazy="joined")
-
-    tasks: Mapped[List["Task"]] = relationship(
-        "Task",
-        back_populates="todo_list",
-        cascade="all, delete-orphan",
-        lazy="joined"
-    )
 
 class Task(Base):
     title: Mapped[str] = mapped_column(String, nullable=False)
