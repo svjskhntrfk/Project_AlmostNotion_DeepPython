@@ -1,5 +1,5 @@
-from src.core.database import DATABASE_URL
-from  src.core.models import *
+from src.db import DATABASE_URL
+from  src.db import *
 import asyncio
 from logging.config import fileConfig
 

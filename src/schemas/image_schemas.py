@@ -2,7 +2,7 @@ from pydantic import BaseModel, HttpUrl
 from uuid import UUID
 from fastapi import UploadFile
 import uuid
-from src.core.config import settings
+from src.db.cfg.config import settings
 
 class ImageSchema(BaseModel):
     id: UUID

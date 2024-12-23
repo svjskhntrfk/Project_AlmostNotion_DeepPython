@@ -7,11 +7,11 @@ from passlib.context import CryptContext
 from starlette.requests import Request
 from starlette.responses import HTMLResponse
 
-from src.core.database import *
-from src.auth.transport.router_reg import router as reg_router
-from src.router.router_boards import router as board_router
-from src.router.router_profile import router as profile_router
-from src.router.router_image import  router as image_router
+from src.db import *
+from src import router as reg_router
+from src import router as board_router
+from src import router as profile_router
+from src import  router as image_router
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 

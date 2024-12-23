@@ -2,10 +2,8 @@ import pytest
 import pytest_asyncio
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-from src.core.models import Base, User, Profile, Board
+from src.db import *
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-from src.core.models import Base, User, Board
-from src.core.database import *
 
 
 @pytest_asyncio.fixture(scope="session", autouse=True)

@@ -6,6 +6,7 @@ services:
     volumes:
       - .:/app
     environment:
+      - PYTHONPATH=/app
       - DB_HOST=postgres
       - DB_USER=postgres
       - DB_PASSWORD=postgres

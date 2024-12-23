@@ -2,6 +2,8 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+ENV PYTHONPATH=/app
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     curl \
@@ -18,4 +20,4 @@ COPY . .
 RUN mkdir -p static
 
 # Command to run the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
