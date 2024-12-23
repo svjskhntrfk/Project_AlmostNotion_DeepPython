@@ -6,12 +6,16 @@ from fastapi.templating import Jinja2Templates
 from passlib.context import CryptContext
 from starlette.requests import Request
 from starlette.responses import HTMLResponse
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from router_notification import check_and_send_notifications
+from datetime import datetime, timedelta
 
 from database import *
 from auth.transport.router_reg import router as reg_router
 from router_boards import router as board_router
 from router_profile import router as profile_router
 from router_image import  router as image_router
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
@@ -53,6 +57,16 @@ app.include_router(image_router)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
+
+# Настраиваем планировщик для проверки дедлайнов TodoList
+scheduler = AsyncIOScheduler()
+scheduler.add_job(
+    check_and_send_notifications,
+    'interval',
+    seconds=30,  # проверяем каждые 30 секунд
+    kwargs={'session': async_session_maker()}
+)
+scheduler.start()
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):

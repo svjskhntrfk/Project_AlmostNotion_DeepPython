@@ -37,7 +37,6 @@ async function uploadImage(event) {
 async function confirmUpload(file, currentMainSrc, currentHeaderSrc) {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('is_main', 'true');
 
     try {
         const response = await fetch('/image/upload-image', {

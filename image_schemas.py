@@ -6,7 +6,6 @@ import uuid
 class ImageSchema(BaseModel):
     id: UUID
     file: str
-    is_main: bool
     
     @property
     def url(self) -> str:
@@ -18,15 +17,11 @@ class ImageSchema(BaseModel):
         
 class ImageCreate(BaseModel):
     file: str
-    is_main: bool
 
-class ImageUploadRequest(BaseModel):
-    is_main: bool
 
 class ImageUploadResponse(BaseModel):
     id: UUID
     file: str
-    is_main: bool
     url: str
 
     class Config:
