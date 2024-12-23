@@ -1,0 +1,91 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    environment:
+      - DB_HOST=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=mydatabase
+      - DB_PORT=5432
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+      - MINIO_DOMAIN=minio:9000
+      - MINIO_REGION_NAME=us-east-1
+      - MINIO_MEDIA_BUCKET=media
+      - MINIO_STATIC_BUCKET=static
+      - MINIO_DATABASE_BUCKET=database
+      - MINIO_USE_SSL=false
+      - API_SECRET=e4a792f89fd542fbf74ea35aa02f86a0ce306086c292fb601bdfed7449a6086e
+      - HASH_SALT=a8536495aab331da48d5b6cab5c3b98c
+      - JWT_SECRET=c30f900157188ebb51cbf74b8644d4e381cd2e2cab577ced2e8ecea6bfe93abe
+      - ACCESS_TOKEN_TTL=900
+      - REFRESH_TOKEN_TTL=86400 
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_started
+
+  postgres:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=mydatabase
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    volumes:
+      - minio_data:/data
+      - ./create_buckets.sh:/docker-entrypoint-initdb.d/create_buckets.sh
+    command: server --console-address ":9001" /data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  createbuckets:
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      sleep 5;
+      /usr/bin/mc config host add myminio http://minio:9000 minioadmin minioadmin;
+      /usr/bin/mc mb myminio/media;
+      /usr/bin/mc policy set public myminio/media;
+      exit 0;
+      "
+
+volumes:
+  postgres_data:
+  minio_data:
+
+networks:
+  network1:
+    driver: overlay
+    driver_opts:
+      com.docker.network.driver.mtu: 1450

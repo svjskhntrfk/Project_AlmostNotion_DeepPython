@@ -30,11 +30,9 @@ a {
 }
 
 header {
-    position: absolute;
     top: 20px;
     right: 20px;
     display: flex;
-    align-items: center;
 }
 .phrase{
     position: absolute;
@@ -46,4 +44,17 @@ header {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 60%;
+}
+
+.img_icon {
+    width: 50px;
+    justify-content: flex-start;
+    margin: 8px 15px;
+}
+
+.navi {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-left: 1060px;
 }

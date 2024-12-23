@@ -19,7 +19,7 @@ header{
     border: 1px solid #C9C9C9;
     border-bottom-right-radius: 25px;
     border-bottom-left-radius: 25px;
-    margin-bottom: 50px;
+    margin-bottom: 30px;
     display: flex;
     align-items: center;
 }
@@ -44,7 +44,7 @@ body {
 .settings {
     width: 27%;
     background-color: #DD8E75;
-    height: 590px;
+    height: 680px;
     border: 1px solid #C9C9C9;
     border-radius: 25px;
     margin-left: 150px;
@@ -55,7 +55,7 @@ body {
 .info {
     width: 50%;
     background-color: #FFFFFF;
-    height: 550px;
+    height: 640px;
     border: 1px solid #C9C9C9;
     border-radius: 25px;
     margin-left: 20px;
@@ -179,7 +179,7 @@ h {
     color: #F0E4D8;
     font-size: 16px;
     display: block;
-    margin-top: 20px;
+    margin-top: 10px;
     margin-bottom: 20px;
     font-family: "Philosopher", sans-serif;
 }
@@ -196,4 +196,34 @@ label {
     display: flex;
     align-items: center;
     justify-content: flex-end;
+}
+
+.photo_info {
+    margin: 5px;
+}
+
+.user_photo_info {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: none;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.confirm-photo-btn {
+    width: 53%;
+    height: 35px;
+    border: none;
+    border-radius: 8px;
+    background-color: #B14F44;
+    color: #F0E4D8;
+    font-size: 16px;
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    font-family: "Philosopher", sans-serif;
 }

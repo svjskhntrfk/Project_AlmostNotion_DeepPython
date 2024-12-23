@@ -32,7 +32,6 @@ body {
     margin: 15px 0px;
 }
 a {
-    text-decoration: none;
     color: #F0E4D8;
     font-size: 15px;
 }
@@ -85,4 +84,15 @@ button {
     border-radius: 5px;
     margin-bottom: 15px;
     text-align: center;
+}
+
+.img_icon {
+    width: 50px;
+    justify-content: flex-start;
+    margin: 8px 15px;
+    border: none;
+}
+
+.lg {
+    color: black;
 }

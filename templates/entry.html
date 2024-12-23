@@ -1,24 +1,24 @@
 <!DOCTYPE HTML>
 <html lang="ru">
-  <div>
       <head>
         <meta charset="UTF-8">
         <title>MindSpace</title>
         <meta name="description" content="Описание страницы" />
-        <link rel="stylesheet" type="text/css" href="../static/css/style_entry.css" />
-
+        <link rel="stylesheet" type="text/css" href="../static/css/style_entry.css?v=3" />
+        <link rel="shortcut icon" type="image/x-icon" href="/static/img/icon_2.ico">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Philosopher:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
       </head>
       <body>
         <header>
+            <img src="/static/img/icon_2.png" class="img_icon">
         </header>
         <main>
             <section>
                 <div class="entry_section">
                     <p style="font-size: 30px; text-align: center">Вход<p>
-                    <form action="users/login" method="post">
+                    <form action="/users/login" method="post">
                         <label for="email"><p style="text-align: left">Логин</p></label>
                         <input class="in" type="text" id="email" name="email" required placeholder="Введите Ваш логин или email">
                         <label for="password"><p style="text-align: left">Пароль</p></label>
@@ -27,7 +27,7 @@
                     </form>
 
                     <div class="reg">
-                        <p>Еще нет аккаунта?   <a href="/registration" style="color: #000000; text-decoration: underline;">Зарегистрироваться</a></p>
+                        <p>Еще нет аккаунта?   <a href="/users/registration" style="color: #000000; text-decoration: underline;">Зарегистрироваться</a></p>
                     </div>
                 </div>
             </section>
@@ -35,5 +35,4 @@
         <footer>
         </footer>
       </body>
-  </div>
 </html>
