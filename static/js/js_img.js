@@ -1,46 +1,76 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // ... существующий код ...
+async function uploadImage(event) {
+    event.preventDefault();
+    const file = event.target.files[0];
 
-    // Добавляем обработчик для кнопки добавления изображения
-    const addImgBtn = document.getElementById('addImg');
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = 'image/*';
-    fileInput.style.display = 'none';
-    document.body.appendChild(fileInput);
+    if (!file) return;
 
-    addImgBtn.addEventListener('click', function() {
-        fileInput.click();
-    });
+    const currentMainSrc = document.getElementById('user_photo_main').src;
+    const currentHeaderSrc = document.getElementById('user_photo_header').src;
 
-    fileInput.addEventListener('change', async function() {
-        if (!this.files || !this.files[0]) return;
+    try {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const confirmButton = document.createElement('button');
+            confirmButton.textContent = 'Сохранить фото';
+            confirmButton.className = 'confirm-photo-btn';
+            confirmButton.onclick = () => confirmUpload(file);
 
-        const formData = new FormData();
-        formData.append('file', this.files[0]);
+            const photoInfo = document.querySelector('.photo_info');
 
-        try {
-            const boardId = window.location.pathname.split('/')[3];
-            const response = await fetch(`/board/main_page/${boardId}/add_image`, {
-                method: 'POST',
-                body: formData
-            });
+            const existingBtn = photoInfo.querySelector('.confirm-photo-btn');
+            if (existingBtn) {
+                existingBtn.remove();
+            }
+            photoInfo.appendChild(confirmButton);
+        };
 
-            if (!response.ok) throw new Error('Failed to upload image');
+        reader.readAsDataURL(file);
+    } catch (error) {
+        console.error('Error:', error);
+        displayError("An error occurred while processing the image.");
+    }
+}
 
-            const data = await response.json();
+async function confirmUpload(file, currentMainSrc, currentHeaderSrc) {
+    const formData = new FormData();
+    formData.append('file', file);
 
-            // Добавляем изображение в контейнер
-            const imagesContainer = document.querySelector('.images');
-            const newImage = document.createElement('img');
-            newImage.src = data.image_url;
-            newImage.alt = 'Image';
-            imagesContainer.appendChild(newImage);
+    try {
+        const response = await fetch('/board/upload-image', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
 
-        } catch (error) {
-            console.error('Error uploading image:', error);
-            alert('Ошибка при загрузке изображения');
+        if (!response.ok) {
+            throw new Error('Upload failed');
         }
-    });
 
-});
+        const data = await response.json();
+        if (data.url) {
+            const finalUrl = data.url;
+
+            const confirmButton = document.querySelector('.confirm-photo-btn');
+            if (confirmButton) {
+                confirmButton.remove();
+            }
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
+        } else {
+            throw new Error('No URL in response');
+        }
+    } catch (error) {
+        console.error('Upload error:', error);
+        displayError("Произошла ошибка при загрузке изображения. Maximum file size: 5MB");
+    }
+}
+
+function displayError(message) {
+    const errorMessageDiv = document.getElementById("error-message-upload");
+    errorMessageDiv.textContent = message;
+    errorMessageDiv.style.display = "block";
+}
