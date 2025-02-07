@@ -1,60 +1,46 @@
-# AlmostNotion project
+# MindSpace - Task Management Platform
 
-## Возможности:
-* Регистрация пользователя
-* Создание нескольких досок для одного пользователя
-* Создание и редактирование текста в доске
-* Добавление картинок( в разработке)
+## Overview
+MindSpace is a collaborative task management platform that helps users organize their work through boards, tasks, and to-do lists. Built with FastAPI and modern web technologies, it offers a user-friendly interface for managing projects and tasks.
 
-## Стек технологий:
-### Backend:
-   * FastAPI
+## Features
+- 👤 User Authentication
+  - Email-based registration and login
+  - JWT token-based authentication
+  - Password validation and security
+
+- 📋 Boards Management
+  - Create multiple boards per user
+  - Collaborative board sharing
+  - Text content creation and editing
+
+- ✅ Task Management
+  - Create to-do lists with deadlines
+  - Task completion tracking
+  - Email notifications for upcoming deadlines
+
+- 🖼️ Media Support
+  - Profile picture upload
+  - S3-compatible storage integration
+  - Image optimization and WebP conversion
+
+## Tech Stack
+### Backend
+- FastAPI
+- SQLAlchemy (Async)
+- PostgreSQL
+- JWT Authentication
+- APScheduler for notifications
 
 ### Frontend
-* HTML
-* CSS
+- HTML/CSS
+- JavaScript
+- Jinja2 Templates
 
-### Базы данных:
-* PostgreSQL
+### Storage
+- S3-compatible object storage
+- PostgreSQL database
 
-## Cхема проекта:
-* https://app.eraser.io/workspace/4ipEndZHsYKZ7cctKYBQ
-
-## Команда:
-* Frontend Developer - @ann_eri
-* Backend (Database) Developer - @horny_jesus_christ
-* Backend Developer - @svjskhn_trfk
-* Backend Developer - @siehfis
-
-
-## Работа с проектом локально:
-**Запускать через терминал:** 
-uvicorn main:app 
-
-Для работы с проектом надо **скачать PostgreSQL и создать базу данных локально**. Вот инструкция как это сделать.
-
-Открываем терминал в нашем IDE и пишем следующие команды:
-
-### Скачать на MacOS:
-> brew install postgresql\
-> brew services start postgresql
-
-### Скачать на Ubuntu:
-> sudo apt install postgres
-
-### Дальше инструкция для всех одинаковая:
->whoami #получаем имя пользователя\
->psql -U 'имя пользователя' -d postgres\
->CREATE DATABASE mydatabase; #создаем нашу базу данных, команду обязательно написать с ;\
->\l #принтим всем дб, которые созданы на вашем компе\
->\q #закрываем
-
-
-### После установки PostgreSQL 
-надо зайти в файл **.env** и поменять **DB_user на имя пользователя** (то, что вывела команда whoami) и так же поменять **DB_PASSWORD**. 
-
-#### Вот команды для изменения пароля:
-> sudo -u postgres psql
-> \c название_базы_данных
-> ALTER USER имя_пользователя WITH PASSWORD 'новый_пароль';
-> \q
+### Infrastructure
+- Docker containerization
+- SMTP email integration (Gmail)
