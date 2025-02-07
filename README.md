@@ -44,3 +44,4 @@ MindSpace is a collaborative task management platform that helps users organize 
 ### Infrastructure
 - Docker containerization
 - SMTP email integration (Gmail)
+![alt-text](https://github.com/svjskhntrfk/Project_AlmostNotion_DeepPython/blob/main/IMG_9012.gif)
